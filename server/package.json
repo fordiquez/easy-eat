@@ -1,0 +1,50 @@
+{
+  "name": "easy-eat",
+  "version": "1.0.0",
+  "description": "Server for Easy-Eat project based on Node.js & Express framework and Mongo & Mongoose for database API queries",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fordiquez/easy-eat.git"
+  },
+  "keywords": [
+    "node.js",
+    "express",
+    "mongo",
+    "mongoose",
+    "restful",
+    "api",
+    "jwt",
+    "token"
+  ],
+  "author": "Ruslan Tsiapko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fordiquez/easy-eat/issues"
+  },
+  "homepage": "https://github.com/fordiquez/easy-eat#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^14.3.2",
+    "express": "^4.17.2",
+    "express-jwt": "^6.1.0",
+    "joi": "^17.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.3.1",
+    "mongoose": "^6.1.8",
+    "nodemailer": "^6.7.2",
+    "rootpath": "^0.1.2",
+    "swagger-ui-express": "^4.3.0",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
