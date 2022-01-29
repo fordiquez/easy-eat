@@ -1,12 +1,12 @@
 import { createStore } from 'vuex'
-import { alert } from "@/store/alert";
 import { account } from "@/store/account";
+import { alert } from "@/store/alert";
 import { products } from "@/store/product";
 
 export default createStore({
   modules: {
-    alert,
     account,
+    alert,
     products
   }
 })

@@ -1,12 +1,12 @@
 <template>
-  <h3>Admin</h3>
+  <h2>Admin</h2>
   <p>This section can only be accessed by administrators.</p>
-  <button class="btn btn-primary">Manage Users</button>
+  <router-link :to="{ name: 'UsersList' }" class="btn btn-primary">Manage Users</router-link>
 </template>
 
 <script>
 export default {
-  name: "AdminIndex"
+  name: "Admin"
 }
 </script>
 

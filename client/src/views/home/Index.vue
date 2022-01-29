@@ -2,14 +2,15 @@
   <div>
     <h2 v-if="user">Hola, {{ user.firstName }}!</h2>
     <p>You're logged in with Vue 3 & JWT!</p>
-    <button @click="signOut" class="btn btn-primary">Logout</button>
+    <button @click="onLogout" class="btn btn-primary">Logout</button>
   </div>
 </template>
 
 <script>
-import {mapActions, mapGetters, mapState} from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
+  name: "Home",
   data() {
     return {
       user: null
@@ -19,16 +20,13 @@ export default {
     this.getUser.subscribe(user => this.user = user)
   },
   computed: {
-    ...mapState('account', ['status', 'response']),
     ...mapGetters('account', ['getUser']),
   },
   methods: {
-    ...mapActions({
-      logout: 'account/logout',
-    }),
-    async signOut() {
+    ...mapActions('account', ['logout']),
+    async onLogout() {
       await this.logout().then(async () => {
-        await this.$router.push({name: 'Login'});
+        await this.$router.push({ name: 'Login' });
       })
     },
   }

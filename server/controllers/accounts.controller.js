@@ -104,12 +104,7 @@ const revokeTokenSchema = (req, res, next) => {
 }
 
 const revokeToken = (req, res, next) => {
-  // accept token from request body or cookie
-  // const token = req.cookies.refreshToken || req.headers.authorization;
   const token = req.cookies.refreshToken
-  console.log(req.headers)
-  console.log(req.cookies)
-  const ipAddress = req.ip;
 
   if (!token) return res.status(400).json({ message: 'Token is required' });
 
@@ -118,7 +113,7 @@ const revokeToken = (req, res, next) => {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  accountService.revokeToken({ token, ipAddress }).then(response => res.json(response)).catch(next);
+  accountService.revokeToken(token).then(response => res.json(response)).catch(next);
 }
 
 const getAll = (req, res, next) => {
@@ -186,7 +181,7 @@ const _delete = (req, res, next) => {
   }
 
   accountService.delete(req.params.id)
-    .then(() => res.json({ message: 'Account deleted successfully' }))
+    .then(account => res.json(account))
     .catch(next);
 }
 

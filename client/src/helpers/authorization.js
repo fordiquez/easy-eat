@@ -21,9 +21,7 @@ export const getToken = () => {
   return isToken ? JSON.parse(localStorage.getItem('jwtToken')) : false
 }
 
-export const isTokenExpired = (expires) => {
-  return expires < new Date().getTime()
-}
+export const isTokenExpired = (expires) => expires < new Date().getTime()
 
 export const tokenExpirationTime = ({ jwtToken }) => {
   // parse json object from base64 encoded jwt token

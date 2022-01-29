@@ -1,15 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getUser, isAuthorized } from "@/helpers/authorization";
-import { Role } from "@/helpers/role";
+import { getUser, isAuthorized } from "@/helpers/authorization"
+import { Role } from "@/helpers/role"
 import Home from "@/views/home/Index"
-import Login from "@/views/account/Login.vue"
+import Login from "@/views/account/Login"
 import Register from "@/views/account/Register"
-import ForgotPassword from "@/views/account/ForgotPassword";
-import VerifyEmail from "@/views/account/VerifyEmail";
-import ResetPassword from "@/views/account/ResetPassword";
+import ForgotPassword from "@/views/account/ForgotPassword"
+import VerifyEmail from "@/views/account/VerifyEmail"
+import ResetPassword from "@/views/account/ResetPassword"
 import Profile from "@/views/profile/Index"
-import Update from "@/views/profile/Update";
-import AdminIndex from "@/views/admin/Index"
+import ProfileUpdate from "@/views/profile/Update"
+import Admin from "@/views/admin/Index"
+import UsersList from "@/views/admin/users/List"
+import UserCreate from "@/views/admin/users/Create"
+import UserEdit from "@/views/admin/users/Edit"
 
 const routes = [
   {
@@ -27,13 +30,31 @@ const routes = [
   {
     path: '/profile/update',
     name: 'ProfileUpdate',
-    component: Update,
+    component: ProfileUpdate,
     meta: { authorized: [] }
   },
   {
     path: '/admin',
-    name: 'AdminIndex',
-    component: AdminIndex,
+    name: 'Admin',
+    component: Admin,
+    meta: { authorized: [Role.Admin] }
+  },
+  {
+    path: '/admin/users',
+    name: 'UsersList',
+    component: UsersList,
+    meta: { authorized: [Role.Admin] }
+  },
+  {
+    path: '/admin/users/create',
+    name: 'UserCreate',
+    component: UserCreate,
+    meta: { authorized: [Role.Admin] }
+  },
+  {
+    path: '/admin/users/edit/:id',
+    name: 'UserEdit',
+    component: UserEdit,
     meta: { authorized: [Role.Admin] }
   },
   {

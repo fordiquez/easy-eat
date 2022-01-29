@@ -1,5 +1,6 @@
 import axios from "axios";
-import { getCookie, getToken, isTokenExpired } from "@/helpers/authorization";
+import { getCookie, getToken, isTokenExpired, tokenExpirationTime } from "@/helpers/authorization";
+import store from '@/store/index'
 
 axios.defaults.withCredentials = true
 
@@ -28,6 +29,13 @@ DefaultAPIInstance.interceptors.request.use(async (config) => {
   if (cookie && token && expires && isTokenExpired(expires)) {
     const refreshInstance = axios.create(defaultConfig)
     await refreshInstance.post('/accounts/refresh-token').then(response => {
+      const expires = tokenExpirationTime(response.data)
+      const jwtToken = {
+        token: response.data.jwtToken,
+        expires
+      }
+      store.commit('account/SET_USER', response.data)
+      store.commit('account/SET_TOKEN', jwtToken)
       config.headers['Authorization'] = `Bearer ${response.data.jwtToken}`
     }).catch(error => {
       return Promise.reject(error)

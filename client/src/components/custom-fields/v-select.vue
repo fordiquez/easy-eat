@@ -39,10 +39,6 @@ export default defineComponent({
       type: Array,
       default: () => [],
     },
-    // preselectedValue: {
-    //   type: String,
-    //   default: null,
-    // },
     errors: {
       type: Array,
       default: () => [],

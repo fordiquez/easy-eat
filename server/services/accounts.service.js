@@ -149,13 +149,9 @@ const refreshToken = async ({ token, ipAddress }) => {
   };
 }
 
-const revokeToken = async ({ token, ipAddress }) => {
+const revokeToken = async (token) => {
   const refreshToken = await getRefreshToken(token);
-
-  // revoke token and save
-  // refreshToken.revoked = Date.now();
-  // refreshToken.revokedByIp = ipAddress;
-  // await refreshToken.save();
+  console.log(refreshToken)
   // remove token from the collection
   await refreshToken.remove();
   return {
@@ -188,7 +184,10 @@ const create = async (params) => {
   // save account
   await account.save();
 
-  return basicDetails(account);
+  return {
+    ...basicDetails(account),
+    message: 'The user account has been successfully created.'
+  };
 }
 
 const update = async (id, params) => {
@@ -209,12 +208,20 @@ const update = async (id, params) => {
   account.updated = Date.now();
   await account.save();
 
-  return basicDetails(account);
+  return {
+    ...basicDetails(account),
+    message: 'The user account has been successfully updated.'
+  };
 }
 
 const _delete = async (id) => {
   const account = await getAccount(id);
+  await db.RefreshToken.deleteMany({ account: id })
   await account.remove();
+
+  return {
+    message: 'The user account has been successfully deleted.'
+  }
 }
 
 // helper functions
@@ -267,7 +274,7 @@ const sendVerificationEmail = async (account, origin) => {
   if (origin) {
     const verifyUrl = `${origin}/account/verify-email?token=${account.verificationToken}`;
     message = `<p>Please click the below link to verify your email address:</p>
-                   <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
+                   <p><a href="${verifyUrl}" target="_blank">${verifyUrl}</a></p>`;
   } else {
     message = `<p>Please use the below token to verify your email address with the <code>/account/verify-email</code> api route:</p>
                    <p><code>${account.verificationToken}</code></p>`;
@@ -304,7 +311,7 @@ const sendPasswordResetEmail = async (account, origin) => {
   if (origin) {
     const resetUrl = `${origin}/account/reset-password?token=${account.resetToken.token}`;
     message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
-                   <p><a href="${resetUrl}">${resetUrl}</a></p>`;
+                   <p><a href="${resetUrl}" target="_blank">${resetUrl}</a></p>`;
   } else {
     message = `<p>Please use the below token to reset your password with the <code>/account/reset-password</code> api route:</p>
                    <p><code>${account.resetToken.token}</code></p>`;

@@ -1,11 +1,11 @@
 <template>
   <Nav :user="user" />
   <div class="container">
-    <div class="row">
-      <div class="col-sm-10 offset-sm-1 mt-5">
+<!--    <div class="row">-->
+<!--      <div class="col-sm-10 offset-sm-1 mt-5">-->
         <router-view></router-view>
-      </div>
-    </div>
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -13,19 +13,16 @@
 import { mapState, mapActions, mapGetters } from 'vuex'
 import { getCookie } from "@/helpers/authorization";
 import Nav from "@/components/Nav";
-import {accountService} from "@/services";
 
 export default {
   name: 'app',
-  components: {Nav},
+  components: { Nav },
   data() {
     return {
       user: null
     }
   },
   created() {
-    // this.getUser.subscribe(user => this.user = user)
-    // this.user = this.getUserValue
     this.getUser.subscribe(user => this.user = user)
   },
   mounted() {
@@ -41,7 +38,6 @@ export default {
   methods: {
     ...mapActions({
       clearAlert: 'alert/clear',
-      refreshToken: 'account/refreshToken',
       clearResponse: 'account/clear',
     }),
   },

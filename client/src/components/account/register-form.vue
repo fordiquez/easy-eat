@@ -63,7 +63,6 @@ import { required, email, sameAs, helpers } from "@vuelidate/validators";
 import { defineComponent } from "vue";
 import { mapActions, mapState } from "vuex";
 import VInput from "@/components/custom-fields/v-input"
-import VRadio from "@/components/custom-fields/v-radio"
 import VCheckbox from "@/components/custom-fields/v-checkbox";
 
 export default defineComponent({
@@ -71,7 +70,6 @@ export default defineComponent({
   components: {
     VCheckbox,
     VInput,
-    VRadio
   },
   setup() {
     return { v$: useVuelidate() };
@@ -91,8 +89,8 @@ export default defineComponent({
         firstName: '',
         lastName: '',
         email: '',
-        password: "",
-        passwordConfirm: "",
+        password: '',
+        passwordConfirm: '',
         acceptTerms: false,
       },
     };

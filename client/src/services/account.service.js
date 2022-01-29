@@ -52,41 +52,23 @@ const resetPassword = (token, password, passwordConfirm) => {
 }
 
 const getAll = () => {
-  const requestOptions = {
-    method: 'GET',
-    headers: authHeader()
-  };
+  return DefaultAPIInstance.get(`${baseURL}/`)
+}
 
-  return fetch(`${config.apiUrl}/accounts`, requestOptions).then(handleResponse);
+const create = (user) => {
+  return DefaultAPIInstance.post(`${baseURL}/`, user)
 }
 
 const getById = (id) => {
-  const requestOptions = {
-    method: 'GET',
-    headers: authHeader()
-  };
-
-  return fetch(`${config.apiUrl}/accounts/${id}`, requestOptions).then(handleResponse);
+  return DefaultAPIInstance.get(`${baseURL}/${id}`)
 }
 
-const update = (user) => {
-  const requestOptions = {
-    method: 'PUT',
-    headers: { ...authHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(user)
-  };
-
-  return fetch(`${config.apiUrl}/accounts/${user.id}`, requestOptions).then(handleResponse);
+const update = (id, payloads) => {
+  return DefaultAPIInstance.put(`${baseURL}/${id}`, payloads)
 }
 
-// prefixed function name with underscore because delete is a reserved word in javascript
 const _delete = (id) => {
-  const requestOptions = {
-    method: 'DELETE',
-    headers: authHeader()
-  };
-
-  return fetch(`${config.apiUrl}/accounts/${id}`, requestOptions).then(handleResponse);
+  return DefaultAPIInstance.delete(`${baseURL}/${id}`)
 }
 
 export const accountService = {
@@ -98,4 +80,9 @@ export const accountService = {
   forgotPassword,
   validateResetToken,
   resetPassword,
+  getAll,
+  create,
+  getById,
+  update,
+  delete: _delete
 };

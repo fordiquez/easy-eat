@@ -11,7 +11,7 @@
 import { mapGetters } from "vuex";
 
 export default {
-  name: "Index",
+  name: "Profile",
   data() {
     return {
       user: null

@@ -20,7 +20,7 @@
             <router-link aria-current="page" exact-active-class="active" active-class="active" :to="{ name: 'Profile' }" class="nav-link px-2 text-secondary">Profile</router-link>
           </li>
           <li v-if="isAdmin">
-            <router-link aria-current="page" exact-active-class="active" active-class="active" :to="{ name: 'AdminIndex' }" class="nav-link px-2 text-secondary">Admin</router-link>
+            <router-link aria-current="page" exact-active-class="active" active-class="active" :to="{ name: 'Admin' }" class="nav-link px-2 text-secondary">Admin</router-link>
           </li>
         </ul>
 
@@ -42,7 +42,7 @@
             <li><button class="dropdown-item" href="#">Settings</button></li>
             <li><router-link :to="{ name: 'Profile' }" class="dropdown-item">Profile</router-link></li>
             <li><hr class="dropdown-divider"></li>
-            <li><button class="dropdown-item" @click="signOut">Sign out</button></li>
+            <li><button class="dropdown-item" @click="onLogout">Logout</button></li>
           </ul>
         </div>
       </div>
@@ -69,10 +69,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      logout: 'account/logout',
-    }),
-    async signOut() {
+    ...mapActions('account', ['logout']),
+    async onLogout() {
       await this.logout().then(async () => {
         await this.$router.push({name: 'Login'});
       })

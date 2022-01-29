@@ -47,15 +47,6 @@ export default defineComponent({
   setup() {
     return { v$: useVuelidate() };
   },
-  watch: {
-    formData: {
-      handler(value) {
-        this.$emit("formData", value);
-      },
-      deep: true,
-      immediate: true,
-    },
-  },
   data() {
     return {
       formData: {
@@ -76,6 +67,15 @@ export default defineComponent({
         },
       },
     };
+  },
+  watch: {
+    formData: {
+      handler(value) {
+        this.$emit("formData", value);
+      },
+      deep: true,
+      immediate: true,
+    },
   },
   computed: {
     ...mapState('account', ['status', 'response'])

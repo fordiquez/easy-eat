@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-center mb-4 mt-3">Update Profile</h1>
+  <h1 class="text-center mb-4 mt-3">Edit user account</h1>
   <form class="card" @submit.prevent="onSubmit">
     <div class="card-body">
       <v-input
@@ -23,6 +23,21 @@
           :errors="v$.user.email.$errors"
           :isValidData="!v$.user.email.$invalid">
       </v-input>
+      <label class="me-2">Account role</label>
+      <v-radio
+          label="User"
+          value="User"
+          v-model="v$.user.role.$model"
+          :errors="v$.user.role.$errors"
+          :isValidData="!v$.user.role.$invalid">
+      </v-radio>
+      <v-radio
+          label="Admin"
+          value="Admin"
+          v-model="v$.user.role.$model"
+          :errors="v$.user.role.$errors"
+          :isValidData="!v$.user.role.$invalid">
+      </v-radio>
       <v-input
           type="password"
           label="Create your password"
@@ -55,11 +70,11 @@
 import VInput from "@/components/custom-fields/v-input";
 import useVuelidate from "@vuelidate/core";
 import {email, helpers, minLength, required, sameAs} from "@vuelidate/validators";
-import {mapActions, mapGetters, mapState} from "vuex";
+import {mapActions, mapState} from "vuex";
 import VRadio from "@/components/custom-fields/v-radio";
 
 export default {
-  name: "ProfileUpdate",
+  name: "UserEdit",
   components: {
     VRadio,
     VInput,
@@ -76,8 +91,7 @@ export default {
     };
   },
   mounted() {
-    const { id } = this.getUserValue
-    this.getUser(id)
+    this.getUser(this.$route.params.id)
   },
   validations() {
     return {
@@ -92,6 +106,9 @@ export default {
           required: helpers.withMessage('This field cannot be empty', required),
           email: helpers.withMessage('This field has an invalid email address', email)
         },
+        role: {
+          required: helpers.withMessage('This field must be selected', required)
+        },
         password: {
           minLength: helpers.withMessage('Password must have at least 6 characters', minLength(6))
         },
@@ -102,8 +119,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('account', ['status', 'response']),
-    ...mapGetters('account', ['getUserValue'])
+    ...mapState('account', ['status', 'response'])
   },
   methods: {
     ...mapActions({
@@ -116,7 +132,7 @@ export default {
       const validated = await this.v$.$validate()
       if (validated) {
         console.table(this.user)
-        await this.update(this.user).then(async res => {
+        await this.update(this.user).then(async (res) => {
           console.log(res)
           if (this.status.success) {
             await this.success(this.response)
