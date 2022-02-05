@@ -10,7 +10,7 @@ const register = async (params, origin) => {
   if (await db.Account.findOne({ email: params.email })) {
     // send already registered error in email to prevent account enumeration
     // await sendAlreadyRegisteredEmail(params.email, origin);
-    throw 'Account with such email has already been registered.'
+    throw 'Account with such email has already been registered'
   }
 
   // create account object
@@ -29,9 +29,12 @@ const register = async (params, origin) => {
 
   // send email
   await sendVerificationEmail(account, origin);
-  const message = `Congratulations, ${params.firstName}! Your account has been successfully registered. Please check your email ${params.email} to verify the account.`
+  const messages = {
+    success: `Congratulations, ${params.firstName}! Your account has been successfully registered`,
+    info: `Please check your email ${params.email} to verify the account`
+  }
   return {
-    message,
+    messages,
     user: {
       ...basicDetails(account)
     }
@@ -41,15 +44,15 @@ const register = async (params, origin) => {
 const verifyEmail = async ({ token }) => {
   const account = await db.Account.findOne({ verificationToken: token });
 
-  if (!account) throw 'Verification failed. Account with such token has not found.';
-  if (account.verified) throw 'Account has already been verified.';
+  if (!account) throw 'Verification failed. Account with such token has not found';
+  if (account.verified) throw 'Account has already been verified';
 
   account.isVerified = false;
   account.verified = Date.now();
   // account.verificationToken = undefined;
   await account.save();
   return {
-    message: 'Verification successful, you can now login.'
+    message: 'Verification was successful, you can now log in into your account'
   }
 }
 
@@ -57,7 +60,7 @@ const forgotPassword = async ({ email }, origin) => {
   const account = await db.Account.findOne({ email });
 
   // always return ok response to prevent email enumeration
-  if (!account) throw 'Account with such email has not found.';
+  if (!account) throw 'Account with such email has not found';
 
   // create reset token that expires after 24 hours
   account.resetToken = {
@@ -82,7 +85,7 @@ const validateResetToken = async ({ token }) => {
   if (!account) throw 'Invalid token';
 
   return {
-    message: 'Token is valid'
+    message: 'The reset token has been confirmed, you can now come up with a new password for your account'
   }
 }
 
@@ -100,7 +103,7 @@ const resetPassword = async ({ token, password }) => {
   account.resetToken = undefined;
   await account.save();
   return {
-    message: 'Password reset successfully, you can now login'
+    message: 'Password reset successfully, you can now log in into your account'
   }
 }
 
@@ -186,7 +189,7 @@ const create = async (params) => {
 
   return {
     ...basicDetails(account),
-    message: 'The user account has been successfully created.'
+    message: 'The user account has been successfully created'
   };
 }
 
@@ -210,7 +213,7 @@ const update = async (id, params) => {
 
   return {
     ...basicDetails(account),
-    message: 'The user account has been successfully updated.'
+    message: 'The user account has been successfully updated'
   };
 }
 
@@ -220,7 +223,7 @@ const _delete = async (id) => {
   await account.remove();
 
   return {
-    message: 'The user account has been successfully deleted.'
+    message: 'The user account has been successfully deleted'
   }
 }
 

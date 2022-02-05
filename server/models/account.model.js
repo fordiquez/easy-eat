@@ -7,7 +7,7 @@ const schema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   role: { type: String, required: true },
-  acceptTerms: Boolean,
+  acceptedTerms: Boolean,
   verificationToken: String,
   verified: Date,
   resetToken: {

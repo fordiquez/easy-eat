@@ -2,33 +2,50 @@
   <div>
     <h2 v-if="user">Hola, {{ user.firstName }}!</h2>
     <p>You're logged in with Vue 3 & JWT!</p>
-    <button @click="onLogout" class="btn btn-primary">Logout</button>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: "Home",
   data() {
     return {
-      user: null
+      user: null,
+      query: ''
     }
   },
   created() {
     this.getUser.subscribe(user => this.user = user)
   },
+  mounted() {
+  },
   computed: {
     ...mapGetters('account', ['getUser']),
   },
   methods: {
-    ...mapActions('account', ['logout']),
+    ...mapActions({
+      logout: 'account/logout',
+      search: 'product/search'
+    }),
     async onLogout() {
       await this.logout().then(async () => {
         await this.$router.push({ name: 'Login' });
       })
     },
+    async nutritionAnalysis() {
+      const options = {
+        params: {
+          ingr: this.query
+        }
+      }
+      await this.search(options).then(response => {
+        console.log(response)
+      }).catch(error => {
+        console.log(error)
+      })
+    }
   }
 }
 </script>

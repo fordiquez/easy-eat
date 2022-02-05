@@ -1,17 +1,18 @@
 import axios from "axios";
-import { getCookie, getToken, isTokenExpired, tokenExpirationTime } from "@/helpers/authorization";
+import { getCookie, getToken, isTokenExpired, tokenExpirationTime } from "@/utils/authorization";
 import store from '@/store/index'
 
 axios.defaults.withCredentials = true
 
-const authConfig = {
-  baseURL: process.env.VUE_APP_BASE_URL,
+const rapidConfig = {
+  baseURL: process.env.VUE_APP_RAPID_API_NUTRITION_ANALYSIS_URL,
   headers: {
-    'Content-Type': 'application/json'
+    'x-rapidapi-host': process.env.VUE_APP_RAPID_API_HOST,
+    'x-rapidapi-key': process.env.VUE_APP_RAPID_API_KEY
   }
 }
 
-export const AuthAPIInstance = axios.create(authConfig)
+export const RapidAPIInstance = axios.create(rapidConfig)
 
 const defaultConfig = {
   baseURL: process.env.VUE_APP_BASE_URL,

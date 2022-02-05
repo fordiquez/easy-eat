@@ -1,22 +1,15 @@
 <template>
-  <Nav :user="user" />
-  <div class="container">
-<!--    <div class="row">-->
-<!--      <div class="col-sm-10 offset-sm-1 mt-5">-->
-        <router-view></router-view>
-<!--      </div>-->
-<!--    </div>-->
-  </div>
+  <component :user="user" :is="layout" />
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from 'vuex'
-import { getCookie } from "@/helpers/authorization";
-import Nav from "@/components/Nav";
+import { mapActions, mapGetters, mapState } from 'vuex'
+import { getCookie } from "@/utils/authorization"
+import DefaultLayout from "@/layouts/default"
 
 export default {
   name: 'app',
-  components: { Nav },
+  components: {DefaultLayout},
   data() {
     return {
       user: null
@@ -24,12 +17,16 @@ export default {
   },
   created() {
     this.getUser.subscribe(user => this.user = user)
+    // this.user = this.getUserValue
   },
   mounted() {
     const cookie = getCookie('refreshToken')
     console.log('refreshToken cookie: ' + cookie)
   },
   computed: {
+    layout() {
+      return this.$route.meta.layout || 'DefaultLayout'
+    },
     ...mapState({
       alert: state => state.alert,
     }),
@@ -37,37 +34,13 @@ export default {
   },
   methods: {
     ...mapActions({
-      clearAlert: 'alert/clear',
-      clearResponse: 'account/clear',
+      clear: 'alert/clear'
     }),
   },
   watch: {
-    $route(to, from) {
-      this.clearAlert()
-      setTimeout(() => this.clearResponse(), 5000)
+    $route() {
+      this.clear()
     }
   }
 };
 </script>
-
-<style>
-@import "../node_modules/bootstrap/dist/css/bootstrap.css";
-
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-}
-a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-a .router-link-exact-active {
-  color: #42b983;
-}
-
-</style>

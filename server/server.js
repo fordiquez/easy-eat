@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const errorHandler = require('middlewares/error-handler');
 const accountsRoutes = require('routes/accounts.routes')
+const productsRoutes = require('routes/products.routes')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -25,6 +26,7 @@ app.use(cors(corsOptions));
 
 // api routes
 app.use('/accounts', accountsRoutes);
+app.use('/products', productsRoutes);
 
 // swagger docs route
 app.use('/api-docs', require('helpers/swagger.helper'));

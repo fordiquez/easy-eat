@@ -1,59 +1,61 @@
 <template>
-  <div class="card">
-    <h3 class="card-header">Forgot Password</h3>
-    <div class="card-body">
-      <form @submit.prevent="onSubmit">
-        <v-input
-            type="email"
-            label="Email"
-            v-model="v$.email.$model"
-            :errors="v$.email.$errors"
-            :isValidData="!v$.email.$invalid">
-        </v-input>
-        <div class="d-flex justify-content-start">
-          <button type="submit" class="btn btn-primary" :disabled="v$.$invalid || status.loading">
-            <span v-show="!status.loading">Submit</span>
-            <span v-show="status.loading">
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Loading...
-          </span>
-          </button>
-          <router-link :to="{ name: 'Login' }" class="btn btn-outline-primary ms-3">Cancel</router-link>
-        </div>
-      </form>
-    </div>
-  </div>
+  <v-card :loading="status.loading" flat>
+    <v-card-title>Account recovery</v-card-title>
+    <v-card-subtitle class="pb-0">Please enter the email from your account</v-card-subtitle>
+    <v-form ref="form" @submit.prevent="submit">
+      <v-container fluid>
+        <v-row>
+          <v-col cols="12">
+            <v-text-field
+                v-model="email"
+                :error-messages="emailErrors"
+                prepend-icon="mdi-email-outline"
+                label="E-mail address"
+                placeholder="Enter your e-mail address"
+                @blur="$v.email.$touch()"
+                @input="$v.email.$touch()" />
+          </v-col>
+
+          <v-col cols="12">
+            <v-card-actions>
+              <v-btn class="mr-4" :loading="status.loading" :disabled="status.loading" color="success" type="submit">Reset</v-btn>
+              <v-btn class="mr-4" color="primary" :to="{ name: 'Login' }">Cancel</v-btn>
+            </v-card-actions>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-form>
+  </v-card>
 </template>
 
 <script>
-import VInput from "@/components/custom-fields/v-input";
-import useVuelidate from "@vuelidate/core";
-import { email, helpers, required } from "@vuelidate/validators";
-import { mapActions, mapState } from "vuex";
+import {mapActions, mapState} from "vuex";
+import { required, email } from "vuelidate/lib/validators";
+import {validationMixin} from "vuelidate";
 
 export default {
   name: "ForgotPassword",
-  components: {
-    VInput
-  },
-  setup() {
-    return { v$: useVuelidate() };
-  },
-  data() {
-    return {
-      email: ''
-    }
-  },
-  validations() {
-    return {
-      email: {
-        required: helpers.withMessage('This field cannot be empty', required),
-        email: helpers.withMessage('This field has an invalid email address', email)
-      },
-    };
+  mixins: [ validationMixin ],
+  data: () => ({
+    email: ''
+  }),
+  validations: {
+    email: {
+      required,
+      email
+    },
   },
   computed: {
-    ...mapState('account', ['status', 'response'])
+    ...mapState('alert', ['status']),
+    emailErrors() {
+      const errors = []
+      if (!this.$v.email.$dirty) {
+        return errors
+      }
+      !this.$v.email.email && errors.push('Must be valid e-mail')
+      !this.$v.email.required && errors.push('E-mail is required')
+      return errors
+    },
   },
   methods: {
     ...mapActions({
@@ -61,11 +63,11 @@ export default {
       success: 'alert/success',
       error: 'alert/error'
     }),
-    async onSubmit() {
-      const validated = await this.v$.$validate()
-      if (validated) {
-        await this.forgotPassword(this.email).then(async () => {
-          this.status.success ? this.success(this.response) : this.error(this.response)
+    async submit() {
+      this.$v.$touch()
+      if (!this.$v.$invalid) {
+        await this.forgotPassword(this.email).then(response => {
+          console.log(response)
         })
       }
     }

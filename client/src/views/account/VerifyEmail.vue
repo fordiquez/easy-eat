@@ -1,24 +1,16 @@
 <template>
-  <div class="card">
-    <div class="card-header">
-      <h3>Email Verification</h3>
-    </div>
-    <div class="card-body">
-      <div v-if="status.loading" class="d-flex justify-content-center align-items-center">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Verifying...</span>
-        </div>
-        <span class="h5 mb-0 ms-2">Verifying...</span>
-      </div>
-      <span v-else-if="status.success">Verification successful, you can now login.</span>
-      <div v-else>
-        Verification failed, you can also verify your account using the
-        <router-link :to="{ name: 'ForgotPassword' }" class="link-primary text-decoration-none">forgot password</router-link>
-        page.
-      </div>
-    </div>
-  </div>
-
+  <v-card v-if="!status.success" :loading="status.loading" shaped>
+    <v-card-title>Email verification</v-card-title>
+    <v-card-subtitle class="pb-0" v-if="status.error">Verification failed</v-card-subtitle>
+    <v-card-text class="text--primary text-button" v-if="status.error">
+      <span>if you don't have a verification token try to restore the account using the</span>
+      <v-btn color="primary" :to="{ name: 'ForgotPassword' }" plain text>forgot password</v-btn>
+      <span>page</span>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="primary" :to="{ name: 'Login' }" text>Sign in</v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
@@ -26,30 +18,40 @@ import { mapActions, mapState } from "vuex";
 
 export default {
   name: "VerifyEmail",
-  mounted() {
-    this.verify()
+  async mounted() {
+    const { token } = this.$route.query
+    await this.verify(token)
   },
   computed: {
-    ...mapState('account', ['status', 'response'])
+    ...mapState('alert', ['status', 'message'])
   },
   methods: {
     ...mapActions({
       verifyEmail: 'account/verifyEmail',
       success: 'alert/success',
-      error: 'alert/error'
+      error: 'alert/error',
+      info: 'alert/info'
     }),
-    async verify() {
-      const { token } = this.$route.query
-      await this.$router.replace(location.pathname)
-      console.log(token)
-      await this.verifyEmail(token).then(async () => {
-        if (this.status.success) {
-          await this.$router.push({ name: 'Login' })
-          await this.success(this.response)
-        } else {
-          await this.error(this.response)
-        }
-      })
+    async verify(token) {
+      if (token) {
+        await this.$router.replace(location.pathname)
+        await this.verifyEmail(token).then(async response => {
+          console.log(response)
+          if (response.status === 200) {
+            await this.$router.push({ name: 'Login' })
+            await this.success({ status: true, message: response.data.message })
+          }
+        }).catch(error => {
+          console.log(error.response)
+          if (error.response.data.message === 'Account has already been verified') {
+            this.info({ status: true, message: error.response.data.message })
+          } else {
+            this.error({ status: true, message: error.response.data.message })
+          }
+        })
+      } else {
+        this.error({status: true, message: 'Verification token not provided' })
+      }
     }
   }
 }
