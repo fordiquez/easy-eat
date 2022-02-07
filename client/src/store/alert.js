@@ -1,4 +1,4 @@
-import Swal from "sweetalert2";
+import Swal from "sweetalert2"
 
 const state = () => ({
   status: {
@@ -11,7 +11,7 @@ const state = () => ({
     error: null,
     success: null,
     info: null
-  }
+  },
 });
 
 const actions = {
@@ -19,10 +19,10 @@ const actions = {
     commit('SET_LOADING_STATUS', status)
   },
   error: ({ commit }, { status, message }) => {
-    commit('SET_ERROR_ALERT', { status, message });
+    commit('SET_ERROR_ALERT', { status, message })
   },
   success: ({ commit }, { status, message }) => {
-    commit('SET_SUCCESS_ALERT', { status, message });
+    commit('SET_SUCCESS_ALERT', { status, message })
   },
   info: ({ commit }, { status, message }) => {
     commit('SET_INFO_ALERT', { status, message })

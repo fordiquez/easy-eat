@@ -4,12 +4,12 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { getCookie } from "@/utils/authorization"
+import { getCookie } from "@/utils/storage"
 import DefaultLayout from "@/layouts/default"
 
 export default {
   name: 'app',
-  components: {DefaultLayout},
+  components: { DefaultLayout },
   data() {
     return {
       user: null

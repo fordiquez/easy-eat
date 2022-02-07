@@ -1,5 +1,5 @@
 import { DefaultAPIInstance } from "@/utils/axios";
-import { tokenExpirationTime } from "@/utils/authorization";
+import { tokenExpirationTime } from "@/utils/storage";
 
 const baseURL = '/accounts'
 

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { getUser, isAuthorized } from "@/utils/authorization"
+import { getUser, isAuthorized } from "@/utils/storage"
 import { Role } from "@/utils/role"
 import Home from "@/views/home/Index"
 import Login from "@/views/account/Login"
@@ -106,10 +106,10 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const { authorized } = to.meta
-  const { role } = getUser();
+  const user = getUser()
   if (authorized) {
     if (!isAuthorized()) return next({ name: 'Login' })
-    if (authorized.length && !authorized.includes(role)) return next({ name: 'Home' })
+    if (authorized.length && !authorized.includes(user.role)) return next({ name: 'Home' })
   }
   next()
 })

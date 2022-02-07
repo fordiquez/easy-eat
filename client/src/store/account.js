@@ -1,7 +1,7 @@
-import {accountService} from '@/services';
-import {DefaultAPIInstance} from "@/utils/axios";
-import {getToken, getUser, tokenExpirationTime} from "@/utils/authorization";
-import {BehaviorSubject} from "rxjs";
+import { BehaviorSubject } from "rxjs";
+import { accountService } from '@/services';
+import { DefaultAPIInstance } from "@/utils/axios";
+import { getToken, getUser, tokenExpirationTime } from "@/utils/storage";
 
 const user = new BehaviorSubject(getUser())
 const token = new BehaviorSubject(getToken())
@@ -38,6 +38,7 @@ const actions = {
       commit('SET_TOKEN', jwtToken)
       return response
     }).catch(error => {
+      console.log(error)
       dispatch('alert/error', { status: true, message: error.response.data.message }, { root: true })
       return error.response
     }).finally(() => dispatch('alert/loading', false, { root: true }))

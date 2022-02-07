@@ -96,6 +96,8 @@ export default {
         await this.login(this.form).then(async response => {
           console.log(response)
           response.status === 200 && this.status.success ? await this.$router.push({ name: 'Home' }) : null
+        }).catch(error => {
+          console.log(error.response)
         })
       }
     },

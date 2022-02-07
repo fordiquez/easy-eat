@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCookie, getToken, isTokenExpired, tokenExpirationTime } from "@/utils/authorization";
+import { getCookie, getToken, isTokenExpired, tokenExpirationTime } from "@/utils/storage";
 import store from '@/store/index'
 
 axios.defaults.withCredentials = true
@@ -24,10 +24,10 @@ const defaultConfig = {
 export const DefaultAPIInstance = axios.create(defaultConfig)
 
 DefaultAPIInstance.interceptors.request.use(async (config) => {
-  const { token, expires } = getToken()
-  token ? config.headers['Authorization'] = `Bearer ${token}` : null
+  const token = getToken()
   const cookie = getCookie('refreshToken')
-  if (cookie && token && expires && isTokenExpired(expires)) {
+  token?.token && token?.expires ? config.headers['Authorization'] = `Bearer ${token.token}` : null
+  if (cookie && token?.token && token?.expires && isTokenExpired(token?.expires)) {
     const refreshInstance = axios.create(defaultConfig)
     await refreshInstance.post('/accounts/refresh-token').then(response => {
       const expires = tokenExpirationTime(response.data)
