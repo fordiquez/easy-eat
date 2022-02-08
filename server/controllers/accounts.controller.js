@@ -86,7 +86,6 @@ const authenticate = (req, res, next) => {
 
 const refreshToken = (req, res, next) => {
   const token = req.cookies.refreshToken;
-  console.log(req.cookies)
   const ipAddress = req.ip;
   accountService.refreshToken({ token, ipAddress })
     .then(({ refreshToken, ...account }) => {
@@ -121,7 +120,6 @@ const getAll = (req, res, next) => {
 }
 
 const getById = (req, res, next) => {
-  console.log(req.headers.authorization)
   // users can get their own account and admins can get any account
   if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });

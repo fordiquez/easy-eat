@@ -1,7 +1,7 @@
-import { BehaviorSubject } from "rxjs";
-import { accountService } from '@/services';
-import { DefaultAPIInstance } from "@/utils/axios";
-import { getToken, getUser, tokenExpirationTime } from "@/utils/storage";
+import { BehaviorSubject } from "rxjs"
+import { accountService } from '@/services'
+import { DefaultAPIInstance } from "@/utils/axios"
+import { getToken, getUser, tokenExpirationTime } from "@/utils/storage"
 
 const user = new BehaviorSubject(getUser())
 const token = new BehaviorSubject(getToken())
@@ -9,9 +9,9 @@ const token = new BehaviorSubject(getToken())
 const state = () => ({
   user,
   token,
-  users: null,
-}
-)
+  users: [],
+  loading: false
+})
 const getters = {
   getUser: (state) => state.user.asObservable(),
   getUserValue: (state) => state.user.value,
@@ -21,75 +21,40 @@ const getters = {
 }
 
 const actions = {
-  register: async ({ dispatch }, user) => {
-    dispatch('alert/loading', true, { root: true })
-    return accountService.register(user).finally(() => dispatch('alert/loading', false, { root: true }));
+  register: async ({ commit }, user) => {
+    commit('SET_LOADING_STATUS', true)
+    return accountService.register(user).finally(() => commit('SET_LOADING_STATUS', true))
   },
-  login: async ({ dispatch, commit }, { email, password }) => {
-    dispatch('alert/loading', true, { root: true })
+  async login ({ commit }, { email, password }) {
     return await accountService.login(email, password).then(response => {
       const expires = tokenExpirationTime(response.data)
       const jwtToken = {
         token: response.data.jwtToken,
         expires
       }
-      dispatch('alert/success', { status: true, message: response.data.message }, { root: true })
       commit('SET_USER', response.data)
       commit('SET_TOKEN', jwtToken)
       return response
-    }).catch(error => {
-      console.log(error)
-      dispatch('alert/error', { status: true, message: error.response.data.message }, { root: true })
-      return error.response
-    }).finally(() => dispatch('alert/loading', false, { root: true }))
+    })
   },
-  logout: async ({ dispatch, commit }) => {
-    dispatch('alert/loading', true, { root: true })
-    return await accountService.logout().then(response => {
-      commit('LOGOUT')
-      delete DefaultAPIInstance.defaults.headers['authorization']
-      dispatch('alert/success', { status: true, message: response.data.message }, { root: true })
-    }).catch(error => {
-      dispatch('alert/error', { status: true, message: error.response.data.message }, { root: true })
-    }).finally(() => dispatch('alert/loading', false, { root: true }))
+  logout: async ({ commit }) => {
+    return accountService.logout().finally(() => commit('LOGOUT_USER'))
   },
-  verifyEmail: async ({ dispatch }, token) => {
-    dispatch('alert/loading', true, { root: true })
-    return accountService.verifyEmail(token).finally(async () => dispatch('alert/loading', false, { root: true }));
-  },
-  forgotPassword: async ({ dispatch }, email) => {
-    dispatch('alert/loading', true, { root: true })
-    return await accountService.forgotPassword(email).then(response => {
-      dispatch('alert/success', { status: true, message: response.data.message }, { root: true })
-      return response
-    }).catch(error => {
-      dispatch('alert/error', { status: true, message: error.response.data.message }, { root: true })
-      return error.response
-    }).finally(() => dispatch('alert/loading', false, { root: true }))
-  },
-  validateResetToken: async ({ dispatch }, token) => {
-    dispatch('alert/loading', true, { root: true })
-    return await accountService.validateResetToken(token).then(response => {
-      dispatch('alert/success', { status: true, message: response.data.message }, { root: true })
-      return response
-    }).catch(error => {
-      dispatch('alert/error', { status: true, message: error.response.data.message }, { root: true })
-      return error.response
-    }).finally(() => dispatch('alert/loading', false, { root: true }))
-  },
-  resetPassword: async ({ dispatch }, { token, password, passwordConfirm }) => {
-    dispatch('alert/loading', true, { root: true })
-    return accountService.resetPassword(token, password, passwordConfirm).finally(() => dispatch('alert/loading', false, {root: true }));
-  },
-  refreshToken: async ({ commit }) => {
+  verifyEmail: async ({ commit }, token) => {
     commit('SET_LOADING_STATUS', true)
-    await accountService.refreshToken().then(res => {
-      console.log(res)
-      return res
-    }).catch(error => {
-      console.log(error)
-      return error
-    }).finally(() => commit('SET_LOADING_STATUS', false))
+    return accountService.verifyEmail(token).finally(() => commit('SET_LOADING_STATUS', true))
+  },
+  forgotPassword: async ({ commit }, email) => {
+    commit('SET_LOADING_STATUS', true)
+    return accountService.forgotPassword(email).finally(() => commit('SET_LOADING_STATUS', true))
+  },
+  validateResetToken: async ({ commit }, token) => {
+    commit('SET_LOADING_STATUS', true)
+    return accountService.validateResetToken(token).finally(() => commit('SET_LOADING_STATUS', true))
+  },
+  resetPassword: async ({ commit }, { token, password, passwordConfirm }) => {
+    commit('SET_LOADING_STATUS', true)
+    return accountService.resetPassword(token, password, passwordConfirm).finally(() => commit('SET_LOADING_STATUS', true))
   },
   getAll: async ({ commit }) => {
     commit('SET_LOADING_STATUS', true)
@@ -150,10 +115,7 @@ const actions = {
       commit('SET_ERROR_STATUS', { status: true, message: error.response.data.message })
       return error
     }).finally(() => commit('SET_LOADING_STATUS', false))
-  },
-  clear: ({ commit }) => {
-    commit('CLEAR_RESPONSE')
-  },
+  }
 }
 
 const mutations = {
@@ -166,18 +128,18 @@ const mutations = {
     localStorage.setItem('jwtToken', JSON.stringify(jwtToken))
     state.token.next(jwtToken)
   },
-  SET_USERS: (state, users) => {
-    state.users = users
-  },
-  LOGOUT: (state) => {
+  LOGOUT_USER: (state) => {
+    delete DefaultAPIInstance.defaults.headers['Authorization']
     localStorage.removeItem('user')
     localStorage.removeItem('jwtToken')
     state.user.next(null)
     state.token.next(null)
   },
-  CLEAR_RESPONSE: (state) => {
-    state.response.status = undefined
-    state.response.message = null
+  SET_USERS: (state, users) => {
+    state.users = users
+  },
+  SET_LOADING_STATUS: (state, status) => {
+    state.loading = status
   }
 };
 

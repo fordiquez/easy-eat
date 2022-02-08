@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 v-if="user">Hola, {{ user.firstName }}!</h2>
-    <p>You're logged in with Vue 3 & JWT!</p>
+    <p>¡Muchas gracias por visitarnos, espero que disfrute de su estancia con nosotros!</p>
   </div>
 </template>
 

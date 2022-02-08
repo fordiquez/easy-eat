@@ -1,13 +1,14 @@
 <template>
   <div>
-    <v-alert v-if="status.error" v-model="status.error" type="error" border="left" colored-border dismissible prominent dense text>
-      <span>{{ message.error }}</span>
-    </v-alert>
-    <v-alert v-if="status.success" v-model="status.success" type="success" border="left" colored-border dismissible prominent dense text>
-      <span>{{ message.success }}</span>
-    </v-alert>
-    <v-alert v-if="status.info" v-model="status.info" type="info" color="primary" border="left" colored-border dismissible prominent dense text>
-      <span>{{ message.info }}</span>
+    <v-alert
+        v-for="(alert, index) in activeAlerts"
+        :key="index"
+        v-model="alert.active"
+        :type="alert.type"
+        :color="alert.type === 'info' ? 'primary' : alert.type"
+        border="left"
+        colored-border dismissible prominent dense text>
+      <span>{{ alert.text }}</span>
     </v-alert>
   </div>
 </template>
@@ -18,7 +19,10 @@ import { mapState } from "vuex";
 export default {
   name: "Alert",
   computed: {
-    ...mapState('alert', ['status', 'message'])
+    ...mapState('notifications', ['alerts']),
+    activeAlerts() {
+      return this.alerts.filter(alert => alert.active)
+    }
   }
 }
 </script>

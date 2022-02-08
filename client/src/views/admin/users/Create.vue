@@ -126,8 +126,8 @@
 <!--  methods: {-->
 <!--    ...mapActions({-->
 <!--      create: 'account/create',-->
-<!--      success: 'alert/success',-->
-<!--      error: 'alert/error'-->
+<!--      success: 'notifications/success',-->
+<!--      error: 'notifications/error'-->
 <!--    }),-->
 <!--    async onSubmit() {-->
 <!--      const validated = await this.v$.$validate()-->

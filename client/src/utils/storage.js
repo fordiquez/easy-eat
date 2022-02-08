@@ -14,7 +14,7 @@ export const isAuthorized = () => {
 
 export const getCookie = (name) => {
   let matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\\.$?*|{}()[\]/+^])/g, '\\$1') + "=([^;]*)"))
-  return matches ? decodeURIComponent(matches[1]) : false
+  return matches ? decodeURIComponent(matches[1]) : null
 }
 
 export const getApplication = () => {

@@ -121,11 +121,14 @@ const authenticate = async ({ email, password, ipAddress }) => {
   // save refresh token
   await refreshToken.save();
 
+  const message = 'You have successfully logged in'
+
   // return basic details and tokens
   return {
     ...basicDetails(account),
     jwtToken,
-    refreshToken: refreshToken.token
+    refreshToken: refreshToken.token,
+    message
   };
 }
 
@@ -158,7 +161,7 @@ const revokeToken = async (token) => {
   // remove token from the collection
   await refreshToken.remove();
   return {
-    message: 'Token revoked'
+    message: 'Your session has ended successfully'
   }
 }
 

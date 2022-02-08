@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import {mapActions, mapGetters, mapState} from 'vuex'
 import { getCookie } from "@/utils/storage"
 import DefaultLayout from "@/layouts/default"
 
@@ -33,13 +33,11 @@ export default {
     ...mapGetters('account', ['getUser', 'getUserValue']),
   },
   methods: {
-    ...mapActions({
-      clear: 'alert/clear'
-    }),
+    ...mapActions('notifications', ['clearAlerts'])
   },
   watch: {
     $route() {
-      this.clear()
+      this.clearAlerts()
     }
   }
 };

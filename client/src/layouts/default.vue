@@ -26,7 +26,7 @@
       </v-list>
       <template v-slot:append>
         <div class="pa-3" v-if="user">
-          <v-btn :block="!application.miniVariant" :icon="application.miniVariant" :loading="status.loading" @click="onLogout">
+          <v-btn :block="!application.miniVariant" :icon="application.miniVariant" :loading="loading" @click="onLogout">
             <v-icon class="success--text" :large="application.miniVariant">mdi-exit-to-app</v-icon>
             <span class="ma-2 success--text" v-if="!application.miniVariant">Logout</span>
           </v-btn>
@@ -52,7 +52,8 @@
     </v-app-bar>
     <v-main>
       <v-container>
-        <Alert v-if="status.error || status.success || status.info" />
+        <Alert v-if="isActiveAlert" />
+        <Snackbar v-if="isActiveSnackbar" />
         <router-view />
       </v-container>
     </v-main>
@@ -75,12 +76,13 @@
 </template>
 
 <script>
-import {mapActions, mapGetters, mapState} from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import Alert from "@/components/Alert";
+import Snackbar from "@/components/Snackbar";
 
 export default {
   name: 'DefaultLayout',
-  components: { Alert },
+  components: {Snackbar, Alert },
   props: {
     user: {
       type: [Object, Boolean],
@@ -96,6 +98,7 @@ export default {
       right: true,
       rightDrawer: false,
     },
+    loading: false,
     selectedItem: 0,
     title: 'EasyEat',
     routes: [
@@ -112,23 +115,39 @@ export default {
     this.application = this.getApplication
   },
   computed: {
-    ...mapState('alert', ['status']),
+    ...mapState('notifications', ['alerts', 'snackbars']),
     ...mapGetters({
       getUser: 'account/getUser',
       getUserValue: 'account/getUserValue',
       getApplication: 'application/getApplication'
-    })
+    }),
+    isActiveAlert() {
+      return !!this.alerts.find(alert => alert.active)
+    },
+    isActiveSnackbar() {
+      return !!this.snackbars.find(snackbar => snackbar.active)
+    }
   },
   methods: {
     ...mapActions({
       logout: 'account/logout',
       init: 'application/init',
-      update: 'application/update'
+      update: 'application/update',
+      setAlert: 'notifications/setAlert',
+      setSnackbar: 'notifications/setSnackbar'
     }),
     async onLogout() {
-      await this.logout().then(async () => {
+      this.loading = true
+      await this.logout().then(async response => {
+        console.log(response)
         this.$route.name !== 'Login' ? await this.$router.push({ name: 'Login' }) : null
-      })
+        await this.setAlert({ type: 'success', text: response.data.message })
+        await this.setSnackbar({ color: 'success', text: response.data.message })
+      }).catch(error => {
+        console.log(error.response)
+        this.setAlert({ type: 'error', text: error.response.data.message })
+        this.setSnackbar({ color: 'error', text: error.response.data.message })
+      }).finally(() => this.loading = false)
     },
     onClipped() {
       this.application.clipped = !this.application.clipped

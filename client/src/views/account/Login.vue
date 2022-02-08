@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="status.loading" flat>
+  <v-card :loading="loading" flat>
     <v-card-title>Log In</v-card-title>
     <v-card-subtitle class="pb-0">Please enter your account information for authorization</v-card-subtitle>
     <v-form ref="form" @submit.prevent="submit">
@@ -32,7 +32,7 @@
           </v-col>
 
           <v-col cols="12">
-            <v-btn class="mr-4" color="success" :loading="status.loading" :disabled="status.loading" type="submit">Log In</v-btn>
+            <v-btn class="mr-4" color="success" :loading="loading" :disabled="loading" type="submit">Log In</v-btn>
             <v-btn class="mr-4" color="primary" :to="{ name: 'Register' }">Sign Up</v-btn>
             <v-btn class="mr-4" color="error" :to="{ name: 'ForgotPassword' }">Forgot Password</v-btn>
           </v-col>
@@ -43,9 +43,10 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions } from 'vuex'
 import { validationMixin } from 'vuelidate'
 import { email, required } from 'vuelidate/lib/validators'
+import { emailErrors, passwordErrors } from "@/utils/validations";
 
 export default {
   name: 'Login',
@@ -55,7 +56,8 @@ export default {
       email: '',
       password: ''
     },
-    visibility: false
+    visibility: false,
+    loading: false
   }),
   validations: {
     form: {
@@ -69,41 +71,34 @@ export default {
     }
   },
   computed: {
-    ...mapState('alert', ['status']),
     emailErrors() {
-      const errors = []
-      if (!this.$v.form.email.$dirty) {
-        return errors
-      }
-      !this.$v.form.email.email && errors.push('Must be valid e-mail')
-      !this.$v.form.email.required && errors.push('E-mail is required')
-      return errors
+      return emailErrors(this.$v.form.email)
     },
     passwordErrors() {
-      const errors = []
-      if (!this.$v.form.password.$dirty) {
-        return errors
-      }
-      !this.$v.form.password.required && errors.push('Password is required')
-      return errors
+      return passwordErrors(this.$v.form.password)
     },
   },
   methods: {
-    ...mapActions('account', ['login']),
+    ...mapActions({
+      login: 'account/login',
+      setAlert: 'notifications/setAlert',
+      setSnackbar: 'notifications/setSnackbar'
+    }),
     async submit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
+        this.loading = true
         await this.login(this.form).then(async response => {
           console.log(response)
-          response.status === 200 && this.status.success ? await this.$router.push({ name: 'Home' }) : null
+          await this.$router.push({ name: 'Home' })
+          await this.setAlert({ type: 'success', text: response.data.message })
+          await this.setSnackbar({ color: 'success', text: response.data.message })
         }).catch(error => {
           console.log(error.response)
-        })
+          this.setAlert({ type: 'error', text: error.response.data.message })
+          this.setSnackbar({ color: 'error', text: error.response.data.message })
+        }).finally(() => this.loading = false)
       }
-    },
-    reset () {
-      this.$v.$reset()
-      this.form.email = this.form.password = null
     }
   }
 }

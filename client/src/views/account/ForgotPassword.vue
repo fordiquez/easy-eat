@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="status.loading" flat>
+  <v-card :loading="loading" flat>
     <v-card-title>Account recovery</v-card-title>
     <v-card-subtitle class="pb-0">Please enter the email from your account</v-card-subtitle>
     <v-form ref="form" @submit.prevent="submit">
@@ -18,7 +18,7 @@
 
           <v-col cols="12">
             <v-card-actions>
-              <v-btn class="mr-4" :loading="status.loading" :disabled="status.loading" color="success" type="submit">Reset</v-btn>
+              <v-btn class="mr-4" :loading="loading" :disabled="loading" color="success" type="submit">Reset</v-btn>
               <v-btn class="mr-4" color="primary" :to="{ name: 'Login' }">Cancel</v-btn>
             </v-card-actions>
           </v-col>
@@ -29,15 +29,17 @@
 </template>
 
 <script>
-import {mapActions, mapState} from "vuex";
+import { mapActions } from "vuex";
 import { required, email } from "vuelidate/lib/validators";
-import {validationMixin} from "vuelidate";
+import { validationMixin } from "vuelidate";
+import { emailErrors } from "@/utils/validations";
 
 export default {
   name: "ForgotPassword",
   mixins: [ validationMixin ],
   data: () => ({
-    email: ''
+    email: '',
+    loading: false
   }),
   validations: {
     email: {
@@ -46,29 +48,29 @@ export default {
     },
   },
   computed: {
-    ...mapState('alert', ['status']),
     emailErrors() {
-      const errors = []
-      if (!this.$v.email.$dirty) {
-        return errors
-      }
-      !this.$v.email.email && errors.push('Must be valid e-mail')
-      !this.$v.email.required && errors.push('E-mail is required')
-      return errors
+      return emailErrors(this.$v.email)
     },
   },
   methods: {
     ...mapActions({
       forgotPassword: 'account/forgotPassword',
-      success: 'alert/success',
-      error: 'alert/error'
+      setAlert: 'notifications/setAlert',
+      setSnackbar: 'notifications/setSnackbar'
     }),
     async submit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
-        await this.forgotPassword(this.email).then(response => {
+        this.loading = true
+        this.forgotPassword(this.email).then(response => {
           console.log(response)
-        })
+          this.setAlert({ type: 'success', text: response.data.message })
+          this.setSnackbar({ color: 'success', text: response.data.message })
+        }).catch(error => {
+          console.log(error.response)
+          this.setAlert({ type: 'error', text: error.response.data.message })
+          this.setSnackbar({ color: 'error', text: error.response.data.message })
+        }).finally(() => this.loading = false)
       }
     }
   }

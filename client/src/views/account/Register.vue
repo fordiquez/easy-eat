@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="status.loading" flat>
+  <v-card :loading="loading" flat>
     <v-card-title>Sign Up</v-card-title>
     <v-card-subtitle class="pb-0">Please fill in all required fields to register an account</v-card-subtitle>
     <v-form ref="form" @submit.prevent="submit">
@@ -72,9 +72,9 @@
           <v-col cols="12">
             <v-checkbox
                 v-model="form.acceptedTerms"
-                :error-messages="termsErrors"
+                :error-messages="acceptedTerms"
                 on-icon="mdi-marker-check"
-                off-icon="mdi-alert-circle-check-outline"
+                off-icon="mdi-notifications-circle-check-outline"
                 color="success"
                 @change="$v.form.acceptedTerms.$touch()"
             >
@@ -93,7 +93,7 @@
       <v-card-actions>
         <v-btn :to="{ name: 'Login' }" text>Cancel</v-btn>
         <v-spacer></v-spacer>
-        <v-btn :disabled="$v.$invalid && $v.$error" :loading="status.loading" color="primary" type="submit" text>
+        <v-btn :disabled="($v.$invalid && $v.$error) || loading" :loading="loading" color="primary" type="submit" text>
           Sign Up
         </v-btn>
       </v-card-actions>
@@ -128,8 +128,16 @@
 <script>
 import { required, alpha, minLength, email, sameAs } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
-import { hasNumerics } from "@/utils/validators";
-import {mapActions, mapState} from "vuex";
+import { mapActions } from "vuex";
+import {
+  acceptedTermsErrors,
+  emailErrors,
+  firstNameErrors,
+  lastNameErrors,
+  passwordConfirmErrors,
+  passwordErrors,
+  hasNumerics
+} from "@/utils/validations";
 
 export default {
   name: 'Register',
@@ -143,6 +151,7 @@ export default {
       passwordConfirm: '',
       acceptedTerms: false,
     },
+    loading: false,
     visibility: false,
     terms: false,
     conditions: false,
@@ -172,6 +181,7 @@ export default {
       passwordConfirm: {
         required,
         sameAs: sameAs('password'),
+        minLength: minLength(6),
         hasNumerics
       },
       acceptedTerms: {
@@ -180,92 +190,46 @@ export default {
     }
   },
   computed: {
-    ...mapState('alert', ['status']),
     firstNameErrors() {
-      const errors = []
-      if (!this.$v.form.firstName.$dirty) {
-        return errors
-      }
-      !this.$v.form.firstName.required && errors.push('First Name is required')
-      !this.$v.form.firstName.alpha && errors.push('First Name must contain only alphabetic characters')
-      !this.$v.form.firstName.minLength && errors.push('First Name must have at least 2 symbols')
-      return errors
+      return firstNameErrors(this.$v.form.firstName)
     },
     lastNameErrors() {
-      const errors = []
-      if (!this.$v.form.lastName.$dirty) {
-        return errors
-      }
-      !this.$v.form.lastName.required && errors.push('Last Name is required')
-      !this.$v.form.lastName.alpha && errors.push('Last Name must contain only alphabetic characters')
-      !this.$v.form.lastName.minLength && errors.push('Last Name must have at least 2 symbols')
-      return errors
+      return lastNameErrors(this.$v.form.lastName)
     },
     emailErrors() {
-      const errors = []
-      if (!this.$v.form.email.$dirty) {
-        return errors
-      }
-      !this.$v.form.email.email && errors.push('Must be valid e-mail')
-      !this.$v.form.email.required && errors.push('E-mail is required')
-      return errors
+      return emailErrors(this.$v.form.email)
     },
     passwordErrors() {
-      const errors = []
-      if (!this.$v.form.password.$dirty) {
-        return errors
-      }
-      !this.$v.form.password.required && errors.push('Password is required')
-      !this.$v.form.password.minLength && errors.push('Password must have at least 6 symbols')
-      !this.$v.form.password.hasNumerics && errors.push('Password must contain at least 1 digit')
-      return errors
+      return passwordErrors(this.$v.form.password)
     },
     passwordConfirmErrors() {
-      const errors = []
-      if (!this.$v.form.passwordConfirm.$dirty) {
-        return errors
-      }
-      !this.$v.form.passwordConfirm.required && errors.push('You must confirm your password')
-      !this.$v.form.passwordConfirm.sameAs && errors.push('Passwords must be identical')
-      !this.$v.form.password.hasNumerics && errors.push('Password must contain at least 1 digit')
-      return errors
+      return passwordConfirmErrors(this.$v.form.passwordConfirm)
     },
-    termsErrors() {
-      const errors = []
-      if (!this.$v.form.acceptedTerms.$dirty) {
-        return errors
-      }
-      !this.$v.form.acceptedTerms.sameAs && errors.push('You don\'t have a choice, you eat it')
-      return errors
+    acceptedTerms() {
+      return acceptedTermsErrors(this.$v.form.acceptedTerms)
     }
   },
   methods: {
     ...mapActions({
       register: 'account/register',
-      error: 'alert/error',
-      success: 'alert/success',
-      info: 'alert/info'
+      setAlert: 'notifications/setAlert',
+      setSnackbar: 'notifications/setSnackbar'
     }),
-    resetForm() {
-      this.form = Object.assign({})
-      this.$v.$reset()
-    },
     async submit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
+        this.loading = true
         await this.register(this.form).then(async response => {
           console.log(response)
-          if (response.status === 200) {
-            await this.$router.push({ name: 'Login' })
-            await this.success({ status: true, message: response.data.messages.success })
-            await this.info({ status: true, message: response.data.messages.info })
-          } else {
-            await this.error({ status: true, message: response.data.message })
-          }
-        }).catch(async error => {
+          await this.$router.push({ name: 'Login' })
+          await this.setAlert({ type: 'success', text: response.data.messages.success })
+          await this.setAlert({ type: 'info', text: response.data.messages.info })
+          await this.setSnackbar({ color: 'success', text: response.data.message })
+        }).catch(error => {
           console.log(error.response)
-          await this.error({status: true, message: error.response.data.message})
-        })
+          this.setAlert({ type: 'error', text: error.response.data.message })
+          this.setSnackbar({ color: 'error', text: error.response.data.message })
+        }).finally(() => this.loading = false)
       }
     },
   },

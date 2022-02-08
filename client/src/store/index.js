@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { account } from "@/store/account"
-import { alert } from "@/store/alert"
+import { notifications } from "@/store/notifications"
 import { application } from "@/store/application"
 import { product } from "@/store/product"
 
@@ -16,7 +16,7 @@ export default new Vuex.Store({
   },
   modules: {
     account,
-    alert,
+    notifications,
     application,
     product
   }

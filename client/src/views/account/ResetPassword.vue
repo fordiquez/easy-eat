@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="status.loading" flat>
+  <v-card :loading="loading" flat>
     <v-card-title>Reset password</v-card-title>
     <v-form v-if="tokenStatus" ref="form" @submit.prevent="submit">
       <v-container fluid>
@@ -39,7 +39,7 @@
 
           <v-col cols="12">
             <v-card-actions>
-              <v-btn class="mr-4" color="success" type="submit" :loading="status.loading" :disabled="status.loading">
+              <v-btn class="mr-4" color="success" type="submit" :loading="loading" :disabled="loading">
                 Reset
               </v-btn>
               <v-btn class="mr-4" color="primary" :to="{ name: 'Login' }">Cancel</v-btn>
@@ -60,10 +60,10 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions } from "vuex";
 import { validationMixin } from "vuelidate";
 import { minLength, required, sameAs } from "vuelidate/lib/validators";
-import { hasNumerics } from "@/utils/validators";
+import { passwordConfirmErrors, passwordErrors, hasNumerics } from "@/utils/validations";
 
 export default {
   name: "ResetPassword",
@@ -71,6 +71,7 @@ export default {
   data: () => ({
     tokenStatus: false,
     visibility: false,
+    loading: false,
     form: {
       token: null,
       password: '',
@@ -92,69 +93,60 @@ export default {
       passwordConfirm: {
         required,
         sameAs: sameAs('password'),
+        minLength: minLength(6),
         hasNumerics
       },
     }
   },
   computed: {
-    ...mapState('alert', ['status']),
     passwordErrors() {
-      const errors = []
-      if (!this.$v.form.password.$dirty) {
-        return errors
-      }
-      !this.$v.form.password.required && errors.push('Password is required')
-      !this.$v.form.password.minLength && errors.push('Password must have at least 6 symbols')
-      !this.$v.form.password.hasNumerics && errors.push('Password must contain at least 1 digit')
-      return errors
+      return passwordErrors(this.$v.form.password)
     },
     passwordConfirmErrors() {
-      const errors = []
-      if (!this.$v.form.passwordConfirm.$dirty) {
-        return errors
-      }
-      !this.$v.form.passwordConfirm.required && errors.push('You must confirm your password')
-      !this.$v.form.passwordConfirm.sameAs && errors.push('Passwords must be identical')
-      !this.$v.form.passwordConfirm.hasNumerics && errors.push('Password must contain at least 1 digit')
-      return errors
-    },
+      return passwordConfirmErrors(this.$v.form.passwordConfirm)
+    }
   },
   methods: {
     ...mapActions({
       validateResetToken: 'account/validateResetToken',
       resetPassword: 'account/resetPassword',
-      success: 'alert/success',
-      error: 'alert/error'
+      setAlert: 'notifications/setAlert',
+      setSnackbar: 'notifications/setSnackbar'
     }),
     async validate(token) {
       if (token) {
+        this.loading = true
         await this.$router.replace(location.pathname)
         await this.validateResetToken(token).then(response => {
           console.log(response)
-          response.status === 200 ? this.tokenStatus = true : false
+          this.tokenStatus = true
+          this.setAlert({ type: 'success', text: response.data.message })
+          this.setSnackbar({ color: 'success', text: response.data.message })
         }).catch(error => {
           console.log(error.response)
           this.tokenStatus = false
-        })
+          this.setAlert({ type: 'error', text: error.response.data.message })
+          this.setSnackbar({ color: 'error', text: error.response.data.message })
+        }).finally(() => this.loading = false)
       } else {
-        this.error({status: true, message: 'Reset token not provided' })
+        this.setAlert({ type: 'error', text: 'Reset token not provided' })
+        this.setSnackbar({ color: 'error', text: 'Reset token not provided' })
       }
     },
     async submit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
+        this.loading = true
         await this.resetPassword(this.form).then(async response => {
           console.log(response)
-          if (response.status === 200) {
-            await this.$router.push({ name: 'Login' })
-            await this.success({ status: true, message: response.data.message })
-          } else {
-            await this.error({ status: true, message: response.data.message })
-          }
+          await this.$router.push({ name: 'Login' })
+          await this.setAlert({ type: 'success', text: response.data.message })
+          await this.setSnackbar({ color: 'success', text: response.data.message })
         }).catch(error => {
           console.log(error.response)
-          this.error({ status: true, message: error.response.data.message })
-        })
+          this.setAlert({ type: 'error', text: error.response.data.message })
+          this.setSnackbar({ color: 'error', text: error.response.data.message })
+        }).finally(() => this.loading = true)
       }
     }
   }
