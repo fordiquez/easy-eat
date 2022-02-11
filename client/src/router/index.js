@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { getUser, isAuthorized } from "@/utils/storage"
+import {getToken, getUser, isAuthorized} from "@/utils/storage"
 import { Role } from "@/utils/role"
 import Home from "@/views/home/Index"
 import Login from "@/views/account/Login"
@@ -8,34 +8,52 @@ import Register from "@/views/account/Register"
 import ForgotPassword from "@/views/account/ForgotPassword"
 import VerifyEmail from "@/views/account/VerifyEmail"
 import ResetPassword from "@/views/account/ResetPassword"
-import Profile from "@/views/profile/Index"
-import ProfileUpdate from "@/views/profile/Update"
 import Admin from "@/views/admin/Index"
 import UsersList from "@/views/admin/users/List"
 import UserCreate from "@/views/admin/users/Create"
 import UserEdit from "@/views/admin/users/Edit"
 import DailyLog from "@/views/daily-log/Index"
+import Settings from "@/views/settings/Index"
+import Profile from "@/views/settings/Profile"
+import Account from "@/views/settings/Account";
+import App from "@/views/settings/App"
+import store from '@/store/index'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
+    name: 'Dashboard',
     component: Home,
     meta: { authorized: [] }
   },
   {
-    path: '/profile',
-    name: 'Profile',
-    component: Profile,
-    meta: { authorized: [] }
-  },
-  {
-    path: '/profile/update',
-    name: 'ProfileUpdate',
-    component: ProfileUpdate,
-    meta: { authorized: [] }
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: { authorized: [] },
+    redirect: '/settings/profile',
+    children: [
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: Profile,
+        meta: { authorized: [] }
+      },
+      {
+        path: 'account',
+        name: 'Account',
+        component: Account,
+        meta: { authorized: [] }
+      },
+      {
+        path: 'app',
+        name: 'App',
+        component: App,
+        meta: { authorized: [] }
+      }
+    ]
   },
   {
     path: '/daily-log',
@@ -107,8 +125,12 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const { authorized } = to.meta
   const user = getUser()
+  const token = getToken()
   if (authorized) {
-    if (!isAuthorized()) return next({ name: 'Login' })
+    if (!isAuthorized()) {
+      user || token ? store.commit('account/LOGOUT_USER') : null
+      return next({ name: 'Login' })
+    }
     if (authorized.length && !authorized.includes(user.role)) return next({ name: 'Home' })
   }
   next()

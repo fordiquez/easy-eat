@@ -14,7 +14,7 @@
       </v-list-item>
       <v-list nav dense flat>
         <v-list-item-group v-model="selectedItem" :value="selectedItem" color="success">
-          <v-list-item v-for="(route, i) in routes" :key="i" :to="route.to" link exact>
+          <v-list-item v-for="(route, index) in routes.drawer" :key="index" :to="{ name: route.to }" link exact>
             <v-list-item-icon>
               <v-icon v-text="route.icon"></v-icon>
             </v-list-item-icon>
@@ -38,17 +38,35 @@
       <v-btn icon @click.stop="onMiniVariant">
         <v-icon>mdi-{{ `chevron-${application.miniVariant ? 'right' : 'left'}` }}</v-icon>
       </v-btn>
-      <v-btn icon @click.stop="onClipped">
-        <v-icon>mdi-application</v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="onFixed">
-        <v-icon>mdi-minus</v-icon>
-      </v-btn>
       <v-toolbar-title v-text="title" />
       <v-spacer />
-      <v-btn icon @click.stop="onRightDrawer">
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
+      <v-btn v-if="!user" :to="{ name: 'Login' }" active-class="success--text" text>Log In</v-btn>
+      <v-btn v-if="!user" :to="{ name: 'Register' }" active-class="success--text" text>Sign Up</v-btn>
+      <v-menu v-if="user" bottom left offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn v-bind="attrs" v-on="on" icon active-class="success--text">
+            <v-icon>mdi-account-cog-outline</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item v-for="(item, index) in routes.account" :key="index" :to="{ name: item.to }" active-class="success--text" link exact dense>
+            <v-list-item-icon>
+              <v-icon v-text="item.icon" />
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title class="text-subtitle-2" v-text="item.title" />
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click.stop="onRightDrawer" icon>
+            <v-icon v-bind="attrs" v-on="on">mdi-cog-outline</v-icon>
+          </v-btn>
+        </template>
+        <span>Settings</span>
+      </v-tooltip>
     </v-app-bar>
     <v-main>
       <v-container>
@@ -57,18 +75,17 @@
         <router-view />
       </v-container>
     </v-main>
-<!--    <v-navigation-drawer v-model="application.rightDrawer" :right="application.right" fixed temporary>-->
-<!--      <v-list>-->
-<!--        <v-list-item @click.native="onRight">-->
-<!--          <v-list-item-action>-->
-<!--            <v-icon light>-->
-<!--              mdi-repeat-->
-<!--            </v-icon>-->
-<!--          </v-list-item-action>-->
-<!--          <v-list-item-title>Switch drawer</v-list-item-title>-->
-<!--        </v-list-item>-->
-<!--      </v-list>-->
-<!--    </v-navigation-drawer>-->
+    <v-navigation-drawer v-model="rightDrawer" right temporary hide-overlay fixed>
+      <div class="d-flex pa-3">
+        <h5 class="text-h6">Settings</h5>
+        <v-spacer />
+        <v-btn icon @click.stop="onRightDrawer">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </div>
+      <v-divider />
+      <SettingsDrawer :application="application" />
+    </v-navigation-drawer>
     <v-footer class="d-flex justify-center align-center" :absolute="!application.fixed" app>
       <span>&copy; {{ new Date().getFullYear() }} — <strong>{{ title }}</strong></span>
     </v-footer>
@@ -79,10 +96,11 @@
 import { mapActions, mapGetters, mapState } from "vuex";
 import Alert from "@/components/Alert";
 import Snackbar from "@/components/Snackbar";
+import SettingsDrawer from "@/components/SettingsDrawer";
 
 export default {
   name: 'DefaultLayout',
-  components: {Snackbar, Alert },
+  components: { SettingsDrawer, Snackbar, Alert },
   props: {
     user: {
       type: [Object, Boolean],
@@ -95,27 +113,33 @@ export default {
       drawer: false,
       fixed: false,
       miniVariant: false,
-      right: true,
-      rightDrawer: false,
     },
+    rightDrawer: false,
     loading: false,
     selectedItem: 0,
-    title: 'EasyEat',
-    routes: [
-      { icon: 'mdi-circle-half-full', title: 'Dashboard', to: '/' },
-      { icon: 'mdi-flower-tulip-outline', title: 'Log In', to: '/account/login' },
-      { icon: 'mdi-movie-play-outline', title: 'Sign Up', to: '/account/register' },
-      { icon: 'mdi-chart-gantt', title: 'Account recovery', to: '/account/forgot-password' },
-      { icon: 'mdi-account-music-outline', title: 'Reset Password', to: '/account/reset-password' },
-      { icon: 'mdi-flash-auto', title: 'Email Verification', to: '/account/verify-email' },
-    ],
+    title: process.env.VUE_APP_TITLE,
+    routes: {
+      drawer: [
+        { icon: 'mdi-circle-half-full', title: 'Dashboard', to: 'Dashboard' },
+        { icon: 'mdi-flower-tulip-outline', title: 'Log In', to: 'Login' },
+        { icon: 'mdi-movie-play-outline', title: 'Sign Up', to: 'Register' },
+        { icon: 'mdi-chart-gantt', title: 'Account recovery', to: 'ForgotPassword' },
+        { icon: 'mdi-account-music-outline', title: 'Reset Password', to: 'ResetPassword' },
+        { icon: 'mdi-flash-auto', title: 'Email Verification', to: 'VerifyEmail' },
+      ],
+      account: [
+        { icon: 'mdi-account-details', title: 'My Profile', to: 'Profile' },
+        { icon: 'mdi-account-lock-open', title: 'Account Settings', to: 'Account' },
+        { icon: 'mdi-application-cog', title: 'App Settings', to: 'App' },
+      ]
+    }
   }),
   async created() {
     await this.init()
     this.application = this.getApplication
   },
   computed: {
-    ...mapState('notifications', ['alerts', 'snackbars']),
+    ...mapState('notification', ['alerts', 'snackbars']),
     ...mapGetters({
       getUser: 'account/getUser',
       getUserValue: 'account/getUserValue',
@@ -125,16 +149,16 @@ export default {
       return !!this.alerts.find(alert => alert.active)
     },
     isActiveSnackbar() {
-      return !!this.snackbars.find(snackbar => snackbar.active)
-    }
+      return !!this.snackbars.find(snackbar => snackbar.active && snackbar.createdAt > new Date().getTime() - 5000)
+    },
   },
   methods: {
     ...mapActions({
       logout: 'account/logout',
       init: 'application/init',
       update: 'application/update',
-      setAlert: 'notifications/setAlert',
-      setSnackbar: 'notifications/setSnackbar'
+      setAlert: 'notification/setAlert',
+      setSnackbar: 'notification/setSnackbar'
     }),
     async onLogout() {
       this.loading = true
@@ -149,30 +173,17 @@ export default {
         this.setSnackbar({ color: 'error', text: error.response.data.message })
       }).finally(() => this.loading = false)
     },
-    onClipped() {
-      this.application.clipped = !this.application.clipped
-      this.update(this.application)
-    },
     onDrawer() {
       this.application.drawer = !this.application.drawer
-      this.update(this.application)
-    },
-    onFixed() {
-      this.application.fixed = !this.application.fixed
       this.update(this.application)
     },
     onMiniVariant() {
       this.application.miniVariant = !this.application.miniVariant
       this.update(this.application)
     },
-    onRight() {
-      this.application.right = !this.application.right
-      this.update(this.application)
-    },
     onRightDrawer() {
-      this.application.rightDrawer = !this.application.rightDrawer
-      this.update(this.application)
-    }
+      this.rightDrawer = !this.rightDrawer
+    },
   }
 }
 </script>

@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import {mapActions, mapGetters, mapState} from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { getCookie } from "@/utils/storage"
 import DefaultLayout from "@/layouts/default"
 
@@ -17,7 +17,6 @@ export default {
   },
   created() {
     this.getUser.subscribe(user => this.user = user)
-    // this.user = this.getUserValue
   },
   mounted() {
     const cookie = getCookie('refreshToken')
@@ -27,17 +26,15 @@ export default {
     layout() {
       return this.$route.meta.layout || 'DefaultLayout'
     },
-    ...mapState({
-      alert: state => state.alert,
-    }),
-    ...mapGetters('account', ['getUser', 'getUserValue']),
+    ...mapState('notification', ['alerts']),
+    ...mapGetters('account', ['getUser']),
   },
   methods: {
-    ...mapActions('notifications', ['clearAlerts'])
+    ...mapActions('notification', ['clearAlerts'])
   },
   watch: {
     $route() {
-      this.clearAlerts()
+      this.alerts.length ? this.clearAlerts() : null
     }
   }
 };

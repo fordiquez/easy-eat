@@ -22,14 +22,10 @@ import {mapState} from "vuex";
 export default {
   name: "Snackbar",
   computed: {
-    ...mapState('notifications', ['snackbars']),
+    ...mapState('notification', ['snackbars']),
     activeSnackbars() {
       return this.snackbars.filter(s => s.active && s.createdAt > new Date().getTime() - 5000)
     }
   },
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -55,6 +55,9 @@
         <v-btn color="primary" :to="{ name: 'ForgotPassword' }" plain text>forgot password</v-btn>
         <span>page</span>
       </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" :to="{ name: 'Login' }" text>Sign in</v-btn>
+      </v-card-actions>
     </template>
   </v-card>
 </template>
@@ -110,8 +113,8 @@ export default {
     ...mapActions({
       validateResetToken: 'account/validateResetToken',
       resetPassword: 'account/resetPassword',
-      setAlert: 'notifications/setAlert',
-      setSnackbar: 'notifications/setSnackbar'
+      setAlert: 'notification/setAlert',
+      setSnackbar: 'notification/setSnackbar'
     }),
     async validate(token) {
       if (token) {
@@ -152,7 +155,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

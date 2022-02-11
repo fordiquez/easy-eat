@@ -62,8 +62,8 @@ const getById = (id) => {
   return DefaultAPIInstance.get(`${baseURL}/${id}`)
 }
 
-const update = (id, payloads) => {
-  return DefaultAPIInstance.put(`${baseURL}/${id}`, payloads)
+const update = (id, payload) => {
+  return DefaultAPIInstance.put(`${baseURL}/${id}`, payload)
 }
 
 const _delete = (id) => {

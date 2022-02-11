@@ -32,7 +32,7 @@ const mutations = {
   }
 };
 
-export const notifications = {
+export const notification = {
   namespaced: true,
   state,
   actions,

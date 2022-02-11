@@ -1,15 +1,10 @@
-import { Role } from "@/utils/role";
+import { Role } from "@/utils/role"
 
 export const isAuthorized = () => {
   const cookie = getCookie('refreshToken')
   const user = getUser()
   const token = getToken()
-  const isRole = user?.role === Role.Admin || user?.role === Role.User
-  if (!cookie && (user || isRole || token)) {
-    localStorage.removeItem('user')
-    localStorage.removeItem('jwtToken')
-  }
-  return !!(cookie && isRole && token?.token && token?.expires)
+  return !!(cookie && user && token)
 }
 
 export const getCookie = (name) => {
@@ -18,18 +13,17 @@ export const getCookie = (name) => {
 }
 
 export const getApplication = () => {
-  const isApplication = localStorage.getItem('application') || false
-  return isApplication ? JSON.parse(localStorage.getItem('application')) : null
+  return JSON.parse(localStorage.getItem('application')) || null
 }
 
 export const getUser = () => {
-  const isUser = localStorage.getItem('user') || false
-  return isUser ? JSON.parse(localStorage.getItem('user')) : null
+  const user = JSON.parse(localStorage.getItem('user'))
+  return user?.id && (user?.role === Role.Admin || user?.role === Role.User) ? user : null
 }
 
 export const getToken = () => {
-  const isToken = localStorage.getItem('jwtToken') || false
-  return isToken ? JSON.parse(localStorage.getItem('jwtToken')) : null
+  const jwtToken = JSON.parse(localStorage.getItem('jwtToken'))
+  return jwtToken?.token && jwtToken?.expires ? jwtToken : null
 }
 
 export const isTokenExpired = (expires) => expires < new Date().getTime()

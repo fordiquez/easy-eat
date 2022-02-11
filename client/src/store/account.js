@@ -1,7 +1,7 @@
 import { BehaviorSubject } from "rxjs"
 import { accountService } from '@/services'
-import { DefaultAPIInstance } from "@/utils/axios"
 import { getToken, getUser, tokenExpirationTime } from "@/utils/storage"
+import { excludedFilter } from "@/utils/filters";
 
 const user = new BehaviorSubject(getUser())
 const token = new BehaviorSubject(getToken())
@@ -56,6 +56,12 @@ const actions = {
     commit('SET_LOADING_STATUS', true)
     return accountService.resetPassword(token, password, passwordConfirm).finally(() => commit('SET_LOADING_STATUS', true))
   },
+  getById: ({ commit }, id) => {
+    return accountService.getById(id).then(response => {
+      commit('SET_USER', response.data)
+      return response
+    })
+  },
   getAll: async ({ commit }) => {
     commit('SET_LOADING_STATUS', true)
     return await accountService.getAll().then(res => {
@@ -79,29 +85,11 @@ const actions = {
       commit('SET_ERROR_STATUS', { status: true, message: error.response.data.message })
     }).finally(() => commit('SET_LOADING_STATUS', false))
   },
-  getById: async ({ commit }, id) => {
-    commit('SET_LOADING_STATUS', true)
-    return await accountService.getById(id).then(res => {
-      console.log(res)
-      commit('SET_SUCCESS_STATUS', { status: true, message: res.data.message })
-      return res
-    }).catch(error => {
-      console.log(error)
-      commit('SET_ERROR_STATUS', { status: true, message: error.response.data.message })
-      return error
-    }).finally(() => commit('SET_LOADING_STATUS', false))
-  },
-  update: async ({ commit }, { id, firstName, lastName, email, password, passwordConfirm, role }) => {
-    commit('SET_LOADING_STATUS', true)
-    return await accountService.update(id, { firstName, lastName, email, password, passwordConfirm, role }).then(res => {
-      console.log(res)
-      commit('SET_SUCCESS_STATUS', { status: true, message: res.data.message })
-      return res
-    }).catch(error => {
-      console.log(error)
-      commit('SET_ERROR_STATUS', { status: true, message: error.response.data.message })
-      return error
-    }).finally(() => commit('SET_LOADING_STATUS', false))
+  update: async ({ commit }, user) => {
+    return await accountService.update(user.id, user).then(response => {
+      commit('SET_USER', response.data)
+      return response
+    })
   },
   delete: async ({ commit }, id) => {
     commit('SET_LOADING_STATUS', true)
@@ -119,8 +107,9 @@ const actions = {
 }
 
 const mutations = {
-  SET_USER: (state, { id, firstName, lastName, email, created, isVerified, role }) => {
-    const user = { id, firstName, lastName, email, created, isVerified, role }
+  SET_USER: (state, response) => {
+    const excludedKeys = ['message', 'jwtToken']
+    const user = excludedFilter(response, excludedKeys)
     localStorage.setItem('user', JSON.stringify(user))
     state.user.next(user)
   },
@@ -129,7 +118,6 @@ const mutations = {
     state.token.next(jwtToken)
   },
   LOGOUT_USER: (state) => {
-    delete DefaultAPIInstance.defaults.headers['Authorization']
     localStorage.removeItem('user')
     localStorage.removeItem('jwtToken')
     state.user.next(null)

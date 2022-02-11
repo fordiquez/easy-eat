@@ -19,7 +19,7 @@ import { mapState } from "vuex";
 export default {
   name: "Alert",
   computed: {
-    ...mapState('notifications', ['alerts']),
+    ...mapState('notification', ['alerts']),
     activeAlerts() {
       return this.alerts.filter(alert => alert.active)
     }

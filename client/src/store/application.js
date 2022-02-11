@@ -1,13 +1,11 @@
-import {getApplication} from "@/utils/storage";
+import { getApplication } from "@/utils/storage";
 
 const state = () => ({
   application: {
     clipped: false,
     drawer: false,
     fixed: false,
-    miniVariant: false,
-    right: true,
-    rightDrawer: false
+    miniVariant: false
   }
 });
 
@@ -16,28 +14,27 @@ const getters = {
 }
 
 const actions = {
-  init: async ({ commit, state }, application) => {
-    const requiredFields = new Map(Object.entries(application || state.application))
-    const undefinedFields = new Map()
-    const definedFields = new Map()
+  init: ({ commit, state }, application) => {
+    const requiredFields = application || state.application
+    const undefinedFields = {}
+    const definedFields = {}
     const storageApplication = getApplication()
 
     if (storageApplication) {
-      requiredFields.forEach((value, key) => {
-        if (!(key in storageApplication) || typeof storageApplication?.[key] !== "boolean") {
-          undefinedFields.set(key, value)
+      Object.entries(requiredFields).forEach(([key, value]) => {
+        if (!(key in storageApplication) || typeof storageApplication[key] !== "boolean") {
+          undefinedFields[key] = value
         } else {
-          definedFields.set(key, storageApplication?.[key])
+          definedFields[key] = storageApplication[key]
         }
       })
-
-      if (definedFields.size !== requiredFields.size) {
+      if (Object.keys(definedFields).length !== Object.keys(requiredFields).length) {
         commit('SET_REQUIRED_FIELDS', { undefinedFields, definedFields })
       } else {
         commit('SET_APPLICATION_FIELDS', definedFields)
       }
     } else {
-      commit('SET_STORAGE_FIELDS', application || state.application)
+      commit('SET_STORAGE_FIELDS', requiredFields)
     }
   },
   update: ({ commit }, application) => {
@@ -47,27 +44,25 @@ const actions = {
 
 const mutations = {
   SET_REQUIRED_FIELDS: (state, { undefinedFields, definedFields }) => {
-    if (definedFields.size) {
-      definedFields.forEach((value, key) => {
+    if (Object.keys(definedFields).length) {
+      for (let [key, value] of Object.entries(definedFields)) {
         state.application = { ...state.application, [key]: value }
-      })
+      }
     }
-    undefinedFields.forEach((value, key) => {
+    for (let [key, value] of Object.entries(undefinedFields)) {
       state.application = { ...state.application, [key]: value }
-    })
-    const objUndefinedFields = Object.fromEntries(undefinedFields)
-    const objDefinedFields = Object.fromEntries(definedFields)
-    const storageObjFields = Object.assign({}, objUndefinedFields, objDefinedFields)
-    localStorage.setItem('application', JSON.stringify(storageObjFields))
+    }
+    const storageFields = Object.assign({}, undefinedFields, definedFields)
+    localStorage.setItem('application', JSON.stringify(storageFields))
   },
   SET_STORAGE_FIELDS: (state, application) => {
     state.application = application
     localStorage.setItem('application', JSON.stringify(application))
   },
   SET_APPLICATION_FIELDS: (state, application) => {
-    application.forEach((value, key) => {
+    for (let [key, value] of Object.entries(application)) {
       state.application = { ...state.application, [key]: value }
-    })
+    }
   }
 };
 

@@ -35,20 +35,21 @@
                 prepend-icon="mdi-email-outline"
                 placeholder="Enter your e-mail address"
                 @blur="$v.form.email.$touch()"
-                @input="$v.form.email.$touch()" />
+                @input="$v.form.email.$touch()"
+            />
           </v-col>
           <v-col cols="12" sm="6">
             <v-text-field
                 v-model="form.password"
-                :append-icon="visibility ? 'mdi-eye' : 'mdi-eye-off'"
+                :append-icon="passwordVisibility ? 'mdi-eye' : 'mdi-eye-off'"
                 :error-messages="passwordErrors"
-                :type="visibility ? 'text' : 'password'"
+                :type="passwordVisibility ? 'text' : 'password'"
                 label="Password"
                 autocomplete="password"
                 prepend-icon="mdi-lock-outline"
                 placeholder="Create your password"
                 counter
-                @click:append="visibility = !visibility"
+                @click:append="passwordVisibility = !passwordVisibility"
                 @blur="$v.form.password.$touch()"
                 @input="$v.form.password.$touch()"
             />
@@ -56,15 +57,15 @@
           <v-col cols="12" sm="6">
             <v-text-field
                 v-model="form.passwordConfirm"
-                :append-icon="visibility ? 'mdi-eye' : 'mdi-eye-off'"
+                :append-icon="passwordConfirmVisibility ? 'mdi-eye' : 'mdi-eye-off'"
                 :error-messages="passwordConfirmErrors"
-                :type="visibility ? 'text' : 'password'"
+                :type="passwordConfirmVisibility ? 'text' : 'password'"
                 label="Password Confirmation"
                 autocomplete="password-confirm"
                 prepend-icon="mdi-lock-outline"
                 placeholder="Confirm your password"
                 counter
-                @click:append="visibility = !visibility"
+                @click:append="passwordConfirmVisibility = !passwordConfirmVisibility"
                 @blur="$v.form.passwordConfirm.$touch()"
                 @input="$v.form.passwordConfirm.$touch()"
             />
@@ -74,7 +75,7 @@
                 v-model="form.acceptedTerms"
                 :error-messages="acceptedTerms"
                 on-icon="mdi-marker-check"
-                off-icon="mdi-notifications-circle-check-outline"
+                off-icon="mdi-alert-circle-check-outline"
                 color="success"
                 @change="$v.form.acceptedTerms.$touch()"
             >
@@ -152,7 +153,8 @@ export default {
       acceptedTerms: false,
     },
     loading: false,
-    visibility: false,
+    passwordVisibility: false,
+    passwordConfirmVisibility: false,
     terms: false,
     conditions: false,
     content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.',
@@ -212,8 +214,8 @@ export default {
   methods: {
     ...mapActions({
       register: 'account/register',
-      setAlert: 'notifications/setAlert',
-      setSnackbar: 'notifications/setSnackbar'
+      setAlert: 'notification/setAlert',
+      setSnackbar: 'notification/setSnackbar'
     }),
     async submit() {
       this.$v.$touch()

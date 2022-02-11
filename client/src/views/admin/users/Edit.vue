@@ -125,8 +125,8 @@
 <!--    ...mapActions({-->
 <!--      getById: 'account/getById',-->
 <!--      update: 'account/update',-->
-<!--      success: 'notifications/success',-->
-<!--      error: 'notifications/error'-->
+<!--      success: 'notification/success',-->
+<!--      error: 'notification/error'-->
 <!--    }),-->
 <!--    async onSubmit() {-->
 <!--      const validated = await this.v$.$validate()-->

@@ -206,9 +206,9 @@ const update = async (id, params) => {
 
   // hash password if it was entered
   if (params.password) {
-    params.passwordHash = hash(params.password);
+    if (!bcrypt.compareSync(params.password, account.passwordHash)) throw 'Password is incorrect'
+    params.passwordHash = hash(params.password)
   }
-
   // copy params to account and save
   Object.assign(account, params);
   account.updated = Date.now();

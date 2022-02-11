@@ -29,8 +29,8 @@ export default {
   methods: {
     ...mapActions({
       verifyEmail: 'account/verifyEmail',
-      setAlert: 'notifications/setAlert',
-      setSnackbar: 'notifications/setSnackbar'
+      setAlert: 'notification/setAlert',
+      setSnackbar: 'notification/setSnackbar'
     }),
     async verify(token) {
       if (token) {
@@ -60,7 +60,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

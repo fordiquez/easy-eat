@@ -55,8 +55,8 @@ export default {
   methods: {
     ...mapActions({
       forgotPassword: 'account/forgotPassword',
-      setAlert: 'notifications/setAlert',
-      setSnackbar: 'notifications/setSnackbar'
+      setAlert: 'notification/setAlert',
+      setSnackbar: 'notification/setSnackbar'
     }),
     async submit() {
       this.$v.$touch()
@@ -76,7 +76,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

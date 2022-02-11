@@ -62,8 +62,8 @@
 <!--    ...mapActions({-->
 <!--      getAll: 'account/getAll',-->
 <!--      delete: 'account/delete',-->
-<!--      success: 'notifications/success',-->
-<!--      error: 'notifications/error'-->
+<!--      success: 'notification/success',-->
+<!--      error: 'notification/error'-->
 <!--    }),-->
 <!--    async loadUsers() {-->
 <!--      await this.getAll().then(res => {-->

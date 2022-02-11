@@ -15,7 +15,6 @@
                 @blur="$v.form.email.$touch()"
                 @input="$v.form.email.$touch()" />
           </v-col>
-
           <v-col cols="12">
             <v-text-field
                 v-model="form.password"
@@ -81,8 +80,8 @@ export default {
   methods: {
     ...mapActions({
       login: 'account/login',
-      setAlert: 'notifications/setAlert',
-      setSnackbar: 'notifications/setSnackbar'
+      setAlert: 'notification/setAlert',
+      setSnackbar: 'notification/setSnackbar'
     }),
     async submit() {
       this.$v.$touch()
@@ -90,7 +89,7 @@ export default {
         this.loading = true
         await this.login(this.form).then(async response => {
           console.log(response)
-          await this.$router.push({ name: 'Home' })
+          await this.$router.push({ name: 'Dashboard' })
           await this.setAlert({ type: 'success', text: response.data.message })
           await this.setSnackbar({ color: 'success', text: response.data.message })
         }).catch(error => {
