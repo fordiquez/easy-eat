@@ -1,15 +1,43 @@
-<!--<template>-->
-<!--  <h2>Admin</h2>-->
-<!--  <p>This section can only be accessed by administrators.</p>-->
-<!--  <router-link :to="{ name: 'UsersList' }" class="btn btn-primary">Manage Users</router-link>-->
-<!--</template>-->
+<template>
+  <v-card>
+    <v-toolbar flat color="success" dark>
+      <v-toolbar-title>Admin Panel</v-toolbar-title>
+    </v-toolbar>
+    <v-tabs color="success" grow show-arrows>
+      <v-tab :to="{ name: 'Users' }">
+        <v-icon left>mdi-account-details</v-icon>
+        <span>Users</span>
+      </v-tab>
+    </v-tabs>
+    <router-view :user="user" />
+  </v-card>
+</template>
 
-<!--<script>-->
-<!--export default {-->
-<!--  name: "Admin"-->
-<!--}-->
-<!--</script>-->
+<script>
+import { mapActions, mapGetters } from "vuex";
 
-<!--<style scoped>-->
-
-<!--</style>-->
+export default {
+  name: "Admin",
+  data: () => ({
+    user: null,
+  }),
+  async created() {
+    this.user = this.getUserValue
+    await this.getCurrentUser()
+  },
+  computed: {
+    ...mapGetters('account', ['getUser', 'getUserValue'])
+  },
+  methods: {
+    ...mapActions('account', ['getById']),
+    async getCurrentUser() {
+      console.log("index: " + this.user.id)
+      await this.getById(this.user.id).then(async () => {
+        await this.getUser.subscribe(user => this.user = user)
+      }).catch(error => {
+        console.log(error.response)
+      })
+    }
+  }
+}
+</script>

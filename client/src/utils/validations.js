@@ -22,7 +22,7 @@ export const emailErrors = (email) => {
   const errors = []
   if (email.$dirty) {
     !email.email && errors.push('Must be valid e-mail')
-    !email.required && errors.push('E-mail is required')
+    !email.required && errors.push('Email is required')
   }
   return errors
 }
@@ -52,6 +52,14 @@ export const acceptedTermsErrors = (acceptedTerms) => {
   const errors = []
   if (acceptedTerms.$dirty) {
     !acceptedTerms.sameAs && errors.push('You don\'t have a choice, you eat it')
+  }
+  return errors
+}
+
+export const roleErrors = (role) => {
+  const errors = []
+  if (role.$dirty) {
+    !role.required && errors.push('Role is required')
   }
   return errors
 }

@@ -9,8 +9,7 @@ const token = new BehaviorSubject(getToken())
 const state = () => ({
   user,
   token,
-  users: [],
-  loading: false
+  users: []
 })
 const getters = {
   getUser: (state) => state.user.asObservable(),
@@ -21,9 +20,9 @@ const getters = {
 }
 
 const actions = {
-  register: async ({ commit }, user) => {
-    commit('SET_LOADING_STATUS', true)
-    return accountService.register(user).finally(() => commit('SET_LOADING_STATUS', true))
+  // eslint-disable-next-line no-empty-pattern
+  register: async ({  }, user) => {
+    return accountService.register(user)
   },
   async login ({ commit }, { email, password }) {
     return await accountService.login(email, password).then(response => {
@@ -40,21 +39,21 @@ const actions = {
   logout: async ({ commit }) => {
     return accountService.logout().finally(() => commit('LOGOUT_USER'))
   },
-  verifyEmail: async ({ commit }, token) => {
-    commit('SET_LOADING_STATUS', true)
-    return accountService.verifyEmail(token).finally(() => commit('SET_LOADING_STATUS', true))
+  // eslint-disable-next-line no-empty-pattern
+  verifyEmail: async ({  }, token) => {
+    return accountService.verifyEmail(token)
   },
-  forgotPassword: async ({ commit }, email) => {
-    commit('SET_LOADING_STATUS', true)
-    return accountService.forgotPassword(email).finally(() => commit('SET_LOADING_STATUS', true))
+  // eslint-disable-next-line no-empty-pattern
+  forgotPassword: async ({  }, email) => {
+    return accountService.forgotPassword(email)
   },
-  validateResetToken: async ({ commit }, token) => {
-    commit('SET_LOADING_STATUS', true)
-    return accountService.validateResetToken(token).finally(() => commit('SET_LOADING_STATUS', true))
+  // eslint-disable-next-line no-empty-pattern
+  validateResetToken: async ({  }, token) => {
+    return accountService.validateResetToken(token)
   },
-  resetPassword: async ({ commit }, { token, password, passwordConfirm }) => {
-    commit('SET_LOADING_STATUS', true)
-    return accountService.resetPassword(token, password, passwordConfirm).finally(() => commit('SET_LOADING_STATUS', true))
+  // eslint-disable-next-line no-empty-pattern
+  resetPassword: async ({  }, { token, password, passwordConfirm }) => {
+    return accountService.resetPassword(token, password, passwordConfirm)
   },
   getById: ({ commit }, id) => {
     return accountService.getById(id).then(response => {
@@ -63,46 +62,35 @@ const actions = {
     })
   },
   getAll: async ({ commit }) => {
-    commit('SET_LOADING_STATUS', true)
-    return await accountService.getAll().then(res => {
-      console.log(res)
-      commit('SET_SUCCESS_STATUS', { status: true, message: res.data.message })
-      commit('SET_USERS', res.data)
-      return Promise.resolve(res)
-    }).catch(error => {
-      console.log(error)
-      commit('SET_ERROR_STATUS', { status: true, message: error.response.data.message })
-      return error
-    }).finally(() => commit('SET_LOADING_STATUS', false))
-  },
-  create: async ({ commit }, user) => {
-    commit('SET_LOADING_STATUS', true)
-    return await accountService.create(user).then(res => {
-      console.log(res)
-      commit('SET_SUCCESS_STATUS', { status: true, message: res.data.message })
-    }).catch(error => {
-      console.log(error.response)
-      commit('SET_ERROR_STATUS', { status: true, message: error.response.data.message })
-    }).finally(() => commit('SET_LOADING_STATUS', false))
-  },
-  update: async ({ commit }, user) => {
-    return await accountService.update(user.id, user).then(response => {
-      commit('SET_USER', response.data)
+    return await accountService.getAll().then(response => {
+      commit('SET_USERS', response.data)
       return response
     })
   },
-  delete: async ({ commit }, id) => {
-    commit('SET_LOADING_STATUS', true)
-    return await accountService.delete(id).then(res => {
-      console.log(res)
-      commit('SET_SUCCESS_STATUS', { status: true, message: res.data.message })
-      if (state.user.value.id === id) commit('LOGOUT')
-      return res
-    }).catch(error => {
-      console.log(error)
-      commit('SET_ERROR_STATUS', { status: true, message: error.response.data.message })
-      return error
-    }).finally(() => commit('SET_LOADING_STATUS', false))
+  create: async ({ commit }, user) => {
+    return await accountService.create(user).then(response => {
+      commit('SET_CREATED_USER', response.data)
+      return response
+    })
+  },
+  update: async ({ commit, getters }, user) => {
+    return await accountService.update(user.id, user).then(response => {
+      if (response.data.id === getters.getUserValue.id) {
+        commit('SET_USER', response.data)
+        if (getters.getUsers.length) {
+          commit('SET_UPDATED_USER', response.data)
+        }
+      } else {
+        commit('SET_UPDATED_USER', response.data)
+      }
+      return response
+    })
+  },
+  delete: async ({ commit, getters }, id) => {
+    return await accountService.delete(id).then(response => {
+      getters.getUserValue.id === id ? commit('LOGOUT_USER') : commit('SET_DELETED_USER', id)
+      return response
+    })
   }
 }
 
@@ -122,12 +110,23 @@ const mutations = {
     localStorage.removeItem('jwtToken')
     state.user.next(null)
     state.token.next(null)
+    state.users = []
   },
   SET_USERS: (state, users) => {
     state.users = users
   },
-  SET_LOADING_STATUS: (state, status) => {
-    state.loading = status
+  SET_CREATED_USER: (state, response) => {
+    const user = excludedFilter(response, ['message'])
+    state.users.push(user)
+  },
+  SET_UPDATED_USER: (state, response) => {
+    const user = excludedFilter(response, ['message'])
+    const userIndex = state.users.findIndex(item => item.id === user.id)
+    Object.assign(state.users[userIndex], user)
+  },
+  SET_DELETED_USER: (state, id) => {
+    const userIndex = state.users.findIndex(item => item.id === id)
+    state.users.splice(userIndex, 1)
   }
 };
 

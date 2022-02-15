@@ -157,7 +157,6 @@ const refreshToken = async ({ token, ipAddress }) => {
 
 const revokeToken = async (token) => {
   const refreshToken = await getRefreshToken(token);
-  console.log(refreshToken)
   // remove token from the collection
   await refreshToken.remove();
   return {
@@ -198,16 +197,19 @@ const create = async (params) => {
 
 const update = async (id, params) => {
   const account = await getAccount(id);
+  console.log(params)
 
   // validate (if email was changed)
   if (params.email && account.email !== params.email && await db.Account.findOne({ email: params.email })) {
     throw 'Email "' + params.email + '" is already taken';
   }
 
-  // hash password if it was entered
   if (params.password) {
-    if (!bcrypt.compareSync(params.password, account.passwordHash)) throw 'Password is incorrect'
-    params.passwordHash = hash(params.password)
+    if (!bcrypt.compareSync(params.password, account.passwordHash)) throw 'Unfortunately, your current password is incorrect'
+    if (params.updatedPassword && params.updatedPasswordConfirm) {
+      // hash password if it was changed
+      params.passwordHash = hash(params.updatedPassword)
+    }
   }
   // copy params to account and save
   Object.assign(account, params);

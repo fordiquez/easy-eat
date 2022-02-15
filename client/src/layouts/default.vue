@@ -43,10 +43,15 @@
       <v-btn v-if="!user" :to="{ name: 'Login' }" active-class="success--text" text>Log In</v-btn>
       <v-btn v-if="!user" :to="{ name: 'Register' }" active-class="success--text" text>Sign Up</v-btn>
       <v-menu v-if="user" bottom left offset-y>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" icon active-class="success--text">
-            <v-icon>mdi-account-cog-outline</v-icon>
-          </v-btn>
+        <template v-slot:activator="{ on: menu, attrs }">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on: tooltip }">
+              <v-btn v-bind="attrs" v-on="{ ...tooltip, ...menu }" icon active-class="success--text">
+                <v-icon>mdi-account-cog-outline</v-icon>
+              </v-btn>
+            </template>
+            <span>Account</span>
+          </v-tooltip>
         </template>
         <v-list>
           <v-list-item v-for="(item, index) in routes.account" :key="index" :to="{ name: item.to }" active-class="success--text" link exact dense>
@@ -126,6 +131,7 @@ export default {
         { icon: 'mdi-chart-gantt', title: 'Account recovery', to: 'ForgotPassword' },
         { icon: 'mdi-account-music-outline', title: 'Reset Password', to: 'ResetPassword' },
         { icon: 'mdi-flash-auto', title: 'Email Verification', to: 'VerifyEmail' },
+        { icon: 'mdi-account-group-outline', title: 'Admin Users', to: 'Users' },
       ],
       account: [
         { icon: 'mdi-account-details', title: 'My Profile', to: 'Profile' },

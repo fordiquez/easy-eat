@@ -29,20 +29,6 @@ export default {
   data: () => ({
     user: null,
   }),
-  watch: {
-    top (val) {
-      this.bottom = !val
-    },
-    right (val) {
-      this.left = !val
-    },
-    bottom (val) {
-      this.top = !val
-    },
-    left (val) {
-      this.right = !val
-    },
-  },
   async created() {
     this.user = this.getUserValue
     await this.getCurrentUser()

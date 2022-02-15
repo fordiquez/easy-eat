@@ -3,7 +3,7 @@
     <v-card-title>
       <span class="text-h5">My Profile</span>
     </v-card-title>
-    <v-form>
+    <v-form @submit.native="onDialog">
       <v-container fluid>
         <v-row>
           <v-col cols="12" sm="6">
@@ -12,9 +12,10 @@
                 prepend-icon="mdi-account-outline"
                 label="First Name"
                 :loading="dialog"
-                @click="onDialog"
                 readonly
-            />
+            >
+              <v-btn slot="append" color="success" class="mb-2" @click="onDialog" text>Update First Name</v-btn>
+            </v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
             <v-text-field
@@ -22,9 +23,10 @@
                 prepend-icon="mdi-account-outline"
                 label="Last Name"
                 :loading="dialog"
-                @click="onDialog"
                 readonly
-            />
+            >
+              <v-btn slot="append" color="success" class="mb-2" @click="onDialog" text>Update Last Name</v-btn>
+            </v-text-field>
           </v-col>
         </v-row>
       </v-container>
@@ -53,6 +55,7 @@
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-text-field
+                          ref="lastName"
                           v-model="fullName.lastName"
                           :error-messages="lastNameErrors"
                           label="Last Name"
@@ -145,7 +148,9 @@ export default {
         console.log(error.response)
       })
     },
-    onDialog() {
+    onDialog(event) {
+      const value = event.path[3].children[0].children[1].value || event.path[2].children[0].children[1].value
+      value === this.profile.lastName ? setTimeout(() => this.$refs.lastName.focus(), 0) : null
       this.dialog = true
       this.fullName.firstName = this.profile.firstName
       this.fullName.lastName = this.profile.lastName

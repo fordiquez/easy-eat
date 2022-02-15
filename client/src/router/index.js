@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import {getToken, getUser, isAuthorized} from "@/utils/storage"
+import { getToken, getUser, isAuthorized } from "@/utils/storage"
 import { Role } from "@/utils/role"
 import Home from "@/views/home/Index"
 import Login from "@/views/account/Login"
@@ -9,8 +9,7 @@ import ForgotPassword from "@/views/account/ForgotPassword"
 import VerifyEmail from "@/views/account/VerifyEmail"
 import ResetPassword from "@/views/account/ResetPassword"
 import Admin from "@/views/admin/Index"
-import UsersList from "@/views/admin/users/List"
-import UserCreate from "@/views/admin/users/Create"
+import Users from "@/views/admin/users/Index"
 import UserEdit from "@/views/admin/users/Edit"
 import DailyLog from "@/views/daily-log/Index"
 import Settings from "@/views/settings/Index"
@@ -65,25 +64,22 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: Admin,
-    meta: { authorized: [Role.Admin] }
-  },
-  {
-    path: '/admin/users',
-    name: 'UsersList',
-    component: UsersList,
-    meta: { authorized: [Role.Admin] }
-  },
-  {
-    path: '/admin/users/create',
-    name: 'UserCreate',
-    component: UserCreate,
-    meta: { authorized: [Role.Admin] }
-  },
-  {
-    path: '/admin/users/edit/:id',
-    name: 'UserEdit',
-    component: UserEdit,
-    meta: { authorized: [Role.Admin] }
+    meta: { authorized: [Role.Admin] },
+    redirect: '/admin/users',
+    children: [
+      {
+        path: 'users',
+        name: 'Users',
+        component: Users,
+        meta: { authorized: [Role.Admin] }
+      },
+      {
+        path: 'users/edit/:id',
+        name: 'UserEdit',
+        component: UserEdit,
+        meta: { authorized: [Role.Admin] }
+      }
+    ]
   },
   {
     path: '/account/login',
@@ -131,9 +127,9 @@ router.beforeEach((to, from, next) => {
       user || token ? store.commit('account/LOGOUT_USER') : null
       return next({ name: 'Login' })
     }
-    if (authorized.length && !authorized.includes(user.role)) return next({ name: 'Home' })
+    if (authorized.length && !authorized.includes(user.role)) return next({ name: 'Dashboard' })
   }
-  next()
+  return next()
 })
 
 export default router
