@@ -1,11 +1,11 @@
-import { DefaultAPIInstance } from "@/utils/axios";
+import { DefaultAPI } from "@/utils/axios";
 import { tokenExpirationTime } from "@/utils/storage";
 
 const baseURL = '/accounts'
 
 const login = (email, password) => {
-  return DefaultAPIInstance.post(`${baseURL}/authenticate`, { email, password }).then(response => {
-    DefaultAPIInstance.interceptors.request.use(config => {
+  return DefaultAPI.post(`${baseURL}/authenticate`, { email, password }).then(response => {
+    DefaultAPI.interceptors.request.use(config => {
       config.headers['Authorization'] = `Bearer ${response.data.jwtToken}`
       return config
     }, error => {
@@ -18,11 +18,11 @@ const login = (email, password) => {
 }
 
 const logout = () => {
-  return DefaultAPIInstance.post(`${baseURL}/revoke-token`, {})
+  return DefaultAPI.post(`${baseURL}/revoke-token`, {})
 }
 
 const refreshToken = () => {
-  return DefaultAPIInstance.post(`${baseURL}/refresh-token`, {}).then(response => {
+  return DefaultAPI.post(`${baseURL}/refresh-token`, {}).then(response => {
     tokenExpirationTime(response.data)
     return response
   }).catch(error => {
@@ -31,43 +31,43 @@ const refreshToken = () => {
 }
 
 const register = (user) => {
-  return DefaultAPIInstance.post(`${baseURL}/register`, user)
+  return DefaultAPI.post(`${baseURL}/register`, user)
 }
 
 const verifyEmail = (token) => {
-  return DefaultAPIInstance.post(`${baseURL}/verify-email`, { token })
+  return DefaultAPI.post(`${baseURL}/verify-email`, { token })
 }
 
 const forgotPassword = (email) => {
-  return DefaultAPIInstance.post(`${baseURL}/forgot-password`, { email })
+  return DefaultAPI.post(`${baseURL}/forgot-password`, { email })
 }
 
 const validateResetToken = (token) => {
-  return DefaultAPIInstance.post(`${baseURL}/validate-reset-token`, { token })
+  return DefaultAPI.post(`${baseURL}/validate-reset-token`, { token })
 }
 
 const resetPassword = (token, password, passwordConfirm) => {
-  return DefaultAPIInstance.post(`${baseURL}/reset-password`, { token, password, passwordConfirm })
+  return DefaultAPI.post(`${baseURL}/reset-password`, { token, password, passwordConfirm })
 }
 
 const getAll = () => {
-  return DefaultAPIInstance.get(`${baseURL}/`)
+  return DefaultAPI.get(`${baseURL}/`)
 }
 
 const create = (user) => {
-  return DefaultAPIInstance.post(`${baseURL}/`, user)
+  return DefaultAPI.post(`${baseURL}/`, user)
 }
 
 const getById = (id) => {
-  return DefaultAPIInstance.get(`${baseURL}/${id}`)
+  return DefaultAPI.get(`${baseURL}/${id}`)
 }
 
 const update = (id, payload) => {
-  return DefaultAPIInstance.put(`${baseURL}/${id}`, payload)
+  return DefaultAPI.put(`${baseURL}/${id}`, payload)
 }
 
 const _delete = (id) => {
-  return DefaultAPIInstance.delete(`${baseURL}/${id}`)
+  return DefaultAPI.delete(`${baseURL}/${id}`)
 }
 
 export const accountService = {

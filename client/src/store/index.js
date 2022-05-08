@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import { account } from "@/store/account"
 import { notification } from "@/store/notification"
 import { application } from "@/store/application"
-import { product } from "@/store/product"
+import { food } from "@/store/food"
 
 Vue.use(Vuex)
 
@@ -18,6 +18,6 @@ export default new Vuex.Store({
     account,
     notification,
     application,
-    product
+    food
   }
 })

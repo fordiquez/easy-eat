@@ -16,12 +16,13 @@
           <v-text-field
               v-model="search"
               append-icon="mdi-magnify"
+              color="success"
               label="Search"
               placeholder="Please enter at least 1 character of the user account email address"
               ref="search"
               @keydown.esc="onSearch"
               @click="onSearch"
-              hide-details
+              full-width
           />
           <v-btn class="ml-3" color="success" @click="isCreating = true" dark>New Item</v-btn>
         </v-toolbar>

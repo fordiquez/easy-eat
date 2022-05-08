@@ -2,27 +2,38 @@ import axios from "axios";
 import {getCookie, getToken, isTokenExpired, tokenExpirationTime} from "@/utils/storage";
 import store from '@/store/index'
 
-const rapidConfig = {
-  baseURL: process.env.VUE_APP_RAPID_API_NUTRITION_ANALYSIS_URL,
+const nutritionAnalysisConfig = {
+  baseURL: process.env.VUE_APP_API_NUTRITION_ANALYSIS_URL,
   headers: {
-    'x-rapidapi-host': process.env.VUE_APP_RAPID_API_HOST,
+    'x-rapidapi-host': process.env.VUE_APP_API_NUTRITION_ANALYSIS_HOST,
     'x-rapidapi-key': process.env.VUE_APP_RAPID_API_KEY
   }
 }
 
-export const RapidAPIInstance = axios.create(rapidConfig)
+export const NutritionAnalysisAPI = axios.create(nutritionAnalysisConfig)
 
-const defaultConfig = {
-  baseURL: process.env.VUE_APP_BASE_URL,
-  withCredentials: true,
+const nutritionInfoConfig = {
+  baseURL: process.env.VUE_APP_API_FOOD_DATABASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    'x-rapidapi-host': process.env.VUE_APP_API_FOOD_DATABASE_HOST,
+    'x-rapidapi-key': process.env.VUE_APP_RAPID_API_KEY
   }
 }
 
-export const DefaultAPIInstance = axios.create(defaultConfig)
+export const NutritionInfoAPI = axios.create(nutritionInfoConfig)
 
-DefaultAPIInstance.interceptors.request.use(async (config) => {
+const defaultConfig = {
+  baseURL: process.env.VUE_APP_BASE_API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Private-Network': true
+  }
+}
+
+export const DefaultAPI = axios.create(defaultConfig)
+
+DefaultAPI.interceptors.request.use(async (config) => {
   const token = getToken()
   const cookie = getCookie('refreshToken')
   token ? config.headers.Authorization = `Bearer ${token.token}` : delete config.headers.Authorization
@@ -37,8 +48,11 @@ DefaultAPIInstance.interceptors.request.use(async (config) => {
       store.commit('account/SET_USER', response.data)
       store.commit('account/SET_TOKEN', jwtToken)
       config.headers['Authorization'] = `Bearer ${response.data.jwtToken}`
-    }).catch(error => {
-      return Promise.reject(error)
+    }).catch(async error => {
+      console.log(error.response)
+      await store.commit('account/LOGOUT_USER')
+      await this.$router.push({ name: 'Login' })
+      await store.dispatch('notification/setSnackbar', { type: 'error', text: error.response })
     })
   }
   return config

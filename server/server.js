@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const errorHandler = require('middlewares/error-handler');
 const accountsRoutes = require('routes/accounts.routes')
-const productsRoutes = require('routes/products.routes')
+const foodsRoutes = require('routes/foods.routes')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -26,7 +26,7 @@ app.use(cors(corsOptions));
 
 // api routes
 app.use('/accounts', accountsRoutes);
-app.use('/products', productsRoutes);
+app.use('/foods', foodsRoutes);
 
 // swagger docs route
 app.use('/api-docs', require('helpers/swagger.helper'));
@@ -37,5 +37,6 @@ app.use(errorHandler);
 // start server
 const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
 app.listen(port, () => {
-  console.log('Server listening on port ' + port);
+  const date = new Date().toLocaleTimeString()
+  console.log('[' + date + ']' + ' Server listening on port ' + port);
 });

@@ -87,12 +87,10 @@ const authenticate = (req, res, next) => {
 const refreshToken = (req, res, next) => {
   const token = req.cookies.refreshToken;
   const ipAddress = req.ip;
-  accountService.refreshToken({ token, ipAddress })
-    .then(({ refreshToken, ...account }) => {
+  accountService.refreshToken({ token, ipAddress }).then(({ refreshToken, ...account }) => {
       setTokenCookie(res, refreshToken);
       res.json(account);
-    })
-    .catch(next);
+    }).catch(next);
 }
 
 const revokeTokenSchema = (req, res, next) => {

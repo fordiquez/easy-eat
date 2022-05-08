@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer v-model="application.drawer" :clipped="application.clipped" :mini-variant="application.miniVariant" app fixed>
+    <v-navigation-drawer v-model="application.drawer" @input="drawer" :clipped="application.clipped" :mini-variant="application.miniVariant" app fixed>
       <v-list-item class="d-flex justify-center align-center">
         <v-list-item-avatar>
           <v-img alt="Logo" title="Logo" :src="require('@/assets/logo.svg')" />
@@ -77,7 +77,7 @@
       <v-container>
         <Alert v-if="isActiveAlert" />
         <Snackbar v-if="isActiveSnackbar" />
-        <router-view />
+        <router-view :user="user" />
       </v-container>
     </v-main>
     <v-navigation-drawer v-model="rightDrawer" right temporary hide-overlay fixed>
@@ -126,6 +126,7 @@ export default {
     routes: {
       drawer: [
         { icon: 'mdi-circle-half-full', title: 'Dashboard', to: 'Dashboard' },
+        { icon: 'mdi-math-log', title: 'Daily Log', to: 'DailyLog' },
         { icon: 'mdi-flower-tulip-outline', title: 'Log In', to: 'Login' },
         { icon: 'mdi-movie-play-outline', title: 'Sign Up', to: 'Register' },
         { icon: 'mdi-chart-gantt', title: 'Account recovery', to: 'ForgotPassword' },
@@ -190,6 +191,10 @@ export default {
     onRightDrawer() {
       this.rightDrawer = !this.rightDrawer
     },
+    drawer(value) {
+      this.application.drawer = value
+      this.update(this.application)
+    }
   }
 }
 </script>

@@ -4,23 +4,17 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { getCookie } from "@/utils/storage"
 import DefaultLayout from "@/layouts/default"
 
 export default {
   name: 'app',
   components: { DefaultLayout },
-  data() {
-    return {
-      user: null
-    }
-  },
+  data: () => ({
+    user: null
+  }),
   created() {
+    // console.log(window.matchMedia("(prefers-color-scheme: light)").matches)
     this.getUser.subscribe(user => this.user = user)
-  },
-  mounted() {
-    const cookie = getCookie('refreshToken')
-    console.log('refreshToken cookie: ' + cookie)
   },
   computed: {
     layout() {

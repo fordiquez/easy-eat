@@ -5,7 +5,7 @@ const schema = new Schema({
   account: { type: Schema.Types.ObjectId, ref: 'Account' },
   token: String,
   expires: Date,
-  created: { type: Date, default: Date.now },
+  created: { type: Date, default: Date.now() },
   createdByIp: String,
   revoked: Date,
   revokedByIp: String,
