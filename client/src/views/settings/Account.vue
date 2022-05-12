@@ -12,9 +12,10 @@
                 prepend-icon="mdi-email-outline"
                 label="Email address"
                 :loading="updateEmailDialog"
-                readonly disabled
-            >
-              <v-btn slot="append" color="success" class="mb-2" @click="updateEmailDialog = true" text>Update Email</v-btn>
+                readonly disabled>
+              <template v-slot:append>
+                <v-btn color="success" class="mb-2" @click="updateEmailDialog = true" text>Update Email</v-btn>
+              </template>
             </v-text-field>
           </v-col>
         </v-row>
@@ -27,9 +28,10 @@
                 label="Current password"
                 autocomplete="current_password"
                 :loading="updatePasswordDialog"
-                readonly disabled
-            >
-              <v-btn slot="append" color="success" class="mb-2" @click="updatePasswordDialog = true" text>Update Password</v-btn>
+                readonly disabled>
+              <template v-slot:append>
+                <v-btn color="success" class="mb-2" @click="updatePasswordDialog = true" text>Update Password</v-btn>
+              </template>
             </v-text-field>
           </v-col>
         </v-row>

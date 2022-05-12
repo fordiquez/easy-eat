@@ -70,6 +70,14 @@ const _delete = (id) => {
   return DefaultAPI.delete(`${baseURL}/${id}`)
 }
 
+const uploadAvatar = (file, id, onUploadProgress) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  return DefaultAPI.post(`${baseURL}/upload/${id}`, formData, {
+    onUploadProgress
+  })
+}
+
 export const accountService = {
   login,
   logout,
@@ -83,5 +91,6 @@ export const accountService = {
   create,
   getById,
   update,
-  delete: _delete
+  delete: _delete,
+  uploadAvatar
 };

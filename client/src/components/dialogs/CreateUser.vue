@@ -194,11 +194,11 @@ export default {
       create: 'account/create',
       setSnackbar: 'notification/setSnackbar'
     }),
-    async onSubmit() {
+    onSubmit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loading = true
-        await this.create(this.user).then(response => {
+        this.create(this.user).then(response => {
           console.log(response)
           this.setSnackbar({ color: 'success', text: response.data.message })
           this.onCloseDialog()

@@ -127,6 +127,7 @@ export default {
       drawer: [
         { icon: 'mdi-circle-half-full', title: 'Dashboard', to: 'Dashboard' },
         { icon: 'mdi-math-log', title: 'Daily Log', to: 'DailyLog' },
+        { icon: 'mdi-clipboard-text', title: 'Onboarding', to: 'Onboarding' },
         { icon: 'mdi-flower-tulip-outline', title: 'Log In', to: 'Login' },
         { icon: 'mdi-movie-play-outline', title: 'Sign Up', to: 'Register' },
         { icon: 'mdi-chart-gantt', title: 'Account recovery', to: 'ForgotPassword' },
@@ -167,9 +168,9 @@ export default {
       setAlert: 'notification/setAlert',
       setSnackbar: 'notification/setSnackbar'
     }),
-    async onLogout() {
+    onLogout() {
       this.loading = true
-      await this.logout().then(async response => {
+      this.logout().then(async response => {
         console.log(response)
         this.$route.name !== 'Login' ? await this.$router.push({ name: 'Login' }) : null
         await this.setAlert({ type: 'success', text: response.data.message })

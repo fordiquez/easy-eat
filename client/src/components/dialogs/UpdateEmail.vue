@@ -114,11 +114,11 @@ export default {
       update: 'account/update',
       setSnackbar: 'notification/setSnackbar'
     }),
-    async onSubmit() {
+    onSubmit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loading = true
-        await this.update(this.updatedAccount).then(response => {
+        this.update(this.updatedAccount).then(response => {
           console.log(response)
           this.$emit('updated-email', response.data.email)
           this.onCloseDialog()

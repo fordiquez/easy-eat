@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="error" :loading="loading" shaped>
+  <v-card v-if="error" :loading="loading" rounded>
     <v-card-title>Email verification</v-card-title>
     <v-card-subtitle class="pb-0">Verification failed</v-card-subtitle>
     <v-card-text class="text--primary text-button">

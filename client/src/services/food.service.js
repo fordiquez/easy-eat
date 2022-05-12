@@ -19,7 +19,7 @@ const get = async (params) => {
 }
 
 const edit = async (payload) => {
-  return await DefaultAPI.put(`${baseURL}/${payload._id}`, payload)
+  return await DefaultAPI.put(`${baseURL}/${payload.id}`, payload)
 }
 
 const _delete = async (id) => {

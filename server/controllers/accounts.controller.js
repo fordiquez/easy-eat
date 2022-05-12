@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const validateRequest = require('middlewares/validate-request');
 const Role = require('helpers/role.helper');
-const accountService = require('../services/accounts.service');
+const accountService = require('services/accounts.service');
 
 const registerSchema = (req, res, next) => {
   const schema = Joi.object({
@@ -161,15 +161,12 @@ const updateSchema = (req, res, next) => {
   validateRequest(req, next, schema);
 }
 
-const update = (req, res, next) => {
+const update = async (req, res, next) => {
   // users can update their own account and admins can update any account
   if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
-
-  accountService.update(req.params.id, req.body)
-    .then(account => res.json(account))
-    .catch(next);
+  accountService.update(req.params.id, req.body).then(account => res.json(account)).catch(next);
 }
 
 const _delete = (req, res, next) => {
@@ -178,9 +175,23 @@ const _delete = (req, res, next) => {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  accountService.delete(req.params.id)
-    .then(account => res.json(account))
-    .catch(next);
+  accountService.delete(req.params.id).then(account => res.json(account)).catch(next);
+}
+
+const uploadAvatar = async (req, res, next) => {
+  await accountService.uploadAvatar(req, res).then(avatar => res.json(avatar)).catch(next)
+}
+
+const getAvatar = async (req, res, next) => {
+  await accountService.getAvatar(req, res).then(avatar => avatar).catch(next)
+}
+
+const updatedAvatar = async (req, res, next) => {
+  await accountService.updatedAvatar(req, res).then(avatar => avatar).catch(next)
+}
+
+const deleteAvatar = async (req, res, next) => {
+  await accountService.deleteAvatar(req, res).then(avatar => res.json(avatar)).catch(next)
 }
 
 // helper functions
@@ -216,5 +227,9 @@ module.exports = {
   createSchema,
   update,
   updateSchema,
-  _delete
+  _delete,
+  uploadAvatar,
+  getAvatar,
+  updatedAvatar,
+  deleteAvatar,
 }

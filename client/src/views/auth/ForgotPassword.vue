@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading" flat>
+  <v-card :loading="loading" rounded>
     <v-card-title>Account recovery</v-card-title>
     <v-card-subtitle class="pb-0">Please enter the email from your account</v-card-subtitle>
     <v-form ref="form" @submit.prevent="submit">

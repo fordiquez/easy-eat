@@ -11,55 +11,64 @@
       </v-btn>
       <v-list v-if="mealTimeItems.length">
         <v-list-item-group v-model="selection" color="success">
-          <v-list-item v-for="item in mealTimeItems" :key="item._id" @click="onSelectedFoodItem(item)">
-            <v-list-item-avatar width="70" height="70">
-              <v-img :src="item.image || image" :lazy-src="item.image || image" />
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title class="text-h6">{{ item.label }}</v-list-item-title>
-              <v-list-item-subtitle>{{ item.category }}</v-list-item-subtitle>
-              <v-list-item-subtitle>{{ item.servings }} {{ item.servings > 1 ? item.measure + 's' : item.measure }}</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-col cols="6" class="d-flex">
+          <v-list-item v-for="item in mealTimeItems" :key="item.id" @click="onSelectedFoodItem(item)">
+            <v-row class="d-flex flex-column flex-sm-row">
+              <v-col cols="12" sm="4" md="6" class="d-flex">
+                <v-list-item-avatar width="70" height="70">
+                  <v-img :src="item.image || image" :lazy-src="item.image || image" />
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title class="text-h6">{{ item.label }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ item.category }}</v-list-item-subtitle>
+                  <v-list-item-subtitle>{{ item.servings }} {{ item.servings > 1 ? item.measure + 's' : item.measure }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-col>
+              <v-col cols="12" sm="8" md="6" class="d-sm-flex hidden-xs-only">
+                <v-list-item-content class="d-flex flex-column align-center">
+                  <v-list-item-title class="text-subtitle-1">Net Carbs</v-list-item-title>
+                  <v-list-item-subtitle>{{ item.nutrients.CARBS | fixed }}</v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-content class="d-flex flex-column align-center">
+                  <v-list-item-title class="text-subtitle-1">Protein</v-list-item-title>
+                  <v-list-item-subtitle>{{ item.nutrients.PROTEIN | fixed }}</v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-content class="d-flex flex-column align-center">
+                  <v-list-item-title class="text-subtitle-1">Fat</v-list-item-title>
+                  <v-list-item-subtitle>{{ item.nutrients.FAT | fixed }}</v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-content class="d-flex flex-column align-center">
+                  <v-list-item-title class="text-subtitle-1">Cals</v-list-item-title>
+                  <v-list-item-subtitle>{{ item.nutrients.CALS | fixed }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-col>
+            </v-row>
+          </v-list-item>
+        </v-list-item-group>
+        <v-list-item v-if="mealTimeItems.length" class="hidden-xs-only">
+          <v-row class="d-flex flex-column flex-sm-row">
+            <v-col cols="12" sm="4" md="6" xs="2" class="d-flex">
+              <v-list-item-title class="text-h6">{{ mealTime }} Total</v-list-item-title>
+            </v-col>
+            <v-col cols="12" sm="8" md="6" xs="2" class="d-flex">
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Net Carbs</v-list-item-title>
-                <v-list-item-subtitle>{{ item.nutrients.CARBS | fixed }}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ mealTotals.CARBS | fixed }}</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Protein</v-list-item-title>
-                <v-list-item-subtitle>{{ item.nutrients.PROTEIN | fixed }}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ mealTotals.PROTEIN | fixed }}</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Fat</v-list-item-title>
-                <v-list-item-subtitle>{{ item.nutrients.FAT | fixed }}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ mealTotals.FAT | fixed }}</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Cals</v-list-item-title>
-                <v-list-item-subtitle>{{ item.nutrients.CALS | fixed }}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ mealTotals.CALS | fixed }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-col>
-          </v-list-item>
-        </v-list-item-group>
-        <v-list-item v-if="mealTimeItems.length">
-          <v-list-item-title class="text-h6">{{ mealTime }} Total</v-list-item-title>
-          <v-col cols="6" class="d-flex">
-            <v-list-item-content class="d-flex flex-column align-center">
-              <v-list-item-title class="text-subtitle-1">Net Carbs</v-list-item-title>
-              <v-list-item-subtitle>{{ mealTotals.CARBS | fixed }}</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-content class="d-flex flex-column align-center">
-              <v-list-item-title class="text-subtitle-1">Protein</v-list-item-title>
-              <v-list-item-subtitle>{{ mealTotals.PROTEIN | fixed }}</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-content class="d-flex flex-column align-center">
-              <v-list-item-title class="text-subtitle-1">Fat</v-list-item-title>
-              <v-list-item-subtitle>{{ mealTotals.FAT | fixed }}</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-content class="d-flex flex-column align-center">
-              <v-list-item-title class="text-subtitle-1">Cals</v-list-item-title>
-              <v-list-item-subtitle>{{ mealTotals.CALS | fixed }}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-col>
+
+          </v-row>
         </v-list-item>
       </v-list>
     </v-card>
@@ -76,7 +85,7 @@
 
 <script>
 import FoodItem from "@/components/dialogs/FoodItem";
-import { mapGetters } from "vuex";
+import {mapActions, mapGetters} from "vuex";
 export default {
   name: "MealTimeList",
   components: { FoodItem },
@@ -123,11 +132,12 @@ export default {
     },
   },
   methods: {
+    ...mapActions('food', ['selectedMealTime']),
     onFoodSearchDialog() {
       this.$emit('food-search', this.mealTime)
     },
     onSelectedFoodItem(foodItem) {
-      console.log(foodItem)
+      this.selectedMealTime(this.mealTime)
       this.foodItemDialog = true
       this.selectedFood = foodItem
       const nutrients = {

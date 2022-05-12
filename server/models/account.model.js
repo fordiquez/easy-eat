@@ -16,7 +16,14 @@ const schema = new Schema({
   },
   passwordReset: Date,
   created: { type: Date, default: Date.now },
-  updated: Date
+  updated: Date,
+  avatar: {
+    id: {
+      type: Schema.Types.ObjectId,
+      ref: 'avatars.files'
+    },
+    filename: String
+  }
 });
 
 schema.virtual('isVerified').get(function () {

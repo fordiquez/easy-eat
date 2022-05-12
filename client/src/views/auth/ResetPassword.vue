@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading" flat>
+  <v-card :loading="loading" rounded>
     <v-card-title>Reset password</v-card-title>
     <v-form v-if="tokenStatus" ref="form" @submit.prevent="submit">
       <v-container fluid>

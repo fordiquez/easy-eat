@@ -196,8 +196,7 @@ const create = async (params) => {
 }
 
 const update = async (id, params) => {
-  const account = await getAccount(id);
-  console.log(params)
+  const account = await getAccount(id)
 
   // validate (if email was changed)
   if (params.email && account.email !== params.email && await db.Account.findOne({ email: params.email })) {
@@ -220,6 +219,45 @@ const update = async (id, params) => {
     ...basicDetails(account),
     message: 'The user account has been successfully updated'
   };
+}
+
+const uploadAvatar = async (req) => {
+  const account = await getAccount(req.params.id)
+  if (account.avatar.id && account.avatar.filename) await db.deleteAvatar(account.avatar.id)
+  account.avatar = {
+    id: req.file.id,
+    filename: req.file.filename
+  }
+  await account.save()
+  return {
+    avatar: req.file,
+    message: 'Avatar has been downloaded successfully'
+  }
+}
+
+const getAvatar = async (req, res) => {
+  const { avatar } = await getAccount(req.params.id)
+  return avatar.id && avatar.filename ? db.getAvatar(avatar.filename, res) : res.json({ message: 'Avatar not found' })
+}
+
+const updatedAvatar = async (req, res) => {
+  const filename = req.params.filename
+  return filename ? db.getAvatar(filename, res) : res.json({ message: 'Avatar not found' })
+}
+
+const deleteAvatar = async (req) => {
+  const account = await getAccount(req.params.id)
+  if (!account.avatar.id || !account.avatar.filename) {
+    return {
+      message: 'Avatar not found'
+    }
+  }
+  await db.deleteAvatar(account.avatar.id)
+  account.avatar = {}
+  await account.save()
+  return {
+    message: 'Avatar has been deleted successfully'
+  }
 }
 
 const _delete = async (id) => {
@@ -271,8 +309,8 @@ const generateRefreshToken = (account, ipAddress) => {
 }
 
 const basicDetails = (account) => {
-  const { id, title, firstName, lastName, email, role, created, updated, isVerified } = account;
-  return { id, title, firstName, lastName, email, role, created, updated, isVerified };
+  const { id, email, firstName, lastName, role, verified, created, updated, avatar } = account;
+  return { id, email, firstName, lastName, role, verified, created, updated, avatar };
 }
 
 // email functions
@@ -346,5 +384,9 @@ module.exports = {
   getById,
   create,
   update,
-  delete: _delete
+  delete: _delete,
+  uploadAvatar,
+  getAvatar,
+  updatedAvatar,
+  deleteAvatar
 };

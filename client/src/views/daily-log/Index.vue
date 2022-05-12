@@ -1,10 +1,10 @@
 <template>
   <v-container>
-    <v-row justify="center">
-      <v-col cols="12" sm="5" md="5">
+    <v-row>
+      <v-col cols="10" sm="5" md="5">
         <span class="text-h5">{{ greetingsTitle }}</span>
       </v-col>
-      <v-col cols="12" sm="5" md="5">
+      <v-col cols="10" sm="5" md="5" offset="1" offset-sm="0" class="d-flex justify-sm-start justify-center">
         <v-btn @click="changeDay(-1)" icon>
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
@@ -25,7 +25,7 @@
           <v-icon>mdi-arrow-right</v-icon>
         </v-btn>
       </v-col>
-      <v-col cols="12" sm="2" md="2">
+      <v-col cols="2" sm="2" md="2">
         <v-speed-dial v-model="fab" absolute right top direction="bottom" class="mr-5" transition="scroll-x-transition">
           <template v-slot:activator>
             <v-btn v-model="fab" color="blue darken-2" dark fab>

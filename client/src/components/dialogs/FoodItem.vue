@@ -9,10 +9,10 @@
         </v-btn>
       </v-toolbar>
       <v-row class="mx-auto my-auto">
-        <v-col cols="3">
+        <v-col cols="5" xs="4">
           <v-img :src="selectedFood.image || image" :lazy-src="selectedFood.image || image" class="rounded-circle" />
         </v-col>
-        <v-col cols="9">
+        <v-col cols="7" xs="8">
           <v-card-title class="px-0 py-2">{{ selectedFood.label }}</v-card-title>
           <v-card-subtitle class="px-0 py-2 text-subtitle-1">{{ selectedFood.category }}</v-card-subtitle>
           <v-card-text class="px-0 py-0 text-subtitle-2">{{ servings }} {{ servings > 1 ? measure + 's' : measure }}</v-card-text>
@@ -75,28 +75,28 @@
         </v-row>
 
         <v-row>
-          <v-col cols="6">
+          <v-col cols="12" sm="6">
             <v-select
-                @change="setMeasure"
-                v-model="measure"
-                :items="measures"
                 prepend-inner-icon="mdi-food"
                 color="success"
                 item-color="success"
                 label="Serving size"
+                v-model="measure"
+                :items="measures"
+                @change="setMeasure"
             />
           </v-col>
-          <v-col cols="6">
+          <v-col cols="12" sm="6">
             <v-text-field
                 v-model.number="servings"
                 class="input-number"
                 type="number"
-                hide-spin-buttons
                 color="success"
                 label="Servings"
                 append-outer-icon="mdi-plus"
                 @click:append-outer="increment"
                 @input="setServings"
+                hide-spin-buttons
             >
               <template v-slot:prepend>
                 <v-btn icon :disabled="servings <= 0" :style="{ cursor: cursorType, pointerEvents: 'auto' }" @click="decrement">
@@ -232,7 +232,7 @@ export default {
       }).finally(() => this.onClose())
     },
     onRemove() {
-      this.delete(this.selectedFood._id).then(response => {
+      this.delete(this.selectedFood.id).then(response => {
         console.log(response)
         this.setSnackbar({ color: 'success', text: response.data.message })
       }).catch(error => {
@@ -241,6 +241,7 @@ export default {
       }).finally(() => this.onClose())
     },
     onClose() {
+      this.selectedMealTime('')
       this.$emit('close-dialog')
     },
     oneUnits() {

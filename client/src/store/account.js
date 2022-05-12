@@ -96,7 +96,7 @@ const actions = {
 
 const mutations = {
   SET_USER: (state, response) => {
-    const excludedKeys = ['message', 'jwtToken']
+    const excludedKeys = ['message', 'jwtToken', 'avatar']
     const user = excludedFilter(response, excludedKeys)
     localStorage.setItem('user', JSON.stringify(user))
     state.user.next(user)

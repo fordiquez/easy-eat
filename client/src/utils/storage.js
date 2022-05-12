@@ -12,9 +12,7 @@ export const getCookie = (name) => {
   return matches ? decodeURIComponent(matches[1]) : null
 }
 
-export const getApplication = () => {
-  return JSON.parse(localStorage.getItem('application')) || null
-}
+export const getApplication = () => JSON.parse(localStorage.getItem('application')) || null
 
 export const getUser = () => {
   const user = JSON.parse(localStorage.getItem('user'))
@@ -26,7 +24,7 @@ export const getToken = () => {
   return jwtToken?.token && jwtToken?.expires ? jwtToken : null
 }
 
-export const isTokenExpired = (expires) => expires < new Date().getTime()
+export const isTokenExpired = expires => expires < new Date().getTime()
 
 export const tokenExpirationTime = ({ jwtToken }) => {
   const token = JSON.parse(atob(jwtToken.split('.')[1]))

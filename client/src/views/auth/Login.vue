@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading" flat>
+  <v-card :loading="loading" rounded>
     <v-card-title>Log In</v-card-title>
     <v-card-subtitle class="pb-0">Please enter your account information for authorization</v-card-subtitle>
     <v-form ref="form" @submit.prevent="submit">
@@ -68,6 +68,9 @@ export default {
         required
       }
     }
+  },
+  created() {
+    console.log(this.$route.query.returnUrl)
   },
   computed: {
     emailErrors() {

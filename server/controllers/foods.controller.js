@@ -40,7 +40,7 @@ const create = (req, res, next) => {
 
 const updateSchema = (req, res, next) => {
   const schema = Joi.object({
-    _id: Joi.string().required(),
+    id: Joi.string().required(),
     account: Joi.string().required(),
     date: Joi.date().required(),
     mealTime: Joi.string().required(),

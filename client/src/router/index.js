@@ -3,19 +3,21 @@ import VueRouter from 'vue-router'
 import { getToken, getUser, isAuthorized } from "@/utils/storage"
 import { Role } from "@/utils/role"
 import Home from "@/views/home/Index"
-import Login from "@/views/account/Login"
-import Register from "@/views/account/Register"
-import ForgotPassword from "@/views/account/ForgotPassword"
-import VerifyEmail from "@/views/account/VerifyEmail"
-import ResetPassword from "@/views/account/ResetPassword"
-import Admin from "@/views/admin/Index"
-import Users from "@/views/admin/users/Index"
+import Auth from "@/views/auth/Index"
+import Login from "@/views/auth/Login"
+import Register from "@/views/auth/Register"
+import ForgotPassword from "@/views/auth/ForgotPassword"
+import VerifyEmail from "@/views/auth/VerifyEmail"
+import ResetPassword from "@/views/auth/ResetPassword"
 import UserEdit from "@/views/admin/users/Edit"
-import DailyLog from "@/views/daily-log/Index"
 import Settings from "@/views/settings/Index"
 import Profile from "@/views/settings/Profile"
-import Account from "@/views/settings/Account";
+import Account from "@/views/settings/Account"
 import App from "@/views/settings/App"
+import Admin from "@/views/admin/Index"
+import Users from "@/views/admin/users/Index"
+import DailyLog from "@/views/daily-log/Index"
+import Onboarding from "@/views/onboarding/Index"
 import store from '@/store/index'
 
 Vue.use(VueRouter)
@@ -26,6 +28,39 @@ const routes = [
     name: 'Dashboard',
     component: Home,
     meta: { authorized: [] }
+  },
+  {
+    path: '/auth',
+    name: 'Auth',
+    component: Auth,
+    redirect: '/',
+    children: [
+      {
+        path: 'login',
+        name: 'Login',
+        component: Login
+      },
+      {
+        path: 'register',
+        name: 'Register',
+        component: Register
+      },
+      {
+        path: 'verify-email',
+        name: 'VerifyEmail',
+        component: VerifyEmail
+      },
+      {
+        path: 'forgot-password',
+        name: 'ForgotPassword',
+        component: ForgotPassword
+      },
+      {
+        path: 'reset-password',
+        name: 'ResetPassword',
+        component: ResetPassword
+      }
+    ]
   },
   {
     path: '/settings',
@@ -55,12 +90,6 @@ const routes = [
     ]
   },
   {
-    path: '/daily-log',
-    name: 'DailyLog',
-    component: DailyLog,
-    meta: { authorized: [] }
-  },
-  {
     path: '/admin',
     name: 'Admin',
     component: Admin,
@@ -82,29 +111,16 @@ const routes = [
     ]
   },
   {
-    path: '/account/login',
-    name: 'Login',
-    component: Login
+    path: '/daily-log',
+    name: 'DailyLog',
+    component: DailyLog,
+    meta: { authorized: [] }
   },
   {
-    path: '/account/register',
-    name: 'Register',
-    component: Register
-  },
-  {
-    path: '/account/verify-email',
-    name: 'VerifyEmail',
-    component: VerifyEmail
-  },
-  {
-    path: '/account/forgot-password',
-    name: 'ForgotPassword',
-    component: ForgotPassword
-  },
-  {
-    path: '/account/reset-password',
-    name: 'ResetPassword',
-    component: ResetPassword
+    path: '/onboarding',
+    name: 'Onboarding',
+    component: Onboarding,
+    meta: { authorized: [] }
   },
   {
     path: '/:pathMatch(.*)*',
@@ -125,7 +141,7 @@ router.beforeEach((to, from, next) => {
   if (authorized) {
     if (!isAuthorized()) {
       user || token ? store.commit('account/LOGOUT_USER') : null
-      return next({ name: 'Login' })
+      return next({ name: 'Login', query: { returnUrl: to.path } })
     }
     if (authorized.length && !authorized.includes(user.role)) return next({ name: 'Dashboard' })
   }

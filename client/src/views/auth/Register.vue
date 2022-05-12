@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading" flat>
+  <v-card :loading="loading" rounded>
     <v-card-title>Sign Up</v-card-title>
     <v-card-subtitle class="pb-0">Please fill in all required fields to register an account</v-card-subtitle>
     <v-form ref="form" @submit.prevent="submit">
