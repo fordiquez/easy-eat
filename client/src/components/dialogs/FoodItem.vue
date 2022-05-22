@@ -277,6 +277,11 @@ export default {
       this.setMeasure(this.measure)
     }
   },
+  watch: {
+    servings(value) {
+      value < 0 ? this.servings = 0 : null
+    }
+  },
   filters: {
     fixed(number) {
       return number > 0 ? number.toFixed(2) : 0

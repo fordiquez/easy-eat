@@ -22,9 +22,9 @@ export default {
     loading: false,
     error: false
   }),
-  async mounted() {
+  mounted() {
     const { token } = this.$route.query
-    await this.verify(token)
+    this.verify(token)
   },
   methods: {
     ...mapActions({
@@ -32,24 +32,24 @@ export default {
       setAlert: 'notification/setAlert',
       setSnackbar: 'notification/setSnackbar'
     }),
-    async verify(token) {
+    verify(token) {
       if (token) {
-        await this.$router.replace(location.pathname)
-        await this.verifyEmail(token).then(async response => {
-          console.log(response)
-          await this.$router.push({ name: 'Login' })
-          await this.setAlert({ type: 'success', text: response.data.message })
-          await this.setSnackbar({ color: 'success', text: response.data.message })
-        }).catch(error => {
-          console.log(error.response)
-          if (error.response.data.message === 'Account has already been verified') {
-            this.setAlert({ type: 'info', text: error.response.data.message })
-            this.setSnackbar({ color: 'info', text: error.response.data.message })
-          } else {
-            this.setAlert({ type: 'error', text: error.response.data.message })
-            this.setSnackbar({ color: 'error', text: error.response.data.message })
-            this.error = true
-          }
+        this.$router.replace(location.pathname).then(() => {
+          this.verifyEmail(token).then(response => {
+            console.log(response)
+            this.setAlert({ type: 'success', text: response.data.message })
+            this.setSnackbar({ color: 'success', text: response.data.message })
+          }).catch(error => {
+            console.log(error.response)
+            if (error.response.data.message === 'Account has already been verified') {
+              this.setAlert({ type: 'info', text: error.response.data.message })
+              this.setSnackbar({ color: 'info', text: error.response.data.message })
+            } else {
+              this.setAlert({ type: 'error', text: error.response.data.message })
+              this.setSnackbar({ color: 'error', text: error.response.data.message })
+              this.error = true
+            }
+          })
         })
       } else {
         this.setAlert({ type: 'error', text: 'Verification token not provided' })

@@ -7,9 +7,9 @@
       <v-row class="d-flex justify-start align-center flex-column flex-sm-row">
         <v-col cols="12" sm="3" lg="2" class="d-flex justify-center">
           <v-avatar size="150">
-            <v-img v-if="!avatar" :src="avatarPath" :lazy-src="avatarPath"
-                   :alt="profile.firstName + profile.lastName"
-                   :title="profile.firstName + profile.lastName"
+            <v-img v-if="avatar" :src="avatarPath" :lazy-src="avatarPath"
+                   :alt="profile.firstName + ' ' + profile.lastName"
+                   :title="profile.firstName + ' ' + profile.lastName"
             />
             <v-icon color="success" size="100" v-else>mdi-account-circle</v-icon>
           </v-avatar>

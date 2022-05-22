@@ -227,7 +227,7 @@ module.exports = {
   createSchema,
   update,
   updateSchema,
-  _delete,
+  delete: _delete,
   uploadAvatar,
   getAvatar,
   updatedAvatar,

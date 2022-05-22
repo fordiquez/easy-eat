@@ -64,7 +64,40 @@ export const roleErrors = (role) => {
   return errors
 }
 
+export const numericErrors = (number, model, between) => {
+  const errors = []
+  if (number.$dirty) {
+    !number.required && errors.push(`${model} field is required`)
+    !number.hasNumerics && errors.push(`${model} must be a numeric`)
+    !number.between && errors.push(`Please enter a number between ${between[0]} and ${between[1]}`)
+  }
+  return errors
+}
+
+export const birthdayDateErrors = (birthdayDate, range) => {
+  const errors = []
+  if (birthdayDate.$dirty) {
+    !birthdayDate.required && errors.push('Birthday date field is required')
+    !birthdayDate.rangeDate && errors.push(`Please select a birthday date between ${range[0]} and ${range[1]}`)
+  }
+  return errors
+}
+
+export const rangeDate = value => {
+  const maxDate = new Date().toISOString().slice(0, 10)
+  const minDate = new Date('1922-02-22').toISOString().slice(0, 10)
+  return value > minDate && value < maxDate
+}
+
+export const sexErrors = (sex) => {
+  const errors = []
+  if (!['male', 'female'].includes(sex.$model)) {
+    !sex.required && errors.push('Sex field is required')
+  }
+  return errors
+}
+
 export const hasUppercase = val => /[A-Z]/.test(val)
 export const hasLowercase = val => /[a-z]/.test(val)
 export const hasSpecialChars = val => /[$%#]/.test(val)
-export const hasNumerics = val => /[\d]/.test(val)
+export const hasNumerics = val => /\d/.test(val)

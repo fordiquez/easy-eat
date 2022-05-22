@@ -58,7 +58,7 @@ export default {
       setAlert: 'notification/setAlert',
       setSnackbar: 'notification/setSnackbar'
     }),
-    async submit() {
+    submit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loading = true

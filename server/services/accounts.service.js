@@ -221,8 +221,19 @@ const update = async (id, params) => {
   };
 }
 
+const _delete = async (id) => {
+  const account = await getAccount(id);
+  await db.RefreshToken.deleteMany({ account: id })
+  await account.remove();
+
+  return {
+    message: 'The user account has been successfully deleted'
+  }
+}
+
 const uploadAvatar = async (req) => {
   const account = await getAccount(req.params.id)
+  console.log(req.file)
   if (account.avatar.id && account.avatar.filename) await db.deleteAvatar(account.avatar.id)
   account.avatar = {
     id: req.file.id,
@@ -260,16 +271,6 @@ const deleteAvatar = async (req) => {
   }
 }
 
-const _delete = async (id) => {
-  const account = await getAccount(id);
-  await db.RefreshToken.deleteMany({ account: id })
-  await account.remove();
-
-  return {
-    message: 'The user account has been successfully deleted'
-  }
-}
-
 // helper functions
 
 const randomTokenString = () => {
@@ -295,7 +296,7 @@ const getRefreshToken = async (token) => {
 
 const generateJwtToken = (account) => {
   // create a jwt token containing the account id that expires in 15 minutes
-  return jwt.sign({ sub: account.id, id: account.id }, process.env.SECRET, { expiresIn: '15m' });
+  return jwt.sign({ sub: account.id, id: account.id }, process.env.SECRET, { expiresIn: '1h' });
 }
 
 const generateRefreshToken = (account, ipAddress) => {
@@ -318,7 +319,7 @@ const basicDetails = (account) => {
 const sendVerificationEmail = async (account, origin) => {
   let message;
   if (origin) {
-    const verifyUrl = `${origin}/account/verify-email?token=${account.verificationToken}`;
+    const verifyUrl = `${origin}/auth/verify-email?token=${account.verificationToken}`;
     message = `<p>Please click the below link to verify your email address:</p>
                    <p><a href="${verifyUrl}" target="_blank">${verifyUrl}</a></p>`;
   } else {
@@ -338,7 +339,7 @@ const sendVerificationEmail = async (account, origin) => {
 const sendAlreadyRegisteredEmail = async (email, origin) => {
   let message;
   if (origin) {
-    message = `<p>If you don't know your password please visit the <a href="${origin}/account/forgot-password">forgot password</a> page.</p>`;
+    message = `<p>If you don't know your password please visit the <a href="${origin}/auth/forgot-password">forgot password</a> page.</p>`;
   } else {
     message = `<p>If you don't know your password you can reset it via the <code>/account/forgot-password</code> api route.</p>`;
   }
@@ -355,7 +356,7 @@ const sendAlreadyRegisteredEmail = async (email, origin) => {
 const sendPasswordResetEmail = async (account, origin) => {
   let message;
   if (origin) {
-    const resetUrl = `${origin}/account/reset-password?token=${account.resetToken.token}`;
+    const resetUrl = `${origin}/auth/reset-password?token=${account.resetToken.token}`;
     message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
                    <p><a href="${resetUrl}" target="_blank">${resetUrl}</a></p>`;
   } else {

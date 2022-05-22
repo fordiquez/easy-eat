@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const Account = require('models/account.model')
 const RefreshToken = require('models/refresh-token.model')
 const Food = require('models/food.model')
-const Photo = require('models/photo.model')
+const UserData = require('models/user-data.model')
+const MealPlan = require('models/meal-plan.model')
 const mongodb = require("mongodb");
 const assert = require("assert");
 
@@ -14,7 +15,8 @@ module.exports = {
   Account,
   RefreshToken,
   Food,
-  Photo,
+  UserData,
+  MealPlan,
   isValidId,
   getAvatar,
   deleteAvatar
@@ -25,24 +27,27 @@ function isValidId(id) {
 }
 
 function getAvatar(filename, res) {
-  mongodb.MongoClient.connect('mongodb://127.0.0.1:27017/', {
+  mongodb.MongoClient.connect(process.env.MONGODB_CLIENT, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   },(error, client) => {
-    assert.ifError(error)
-    const db = client.db('test')
+    const db = client.db(process.env.MONGODB_NAME)
     const bucket = new mongodb.GridFSBucket(db, { bucketName: 'avatars' })
-    return bucket.openDownloadStreamByName(filename).pipe(res)
+    const cursor = bucket.find({ filename })
+    const avatar = {}
+    cursor.forEach(doc => avatar.filename = doc.filename)
+      .then(() => avatar.filename === filename ? bucket.openDownloadStreamByName(filename).pipe(res) : res.json({ message: 'Avatar not found' }))
+      .catch(error => res.json(error))
   })
 }
 
 function deleteAvatar(ObjectId) {
-  mongodb.MongoClient.connect('mongodb://127.0.0.1:27017/', {
+  mongodb.MongoClient.connect(process.env.MONGODB_CLIENT, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   },(error, client) => {
     assert.ifError(error)
-    const db = client.db('test')
+    const db = client.db(process.env.MONGODB_NAME)
     const bucket = new mongodb.GridFSBucket(db, { bucketName: 'avatars' })
     return bucket.delete(ObjectId)
   })

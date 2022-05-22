@@ -125,9 +125,9 @@ export default {
     title: process.env.VUE_APP_TITLE,
     routes: {
       drawer: [
-        { icon: 'mdi-circle-half-full', title: 'Dashboard', to: 'Dashboard' },
         { icon: 'mdi-math-log', title: 'Daily Log', to: 'DailyLog' },
         { icon: 'mdi-clipboard-text', title: 'Onboarding', to: 'Onboarding' },
+        { icon: 'mdi-file-document', title: 'Meal Plan', to: 'MealPlan' },
         { icon: 'mdi-flower-tulip-outline', title: 'Log In', to: 'Login' },
         { icon: 'mdi-movie-play-outline', title: 'Sign Up', to: 'Register' },
         { icon: 'mdi-chart-gantt', title: 'Account recovery', to: 'ForgotPassword' },

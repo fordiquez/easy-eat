@@ -2,7 +2,6 @@ const db = require('helpers/db.helper')
 
 const create = async (params) => {
   const { id } = await db.Account.findById(params.userId);
-  console.log(params)
   const food = new db.Food({
     account: id,
     date: params.date,
@@ -16,7 +15,6 @@ const create = async (params) => {
     nutrients: params.nutrients,
     image: params.image
   })
-  console.log(food)
   await food.save()
   return {
     food,

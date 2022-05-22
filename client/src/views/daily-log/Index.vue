@@ -45,11 +45,6 @@
         </v-speed-dial>
       </v-col>
     </v-row>
-<!--    <v-row justify="center">-->
-<!--      <v-col>-->
-<!--        <DoughnutChart />-->
-<!--      </v-col>-->
-<!--    </v-row>-->
     <v-row justify="center">
       <v-col cols="12">
         <meal-time-list :user-food="getUserFood" :date="date" :meal-time="'Breakfast'" @food-search="onFoodSearchDialog" />
@@ -175,9 +170,8 @@ export default {
   },
   watch: {
     date(value) {
-      console.log(value)
-      this.dateFormatted = this.formatDate(this.date)
-      this.selectedDate(this.date)
+      this.dateFormatted = this.formatDate(value)
+      this.selectedDate(value)
     },
     foodItemDialog(value) {
       !value ? this.selectedFood = this.selectedNutrients = null : null

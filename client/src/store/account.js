@@ -12,11 +12,11 @@ const state = () => ({
   users: []
 })
 const getters = {
-  getUser: (state) => state.user.asObservable(),
-  getUserValue: (state) => state.user.value,
-  getToken: (state) => state.token.asObservable(),
-  getTokenValue: (state) => state.token.value,
-  getUsers: (state) => state.users
+  getUser: state => state.user.asObservable(),
+  getUserValue: state => state.user.value,
+  getToken: state => state.token.asObservable(),
+  getTokenValue: state => state.token.value,
+  getUsers: state => state.users
 }
 
 const actions = {

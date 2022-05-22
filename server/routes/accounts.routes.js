@@ -17,7 +17,7 @@ router.get('/', authorize(Role.Admin), accountController.getAll);
 router.post('/', authorize(Role.Admin), accountController.createSchema, accountController.create);
 router.get('/:id', authorize(), accountController.getById);
 router.put('/:id', authorize(), accountController.updateSchema, accountController.update);
-router.delete('/:id', authorize(), accountController._delete);
+router.delete('/:id', authorize(), accountController.delete);
 router.post('/upload/:id', authorize(), upload.single('file'), accountController.uploadAvatar);
 router.get('/avatar/:id', accountController.getAvatar);
 router.get('/avatar/:id/:filename', accountController.updatedAvatar);

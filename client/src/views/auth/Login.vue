@@ -56,7 +56,8 @@ export default {
       password: ''
     },
     visibility: false,
-    loading: false
+    loading: false,
+    returnUrl: undefined
   }),
   validations: {
     form: {
@@ -68,9 +69,6 @@ export default {
         required
       }
     }
-  },
-  created() {
-    console.log(this.$route.query.returnUrl)
   },
   computed: {
     emailErrors() {
@@ -86,21 +84,27 @@ export default {
       setAlert: 'notification/setAlert',
       setSnackbar: 'notification/setSnackbar'
     }),
-    async submit() {
+    submit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loading = true
-        await this.login(this.form).then(async response => {
+        this.login(this.form).then(response => {
           console.log(response)
-          await this.$router.push({ name: 'Dashboard' })
-          await this.setAlert({ type: 'success', text: response.data.message })
-          await this.setSnackbar({ color: 'success', text: response.data.message })
+          this.$router.push(this.returnUrl ? { path: this.returnUrl } : { name: 'DailyLog' }).then(() => {
+            this.setAlert({ type: 'success', text: response.data.message })
+            this.setSnackbar({ color: 'success', text: response.data.message })
+          })
         }).catch(error => {
           console.log(error.response)
           this.setAlert({ type: 'error', text: error.response.data.message })
           this.setSnackbar({ color: 'error', text: error.response.data.message })
         }).finally(() => this.loading = false)
       }
+    }
+  },
+  watch: {
+    $route($route) {
+      this.returnUrl = $route.query.returnUrl
     }
   }
 }

@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import { getToken, getUser, isAuthorized } from "@/utils/storage"
 import { Role } from "@/utils/role"
-import Home from "@/views/home/Index"
 import Auth from "@/views/auth/Index"
 import Login from "@/views/auth/Login"
 import Register from "@/views/auth/Register"
@@ -18,6 +17,7 @@ import Admin from "@/views/admin/Index"
 import Users from "@/views/admin/users/Index"
 import DailyLog from "@/views/daily-log/Index"
 import Onboarding from "@/views/onboarding/Index"
+import MealPlan from "@/views/onboarding/MealPlan"
 import store from '@/store/index'
 
 Vue.use(VueRouter)
@@ -25,9 +25,7 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'Dashboard',
-    component: Home,
-    meta: { authorized: [] }
+    redirect: '/daily-log'
   },
   {
     path: '/auth',
@@ -123,6 +121,12 @@ const routes = [
     meta: { authorized: [] }
   },
   {
+    path: '/onboarding/meal-plan',
+    name: 'MealPlan',
+    component: MealPlan,
+    meta: { authorized: [] }
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/'
   },
@@ -143,7 +147,7 @@ router.beforeEach((to, from, next) => {
       user || token ? store.commit('account/LOGOUT_USER') : null
       return next({ name: 'Login', query: { returnUrl: to.path } })
     }
-    if (authorized.length && !authorized.includes(user.role)) return next({ name: 'Dashboard' })
+    if (authorized.length && !authorized.includes(user.role)) return next({ name: 'DailyLog' })
   }
   return next()
 })

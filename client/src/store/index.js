@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { account } from "@/store/account"
-import { notification } from "@/store/notification"
 import { application } from "@/store/application"
+import { notification } from "@/store/notification"
+import { account } from "@/store/account"
+import { userData } from "@/store/user-data"
+import { mealPlan } from "@/store/meal-plan"
 import { food } from "@/store/food"
 
 Vue.use(Vuex)
@@ -15,9 +17,11 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-    account,
-    notification,
     application,
-    food
+    notification,
+    account,
+    userData,
+    mealPlan,
+    food,
   }
 })

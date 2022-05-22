@@ -1,4 +1,4 @@
-import {DefaultAPI, NutritionAnalysisAPI, NutritionInfoAPI} from "@/utils/axios";
+import { DefaultAPI, NutritionAnalysisAPI, NutritionInfoAPI } from "@/utils/axios";
 
 const baseURL = '/foods'
 

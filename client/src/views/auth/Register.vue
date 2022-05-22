@@ -130,15 +130,7 @@
 import { required, alpha, minLength, email, sameAs } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
 import { mapActions } from "vuex";
-import {
-  acceptedTermsErrors,
-  emailErrors,
-  firstNameErrors,
-  lastNameErrors,
-  passwordConfirmErrors,
-  passwordErrors,
-  hasNumerics
-} from "@/utils/validations";
+import { acceptedTermsErrors, emailErrors, firstNameErrors, lastNameErrors, passwordConfirmErrors, passwordErrors, hasNumerics } from "@/utils/validations";
 
 export default {
   name: 'Register',
@@ -217,16 +209,18 @@ export default {
       setAlert: 'notification/setAlert',
       setSnackbar: 'notification/setSnackbar'
     }),
-    async submit() {
+    submit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loading = true
-        await this.register(this.form).then(async response => {
+        this.register(this.form).then(response => {
           console.log(response)
-          await this.$router.push({ name: 'Login' })
-          await this.setAlert({ type: 'success', text: response.data.messages.success })
-          await this.setAlert({ type: 'info', text: response.data.messages.info })
-          await this.setSnackbar({ color: 'success', text: response.data.message })
+          this.$router.push({ name: 'Login' }).then(() => {
+            this.setAlert({ type: 'success', text: response.data.messages.success })
+            this.setAlert({ type: 'info', text: response.data.messages.info })
+            this.setSnackbar({ color: 'info', text: response.data.messages.info })
+            this.setSnackbar({ color: 'success', text: response.data.messages.success })
+          })
         }).catch(error => {
           console.log(error.response)
           this.setAlert({ type: 'error', text: error.response.data.message })

@@ -6,8 +6,10 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const errorHandler = require('middlewares/error-handler');
-const accountsRoutes = require('routes/accounts.routes')
-const foodsRoutes = require('routes/foods.routes')
+const accountsRoutes = require('routes/accounts.routes');
+const userDataRoutes = require('routes/user-data.routes');
+const mealPlanRoutes = require('routes/meal-plan.routes');
+const foodsRoutes = require('routes/foods.routes');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -16,7 +18,7 @@ app.use(cookieParser());
 const whiteList = ['http://localhost:8080']
 
 const corsOptions = {
-  origin: (origin, callback) => whiteList.indexOf(origin) !== -1 ? callback(null, true) : callback(null, true),
+  origin: (origin, callback) => whiteList.indexOf(origin) !== -1 ? callback(null, true) : callback(null, false),
   credentials: true,
   exposedHeaders: ["set-cookie"]
 }
@@ -26,6 +28,8 @@ app.use(cors(corsOptions));
 
 // api routes
 app.use('/accounts', accountsRoutes);
+app.use('/user-data', userDataRoutes);
+app.use('/meal-plan', mealPlanRoutes);
 app.use('/foods', foodsRoutes);
 
 // swagger docs route
