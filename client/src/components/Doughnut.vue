@@ -15,7 +15,7 @@
 <script>
 import { Doughnut } from 'vue-chartjs/legacy'
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale } from 'chart.js'
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
 
 export default {
@@ -52,52 +52,52 @@ export default {
       type: Array,
       default: () => []
     },
+    user: {
+      type: Object,
+      default: null
+    },
   },
-  data() {
-    return {
-      loaded: false,
-      chartData: {
-        labels: ['Carbs', 'Protein', 'Fat'],
-        datasets: [
-          {
-            backgroundColor: ['#E53935', '#1565C0', '#FF9100'],
-            data: []
-          }
-        ]
-      },
-      chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false
-      },
-    }
-  },
+  data: () => ({
+    loaded: false,
+    chartData: {
+      labels: ['Carbs', 'Protein', 'Fat'],
+      datasets: [
+        {
+          backgroundColor: ['#E53935', '#1565C0', '#FF9100'],
+          data: []
+        }
+      ]
+    },
+    chartOptions: {
+      responsive: true,
+      maintainAspectRatio: false
+    },
+  }),
   created() {
-    for (let [,value] of Object.entries(this.getUserDiet.proportions)) {
-      this.chartData.datasets[0].data.push(value)
-    }
+    setTimeout(() => {
+      this.updateChartData()
+    }, 0)
   },
   computed: {
-    ...mapGetters('userData', ['getUserDiet']),
+    ...mapGetters('mealPlan', ['getSelectedPlan']),
     percentageCarbs() {
-      return this.getUserDiet.proportions.CARBS
+      return this.getSelectedPlan.proportions.CARBS
     },
     percentageProtein() {
-      return this.getUserDiet.proportions.PROTEIN
+      return this.getSelectedPlan.proportions.PROTEIN
     },
     percentageFat() {
-      return this.getUserDiet.proportions.FAT
+      return this.getSelectedPlan.proportions.FAT
     },
   },
   methods: {
     updateChartData() {
       this.chartData.datasets[0].data = []
-      for (let [,value] of Object.entries(this.getUserDiet.proportions)) {
-        this.chartData.datasets[0].data.push(value)
-      }
+      for (let [,value] of Object.entries(this.getSelectedPlan.proportions)) this.chartData.datasets[0].data.push(value)
     }
   },
   watch: {
-    getUserDiet() {
+    getSelectedPlan() {
       this.updateChartData()
     },
     percentageCarbs() {

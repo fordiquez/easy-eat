@@ -2,12 +2,16 @@ import { DefaultAPI } from "@/utils/axios";
 
 const baseURL = '/meal-plan'
 
-const create = async (payload) => {
-  return await DefaultAPI.post(`${baseURL}/`, payload)
+const getAll = async () => {
+  return await DefaultAPI.get(`${baseURL}/`)
 }
 
 const getById = async (id) => {
   return await DefaultAPI.get(`${baseURL}/${id}`)
+}
+
+const create = async (payload) => {
+  return await DefaultAPI.post(`${baseURL}/`, payload)
 }
 
 const edit = async (payload) => {
@@ -19,8 +23,9 @@ const _delete = async (id) => {
 }
 
 export const mealPlanService = {
-  create,
+  getAll,
   getById,
+  create,
   edit,
   delete: _delete
 }

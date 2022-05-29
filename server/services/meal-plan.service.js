@@ -5,15 +5,12 @@ const getAll = async () => await db.MealPlan.find()
 const getById = async (id) => await getMealPlan(id)
 
 const create = async (params) => {
-  const existedMealPlan = await db.MealPlan.findOne({ accountId: params.accountId })
-  if (existedMealPlan) {
-    console.log(existedMealPlan)
-    existedMealPlan.remove()
-  }
-  const newUserData = new db.MealPlan(params)
-  await newUserData.save()
+  const existedMealPlan = await db.MealPlan.findOne({ title: params.title })
+  if (existedMealPlan) throw 'Meal plan with such title already exists'
+  const mealPlan = new db.MealPlan(params)
+  await mealPlan.save()
   return {
-    newUserData,
+    mealPlan,
     message: 'The meal plan has been successfully created'
   }
 }
@@ -26,7 +23,7 @@ const update = async (id, params) => {
 
   return {
     mealPlan,
-    message: 'The user data has been successfully updated'
+    message: 'The meal plan has been successfully updated'
   }
 }
 
@@ -35,13 +32,13 @@ const _delete = async (id) => {
   await mealPlan.remove()
 
   return {
-    message: 'The user data has been successfully deleted'
+    message: 'The meal plan has been successfully deleted'
   }
 }
 
-const getMealPlan = async (accountId) => {
-  if (!db.isValidId(accountId)) throw 'Meal plan not found'
-  const mealPlan = await db.MealPlan.findOne({ accountId })
+const getMealPlan = async (id) => {
+  if (!db.isValidId(id)) throw 'Meal plan not found'
+  const mealPlan = await db.MealPlan.findById(id)
   if (!mealPlan) throw 'Meal plan not found'
   return mealPlan
 }

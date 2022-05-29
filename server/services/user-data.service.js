@@ -6,10 +6,7 @@ const getById = async (id) => await getUserData(id)
 
 const create = async (params) => {
   const existedUserData = await db.UserData.findOne({ accountId: params.accountId })
-  if (existedUserData) {
-    console.log(existedUserData)
-    existedUserData.remove()
-  }
+  if (existedUserData) existedUserData.remove()
   const newUserData = new db.UserData(params)
   await newUserData.save()
   return {
@@ -19,10 +16,13 @@ const create = async (params) => {
 }
 
 const update = async (id, params) => {
+  const updatedUserData = await getUserData(id)
+  Object.assign(updatedUserData, params)
+  updatedUserData.updated = Date.now()
+  await updatedUserData.save()
+
   const userData = await getUserData(id)
-  Object.assign(userData, params)
-  userData.updated = Date.now()
-  await userData.save()
+  console.log(userData)
 
   return {
     userData,
@@ -41,8 +41,9 @@ const _delete = async (id) => {
 
 const getUserData = async (accountId) => {
   if (!db.isValidId(accountId)) throw 'User data not found'
-  const userData = await db.UserData.findOne({ accountId })
+  const userData = await db.UserData.findOne({ accountId }).populate('selectedPlan')
   if (!userData) throw 'User data not found'
+  if (userData.customProportions) userData.selectedPlan.proportions = userData.customProportions
   return userData
 }
 

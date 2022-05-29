@@ -1,46 +1,39 @@
 import { mealPlanService } from '@/services'
-import { excludedFilter } from "@/utils/filters";
 
 const state = () => ({
-  mealPlan: {}
+  selectedPlan: {
+    title: null,
+    proportions: {}
+  },
+  plans: [],
 });
 
 const getters = {
-  getMealPlan: state => state.mealPlan
+  getSelectedPlan: state => state.selectedPlan,
+  getPlans: state => state.plans
 }
 
 const actions = {
-  async create({ commit }, payload) {
-    return await mealPlanService.create(payload).then(response => {
-      commit('SET_MEAL_PLAN', response.data)
-      return response
+  async getPlans({ commit }) {
+    return await mealPlanService.getAll().then(response => {
+      console.log(response)
+      commit('SET_PLANS', response.data)
+    }).catch(error => {
+      console.log(error.response)
     })
   },
-  async getById({ commit }, id) {
-    return await mealPlanService.getById(id).then(response => {
-      commit('SET_MEAL_PLAN', response.data)
-      return response
-    })
-  },
-  // eslint-disable-next-line no-empty-pattern
-  async edit({  }, payload) {
-    return await mealPlanService.edit(payload).then(response => {
-      return response
-    })
-  },
-  // eslint-disable-next-line no-empty-pattern
-  async delete({  }, id) {
-    return await mealPlanService.delete(id).then(response => {
-      return response
-    })
-  },
+  setSelectedPlan({ commit }, selectedDiet) {
+    commit('SET_SELECTED_PLAN', selectedDiet)
+  }
 };
 
 const mutations = {
-  SET_MEAL_PLAN: (state, mealPlan) => {
-    excludedFilter(mealPlan, ['message'])
-    state.mealPlan = mealPlan
+  SET_PLANS: (state, plans) => {
+    state.plans = plans
   },
+  SET_SELECTED_PLAN: (state, selectedPlan) => {
+    Object.assign(state.selectedPlan, selectedPlan)
+  }
 };
 
 export const mealPlan = {

@@ -4,15 +4,14 @@ const userDataService = require("services/user-data.service");
 const validateRequest = require("middlewares/validate-request");
 
 const getAll = (req, res, next) => {
-  userDataService.getAll().then(accounts => res.json(accounts)).catch(next);
+  userDataService.getAll().then(userData => res.json(userData)).catch(next);
 }
 
 const getById = (req, res, next) => {
   // if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
   //   return res.status(401).json({ message: 'Unauthorized' });
   // }
-  console.log(req.params)
-  userDataService.getById(req.params.id).then(doc => doc ? res.json(doc) : res.sendStatus(404)).catch(next);
+  userDataService.getById(req.params.id).then(userData => userData ? res.json(userData) : res.sendStatus(404)).catch(next);
 }
 
 const createSchema = (req, res, next) => {
@@ -29,17 +28,25 @@ const createSchema = (req, res, next) => {
 }
 
 const create = (req, res, next) => {
-  userDataService.create(req.body).then(doc => res.json(doc)).catch(next);
+  userDataService.create(req.body).then(userData => res.json(userData)).catch(next);
 }
 
 const updateSchema = (req, res, next) => {
-  const schema = {
-    account: Joi.required(),
-    sex: Joi.string(),
-    birthday_date: Joi.date(),
-    height: Joi.number(),
-    weight: Joi.number(),
-  };
+  const schema = Joi.object({
+    accountId: Joi.string().required(),
+    currentWeight: Joi.number().required(),
+    goalWeight: Joi.number().required(),
+    height: Joi.number().required(),
+    sex: Joi.string().required(),
+    birthdayDate: Joi.date().required(),
+    activityLevel: Joi.string().required(),
+    caloriesGoal: Joi.string(),
+    BMR: Joi.number(),
+    TDEE: Joi.number(),
+    macros: Joi.object(),
+    selectedPlan: Joi.string(),
+    customProportions: Joi.object()
+  });
   validateRequest(req, next, schema);
 }
 
@@ -48,7 +55,7 @@ const update = async (req, res, next) => {
   // if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
   //   return res.status(401).json({ message: 'Unauthorized' });
   // }
-  userDataService.update(req.params.id, req.body).then(doc => res.json(doc)).catch(next);
+  userDataService.update(req.params.id, req.body).then(userData => res.json(userData)).catch(next);
 }
 
 const _delete = (req, res, next) => {
@@ -57,7 +64,7 @@ const _delete = (req, res, next) => {
   //   return res.status(401).json({ message: 'Unauthorized' });
   // }
 
-  userDataService.delete(req.params.id).then(doc => res.json(doc)).catch(next);
+  userDataService.delete(req.params.id).then(userData => res.json(userData)).catch(next);
 }
 
 module.exports = {

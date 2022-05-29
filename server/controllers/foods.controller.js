@@ -3,7 +3,7 @@ const foodsService = require('services/foods.service');
 const validateRequest = require('middlewares/validate-request');
 
 const get = (req, res, next) => {
-  foodsService.get(req.query).then(products => res.json(products)).catch(next);
+  foodsService.get(req.query).then(food => res.json(food)).catch(next);
 }
 
 const createSchema = (req, res, next) => {
@@ -24,7 +24,7 @@ const createSchema = (req, res, next) => {
 }
 
 const create = (req, res, next) => {
-  foodsService.create(req.body).then(account => res.json(account)).catch(next);
+  foodsService.create(req.body).then(food => res.json(food)).catch(next);
 }
 
 const updateSchema = (req, res, next) => {
@@ -50,7 +50,7 @@ const update = (req, res, next) => {
 }
 
 const _delete = (req, res, next) => {
-  foodsService.delete(req.params.id).then(account => res.json(account)).catch(next);
+  foodsService.delete(req.params.id).then(food => res.json(food)).catch(next);
 }
 
 module.exports = {

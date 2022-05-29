@@ -11,7 +11,7 @@ const getById = async (id) => {
 }
 
 const edit = async (payload) => {
-  return await DefaultAPI.put(`${baseURL}/${payload.id}`, payload)
+  return await DefaultAPI.put(`${baseURL}/${payload.accountId}`, payload)
 }
 
 const _delete = async (id) => {

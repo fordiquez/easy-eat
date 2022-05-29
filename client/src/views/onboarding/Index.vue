@@ -115,13 +115,13 @@
             <v-chip-group v-model="userData.sex" class="chip-group" column>
               <v-chip
                   value="male" filter-icon="mdi-gender-male" text-color="success"
-                  :color="sex === 'male' ? 'success' : ''" @keyup.enter="nextStep" filter large outlined
+                  :color="sex === 'male' ? 'success' : ''" @keyup.enter="nextStep" @keyup.space="userData.sex = 'male'" filter large outlined
               >
                 Male
               </v-chip>
               <v-chip
                   value="female" filter-icon="mdi-gender-female" text-color="success"
-                  :color="sex === 'female' ? 'success' : ''" @keyup.enter="nextStep" filter large outlined>
+                  :color="sex === 'female' ? 'success' : ''" @keyup.enter="nextStep" @keyup.space="userData.sex = 'female'" filter large outlined>
                 Female
               </v-chip>
             </v-chip-group>
@@ -380,13 +380,13 @@ export default {
   },
   watch: {
     currentWeight(value) {
-      value < 0 ? this.userData.currentWeight = 0 : null
+      value < 0 || !value ? this.userData.currentWeight = 0 : null
     },
     goalWeight(value) {
-      value < 0 ? this.userData.goalWeight = 0 : null
+      value < 0 || !value ? this.userData.goalWeight = 0 : null
     },
     height(value) {
-      value < 0 ? this.userData.height = 0 : null
+      value < 0 || !value ? this.userData.height = 0 : null
     },
     menu(value) {
       value && setTimeout(() => (this.activePicker = 'YEAR'))

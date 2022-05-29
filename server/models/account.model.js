@@ -3,27 +3,27 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
   email: { type: String, unique: true, required: true },
-  passwordHash: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  role: { type: String, required: true },
-  acceptedTerms: Boolean,
-  verificationToken: String,
-  verified: Date,
-  resetToken: {
-    token: String,
-    expires: Date
-  },
-  passwordReset: Date,
-  created: { type: Date, default: Date.now },
-  updated: Date,
   avatar: {
     id: {
       type: Schema.Types.ObjectId,
       ref: 'avatars.files'
     },
     filename: String
-  }
+  },
+  role: { type: String, required: true },
+  passwordHash: { type: String, required: true },
+  passwordReset: Date,
+  verificationToken: String,
+  resetToken: {
+    token: String,
+    expires: Date
+  },
+  acceptedTerms: Boolean,
+  verified: Date,
+  created: { type: Date, default: Date.now },
+  updated: Date,
 });
 
 schema.virtual('isVerified').get(function () {
