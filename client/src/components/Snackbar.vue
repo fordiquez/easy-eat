@@ -2,11 +2,12 @@
   <div>
     <v-snackbar
         v-for="(snackbar, index) in activeSnackbars"
-        :key="snackbar.createdAt"
+        :key="snackbar.id"
         v-model="snackbar.active"
         :timeout="snackbar.timeout"
         :color="snackbar.color"
         :style="{ bottom: `${(index * 60) + 8}px`}"
+        :right="snackbar.position === 'right'"
     >
       {{ snackbar.text }}
       <template v-slot:action="{ attrs }">
@@ -17,7 +18,7 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
+import { mapState } from "vuex";
 
 export default {
   name: "Snackbar",

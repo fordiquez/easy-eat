@@ -10,7 +10,7 @@ const getById = async (id) => {
   return await DefaultAPI.get(`${baseURL}/${id}`)
 }
 
-const edit = async (payload) => {
+const update = async (payload) => {
   return await DefaultAPI.put(`${baseURL}/${payload.accountId}`, payload)
 }
 
@@ -21,6 +21,6 @@ const _delete = async (id) => {
 export const userDataService = {
   create,
   getById,
-  edit,
+  update,
   delete: _delete
 }

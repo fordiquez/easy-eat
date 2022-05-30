@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-if="selectedFood" v-model="foodItemDialog" @click:outside="onClose" max-width="550">
+  <v-dialog v-if="selectedFood" v-model="dialog" @input="onClose" max-width="550">
     <v-card class="mx-auto" rounded>
       <v-toolbar color="success" dense>
         <v-toolbar-title>{{ selectedFood.label }}</v-toolbar-title>
@@ -161,9 +161,11 @@ export default {
     mealTime: '',
     measure: 'gram',
     measures: ['gram', 'kilogram', 'milliliter', 'liter'],
-    coefficient: null
+    coefficient: null,
+    dialog: false
   }),
   created() {
+    this.dialog = this.foodItemDialog
     !this.itemAdding ? this.servings = this.selectedFood.servings : this.servings = 100
     !this.itemAdding ? this.measure = this.selectedFood.measure : this.measure = 'gram'
     this.measure === 'gram' || this.measure === 'milliliter' ? this.coefficient = 1 : this.coefficient = 1000
@@ -208,7 +210,6 @@ export default {
         nutrients,
         image
       }
-      console.log(payload)
       this.add(payload).then(response => {
         console.log(response)
         this.setSnackbar({ color: 'success', text: response.data.message })

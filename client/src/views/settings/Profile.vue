@@ -1,9 +1,15 @@
 <template>
-  <v-card v-if="profile" flat>
-    <v-card-title>
-      <span class="text-h5">My Profile</span>
-    </v-card-title>
+  <v-card v-if="profile">
     <v-container fluid>
+      <v-row>
+        <v-col class="d-flex align-center justify-space-between">
+          <v-card-title class="text-h5 py-0">My Profile</v-card-title>
+          <v-subheader v-if="status" class="text-subtitle-1 grey--text">
+            <v-progress-circular indeterminate size="25" color="success" />
+            <label class="ml-2" v-text="status" />
+          </v-subheader>
+        </v-col>
+      </v-row>
       <v-row class="d-flex justify-start align-center flex-column flex-sm-row">
         <v-col cols="12" sm="3" lg="2" class="d-flex justify-center">
           <v-avatar size="150">
@@ -47,44 +53,146 @@
           </v-expansion-panels>
         </v-col>
       </v-row>
-      <v-form @submit.native="onDialog">
-        <v-row>
-          <v-col cols="12" sm="6">
-            <v-text-field
-                v-model="profile.firstName"
-                prepend-icon="mdi-account-outline"
-                label="First Name"
-                color="success"
-                :loading="loadingFirstName"
-                readonly>
-              <template v-slot:append>
-                <v-btn color="success" class="mb-2" @click="onDialog" text>Update First Name</v-btn>
+      <v-row>
+        <v-col cols="12" sm="6" lg="5" xl="4">
+          <v-text-field v-model="profile.firstName" label="First Name" color="success" :loading="loadingFirstName" readonly>
+            <template v-slot:append>
+              <v-btn color="success" class="mb-2" @click="onDialog('firstName')" text>
+                Update {{ $vuetify.breakpoint.smAndDown ? '' : 'First Name' }}
+              </v-btn>
+            </template>
+            <template v-slot:prepend>
+              <v-icon color="success" class="mt-1">mdi-account-outline</v-icon>
+            </template>
+          </v-text-field>
+        </v-col>
+        <v-col cols="12" sm="6" lg="5" xl="4">
+          <v-text-field v-model="profile.lastName" label="Last Name" color="success" :loading="loadingLastName" readonly>
+            <template v-slot:append>
+              <v-btn color="success" class="mb-2" @click="onDialog('lastName')" text>
+                Update {{ $vuetify.breakpoint.smAndDown ? '' : 'Last Name' }}
+              </v-btn>
+            </template>
+            <template v-slot:prepend>
+              <v-icon color="success" class="mt-1">mdi-account-outline</v-icon>
+            </template>
+          </v-text-field>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-btn-toggle v-model="userData.sex" :class="$vuetify.breakpoint.xsOnly ? 'd-flex' : ''" @change="updateUserData" mandatory shaped>
+            <v-btn
+                value="male" x-large text
+                :style="$vuetify.breakpoint.xsOnly ? { width: '50%' } : ''" :color="userData.sex === 'male' ? 'success' : ''"
+            >
+              <v-icon :color="userData.sex === 'male' ? 'success' : ''">mdi-gender-male</v-icon>
+              <v-card-text class="text-subtitle-1 text-capitalize">Male</v-card-text>
+            </v-btn>
+            <v-btn
+                value="female" x-large text
+                :style="$vuetify.breakpoint.xsOnly ? { width: '50%' } : ''" :color="userData.sex === 'female' ? 'success' : ''"
+            >
+              <v-icon :color="userData.sex === 'female' ? 'success' : ''">mdi-gender-female</v-icon>
+              <v-card-text class="text-subtitle-1 text-capitalize">Female</v-card-text>
+            </v-btn>
+          </v-btn-toggle>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col :cols="$vuetify.breakpoint.xsOnly ? 12 : 5" md="3" lg="2">
+          <div>
+            <v-menu ref="dateMenu" v-model="dateMenu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field v-model="birthdayDate" label="Birthday date" color="success" :error-messages="birthdayDateErrors" v-bind="attrs" v-on="on" readonly>
+                  <template v-slot:prepend>
+                    <v-icon color="success">mdi-calendar</v-icon>
+                  </template>
+                </v-text-field>
               </template>
-            </v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-text-field
-                v-model="profile.lastName"
-                prepend-icon="mdi-account-outline"
-                label="Last Name"
-                color="success"
-                :loading="loadingLastName"
-                readonly>
-              <template v-slot:append>
-                <v-btn color="success" class="mb-2" @click="onDialog" text>Update Last Name</v-btn>
-              </template>
-            </v-text-field>
-          </v-col>
-        </v-row>
-      </v-form>
+              <v-date-picker v-model="birthdayDate" color="success" :active-picker.sync="activePicker" :max="maxDate" scrollable @change="updateBirthdayDate" />
+            </v-menu>
+          </div>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col :cols="$vuetify.breakpoint.xsOnly ? 12 : 4" md="3">
+          <v-text-field
+              v-model.number="userData.currentWeight"
+              :error-messages="weightErrors"
+              class="input-number"
+              suffix="kg"
+              type="number"
+              color="success"
+              label="Current weight"
+              placeholder="Enter weight"
+              @blur="$v.userData.currentWeight.$touch()"
+              @input="$v.userData.currentWeight.$touch()"
+              @change="updateUserData"
+              hide-spin-buttons
+          >
+            <template v-slot:prepend>
+              <v-btn icon color="success"
+                     :disabled="userData.currentWeight <= 0"
+                     :style="{ cursor: userData.currentWeight === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
+                     @click="decrement('currentWeight')">
+                <v-icon>mdi-minus</v-icon>
+              </v-btn>
+            </template>
+            <template v-slot:append-outer>
+              <v-btn icon color="success" @click="increment('currentWeight')">
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </template>
+          </v-text-field>
+        </v-col>
+        <v-col :cols="$vuetify.breakpoint.xsOnly ? 12 : 4" md="3">
+          <v-text-field
+              v-model.number="userData.height"
+              :error-messages="heightErrors"
+              class="input-number"
+              suffix="cm"
+              type="number"
+              color="success"
+              label="Height"
+              placeholder="Enter height"
+              append-outer-icon="mdi-plus"
+              @click:append-outer="increment('height')"
+              @blur="$v.userData.height.$touch()"
+              @input="$v.userData.height.$touch()"
+              @change="updateUserData"
+              hide-spin-buttons
+          >
+            <template v-slot:prepend>
+              <v-btn icon color="success"
+                     :disabled="userData.height <= 0"
+                     :style="{ cursor: userData.height === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
+                     @click="decrement('height')">
+                <v-icon>mdi-minus</v-icon>
+              </v-btn>
+            </template>
+            <template v-slot:append-outer>
+              <v-btn icon color="success" @click="increment('height')">
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </template>
+          </v-text-field>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" sm="8" md="6">
+          <v-select v-model="userData.activityLevel" :items="getActivities.labels" color="success" item-color="success" label="Activity level" @change="updateUserData" />
+          <v-card-text class="pt-0 grey--text text-center">{{ getActivities.descriptions[activityIndex] }}</v-card-text>
+        </v-col>
+      </v-row>
     </v-container>
     <v-row justify="center">
       <v-dialog v-model="dialog" max-width="600px">
         <v-card :loading="loadingUpdate" flat>
           <v-card-title>
-            <span class="text-h5">Update full name</span>
+            <span class="text-h5">Update Full Name</span>
           </v-card-title>
-          <v-form @submit.prevent="submit">
+          <v-form @submit.prevent="updateFullName">
             <v-card-text>
               <v-container>
                 <v-row>
@@ -96,20 +204,22 @@
                         label="First Name"
                         prepend-icon="mdi-account-outline"
                         placeholder="Enter your First Name"
-                        @blur="$v.fullName.firstName.$touch()"
+                        @focus="loadingFirstName = true"
+                        @blur="onBlur('firstName')"
                         @input="$v.fullName.firstName.$touch()"
                     />
                   </v-col>
                   <v-col cols="12" sm="6">
                     <v-text-field
-                        ref="lastName"
                         v-model="fullName.lastName"
                         :error-messages="lastNameErrors"
                         color="success"
+                        ref="lastName"
                         label="Last Name"
                         prepend-icon="mdi-account-outline"
                         placeholder="Enter your Last Name"
-                        @blur="$v.fullName.lastName.$touch()"
+                        @focus="loadingLastName = true"
+                        @blur="onBlur('lastName')"
                         @input="$v.fullName.lastName.$touch()"
                     />
                   </v-col>
@@ -131,11 +241,12 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
-import { alpha, minLength, required } from "vuelidate/lib/validators";
+import { mapActions, mapGetters } from "vuex";
+import { alpha, minLength, required, minValue, maxValue } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
-import { firstNameErrors, lastNameErrors } from "@/utils/validations";
+import { birthdayDateErrors, firstNameErrors, hasNumerics, lastNameErrors, numericErrors, rangeDate } from "@/utils/validations";
 import { accountService } from "@/services";
+import moment from "moment";
 
 export default {
   name: "ProfileSettings",
@@ -168,19 +279,26 @@ export default {
     progress: 0,
     profile: null,
     dialog: false,
+    status: null,
     loadingUpdate: false,
     loadingUpload: false,
     loadingFirstName: false,
-    loadingLastName: false
+    loadingLastName: false,
+    userData: {},
+    dateMenu: false,
+    activePicker: null,
+    birthdayDate: null,
   }),
   created() {
+    this.status = 'Loading...'
     this.profile = this.user
-    console.log("profile: " + this.profile.id)
-    this.getById(this.profile.id).then(response => {
-      response.data?.avatar?.id && response.data?.avatar?.filename ? this.avatar = true : null
+    if (this.profile.avatar?.id && this.profile.avatar?.filename) this.avatar = true
+    this.getUserDataById(this.profile.id).then(() => {
+      this.getUserData.subscribe(userData => this.userData = userData)
+      this.birthdayDate = moment(this.userData.birthdayDate).format('YYYY-MM-DD')
     }).catch(error => {
       console.log(error.response)
-    })
+    }).finally(() => this.status = null)
     this.avatarPath += `/${this.profile.id}`
   },
   validations: {
@@ -195,35 +313,64 @@ export default {
         alpha,
         minLength: minLength(2)
       },
+    },
+    userData: {
+      birthdayDate: {
+        required,
+        rangeDate
+      },
+      currentWeight: {
+        required,
+        hasNumerics,
+        minValue: minValue(25),
+        maxValue: maxValue(300)
+      },
+      height: {
+        required,
+        hasNumerics,
+        minValue: minValue(90),
+        maxValue: maxValue(250)
+      },
     }
   },
   computed: {
+    ...mapGetters('userData', ['getUserData', 'getActivities']),
     firstNameErrors() {
       return firstNameErrors(this.$v.fullName.firstName)
     },
     lastNameErrors() {
       return lastNameErrors(this.$v.fullName.lastName)
     },
+    maxDate() {
+      return (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().slice(0, 10)
+    },
+    birthdayDateErrors() {
+      return birthdayDateErrors(this.$v.userData.birthdayDate, [new Date('1922-02-22').toISOString().slice(0, 10), this.maxDate])
+    },
+    weightErrors() {
+      return numericErrors(this.$v.userData.currentWeight, 'currentWeight', [25, 300])
+    },
+    heightErrors() {
+      return numericErrors(this.$v.userData.height, 'height', [90, 250])
+    },
+    activityIndex() {
+      return this.getActivities.labels.findIndex(activity => activity === this.userData.activityLevel)
+    },
   },
   methods: {
     ...mapActions({
-      getById: 'account/getById',
-      update: 'account/update',
+      getUserDataById: 'userData/getById',
+      userDataUpdate: 'userData/update',
+      accountUpdate: 'account/update',
       setSnackbar: 'notification/setSnackbar'
     }),
     selectImage(image) {
       this.currentImage = image
-      if (image) {
-        this.previewImage = URL.createObjectURL(this.currentImage)
-      } else {
-        this.previewImage = null
-        this.$refs.avatar.resetValidation()
-      }
+      image ? this.previewImage = URL.createObjectURL(this.currentImage) : this.previewImage = null
+      if (!image) this.$refs.avatar.resetValidation()
     },
     upload() {
-      if (!this.currentImage) {
-        return this.setSnackbar({ color: 'error', text: 'Firstly, please select the image file' })
-      }
+      if (!this.currentImage) return this.setSnackbar({ color: 'error', text: 'Firstly, please select the image file' })
       this.loadingUpload = true
       this.progress = 0
       accountService.uploadAvatar(this.currentImage, this.profile.id, event => {
@@ -244,21 +391,23 @@ export default {
         setTimeout(() => this.progress = 0, 1000)
       })
     },
-    onDialog(event) {
-      const value = event.path[3].children[0].children[1].value || event.path[2].children[0].children[1].value
-      value === this.profile.lastName ? setTimeout(() => this.$refs.lastName.focus(), 0) : null
-      value === this.profile.lastName ? this.loadingLastName = true : this.loadingFirstName = true
+    onDialog(textField) {
+      if (textField === 'lastName') setTimeout(() => this.$refs.lastName.focus(), 0)
       this.dialog = true
       this.fullName.firstName = this.profile.firstName
       this.fullName.lastName = this.profile.lastName
     },
-    async submit() {
+    onBlur(textField) {
+      textField === 'firstName' ? this.loadingFirstName = false : this.loadingLastName = false
+      textField === 'firstName' ? this.$v.fullName.firstName.$touch() : this.$v.fullName.lastName.$touch()
+    },
+    updateFullName() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loadingUpdate = true
         this.profile.firstName = this.fullName.firstName
         this.profile.lastName = this.fullName.lastName
-        await this.update(this.profile).then(response => {
+        this.accountUpdate(this.profile).then(response => {
           console.log(response)
           this.profile = response.data
           this.setSnackbar({ color: 'success', text: response.data.message })
@@ -267,12 +416,41 @@ export default {
           this.setSnackbar({ color: 'error', text: error.response.data.message })
         }).finally(() => this.loadingUpdate = this.dialog = false)
       }
-    }
+    },
+    updateBirthdayDate(date) {
+      this.$refs.dateMenu.save(date)
+      this.birthdayDate = moment(date).format('YYYY-MM-DD')
+      this.userData.birthdayDate = this.birthdayDate
+      this.updateUserData()
+    },
+    increment(property) {
+      this.userData[property] = parseInt(this.userData[property],10) + 1
+      this.$v.userData[property].$touch()
+      if (!this.$v.userData[property].$invalid) this.updateUserData()
+    },
+    decrement(property) {
+      this.userData[property] = parseInt(this.userData[property],10) - 1
+      this.$v.userData[property].$touch()
+      if (!this.$v.userData[property].$invalid) this.updateUserData()
+    },
+    updateUserData() {
+      if (!this.status && !this.$v.userData.$invalid) {
+        this.status = 'Saving...'
+        this.userData.selectedPlan = this.userData.selectedPlan.id
+        this.userDataUpdate(this.userData).then(response => {
+          console.log(response)
+          this.setSnackbar({ color: 'success', position: 'right', text: response.data.message })
+        }).catch(error => {
+          console.log(error.response)
+          this.setSnackbar({ color: 'error', text: error.response.data.message })
+        }).finally(() => this.status = null)
+      }
+    },
   },
   watch: {
-    dialog(value) {
-      !value ? this.loadingFirstName = this.loadingLastName = false : null
-    }
-  }
+    dateMenu(value) {
+      value && setTimeout(() => (this.activePicker = 'YEAR'))
+    },
+  },
 }
 </script>

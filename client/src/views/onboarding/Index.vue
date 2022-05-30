@@ -23,23 +23,27 @@
                 v-model.number="userData.currentWeight"
                 :error-messages="currentWeightErrors"
                 class="input-number"
+                suffix="kg"
                 type="number"
                 color="success"
                 label="Current weight"
                 placeholder="Enter weight"
-                append-outer-icon="mdi-plus"
-                @click:append-outer="increment('currentWeight')"
                 @blur="$v.userData.currentWeight.$touch()"
                 @input="$v.userData.currentWeight.$touch()"
                 @keyup.enter="nextStep"
                 hide-spin-buttons
             >
               <template v-slot:prepend>
-                <v-btn icon
+                <v-btn icon color="success"
                     :disabled="currentWeight <= 0"
                     :style="{ cursor: currentWeight === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                     @click="decrement('currentWeight')">
                   <v-icon>mdi-minus</v-icon>
+                </v-btn>
+              </template>
+              <template v-slot:append-outer>
+                <v-btn icon color="success" @click="increment('currentWeight')">
+                  <v-icon>mdi-plus</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -54,23 +58,27 @@
                 v-model.number="userData.goalWeight"
                 :error-messages="goalWeightErrors"
                 class="input-number"
+                suffix="kg"
                 type="number"
                 color="success"
                 label="Goal weight"
                 placeholder="Enter weight"
-                append-outer-icon="mdi-plus"
-                @click:append-outer="increment('goalWeight')"
                 @blur="$v.userData.goalWeight.$touch()"
                 @input="$v.userData.goalWeight.$touch()"
                 @keyup.enter="nextStep"
                 hide-spin-buttons
             >
               <template v-slot:prepend>
-                <v-btn icon
+                <v-btn icon color="success"
                        :disabled="goalWeight <= 0"
                        :style="{ cursor: goalWeight === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                        @click="decrement('goalWeight')">
                   <v-icon>mdi-minus</v-icon>
+                </v-btn>
+              </template>
+              <template v-slot:append-outer>
+                <v-btn icon color="success" @click="increment('goalWeight')">
+                  <v-icon>mdi-plus</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -85,23 +93,27 @@
                 v-model.number="userData.height"
                 :error-messages="heightErrors"
                 class="input-number"
+                suffix="cm"
                 type="number"
                 color="success"
                 label="Height"
                 placeholder="Enter height"
-                append-outer-icon="mdi-plus"
-                @click:append-outer="increment('height')"
                 @blur="$v.userData.height.$touch()"
                 @input="$v.userData.height.$touch()"
                 @keyup.enter="nextStep"
                 hide-spin-buttons
             >
               <template v-slot:prepend>
-                <v-btn icon
+                <v-btn icon color="success"
                        :disabled="height <= 0"
                        :style="{ cursor: height === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                        @click="decrement('height')">
                   <v-icon>mdi-minus</v-icon>
+                </v-btn>
+              </template>
+              <template v-slot:append-outer>
+                <v-btn icon color="success" @click="increment('height')">
+                  <v-icon>mdi-plus</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -110,21 +122,18 @@
       </v-window-item>
 
       <v-window-item :value="4">
-        <v-row class="d-flex justify-center">
+        <v-row>
           <v-col>
-            <v-chip-group v-model="userData.sex" class="chip-group" column>
-              <v-chip
-                  value="male" filter-icon="mdi-gender-male" text-color="success"
-                  :color="sex === 'male' ? 'success' : ''" @keyup.enter="nextStep" @keyup.space="userData.sex = 'male'" filter large outlined
-              >
-                Male
-              </v-chip>
-              <v-chip
-                  value="female" filter-icon="mdi-gender-female" text-color="success"
-                  :color="sex === 'female' ? 'success' : ''" @keyup.enter="nextStep" @keyup.space="userData.sex = 'female'" filter large outlined>
-                Female
-              </v-chip>
-            </v-chip-group>
+            <v-btn-toggle class="d-flex justify-center mb-5" v-model="userData.sex" mandatory shaped>
+              <v-btn value="male" x-large text :color="userData.sex === 'male' ? 'success' : ''">
+                <v-icon :color="userData.sex === 'male' ? 'success' : ''">mdi-gender-male</v-icon>
+                <v-card-text class="text-subtitle-1 text-capitalize">Male</v-card-text>
+              </v-btn>
+              <v-btn value="female" x-large text :color="userData.sex === 'female' ? 'success' : ''">
+                <v-icon :color="userData.sex === 'female' ? 'success' : ''">mdi-gender-female</v-icon>
+                <v-card-text class="text-subtitle-1 text-capitalize">Female</v-card-text>
+              </v-btn>
+            </v-btn-toggle>
           </v-col>
         </v-row>
       </v-window-item>
@@ -133,12 +142,13 @@
         <v-row class="d-flex justify-center">
           <v-col cols="10" sm="5" md="4" lg="3">
             <div>
-              <v-menu ref="menu" v-model="menu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
+              <v-menu ref="dateMenu" v-model="dateMenu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                      v-model="userData.birthdayDate"
-                      label="Birthday date" prepend-icon="mdi-calendar" color="success"
-                      :error-messages="birthdayDateErrors" v-bind="attrs" v-on="on" readonly />
+                  <v-text-field v-model="userData.birthdayDate" label="Birthday date" color="success" :error-messages="birthdayDateErrors" v-bind="attrs" v-on="on" readonly>
+                    <template v-slot:prepend>
+                      <v-icon color="success">mdi-calendar</v-icon>
+                    </template>
+                  </v-text-field>
                 </template>
                 <v-date-picker v-model="userData.birthdayDate" color="success" :active-picker.sync="activePicker" :max="maxDate" scrollable @change="save" />
               </v-menu>
@@ -150,7 +160,7 @@
       <v-window-item :value="6">
         <v-row class="d-flex justify-center flex-column align-center">
           <v-col cols="12" md="8" xl="6" class="d-flex justify-center">
-            <v-img max-width="200" :src="activityImage" :lazy-src="activityImage" :alt="activities.titles[activityIndex]" :title="activities.titles[activityIndex]" />
+            <v-img max-width="200" :src="activityImage" :lazy-src="activityImage" :alt="getActivities.titles[activityIndex]" :title="getActivities.titles[activityIndex]" />
           </v-col>
           <v-col cols="12" md="8" xl="6">
             <v-slider v-model="activityIndex" track-fill-color="success" thumb-color="success" :max="4" :tick-labels="activityLabels" hide-details />
@@ -176,9 +186,10 @@
 
 <script>
 import { validationMixin } from "vuelidate";
-import { required, between } from "vuelidate/lib/validators";
+import { required, minValue, maxValue } from "vuelidate/lib/validators";
 import { birthdayDateErrors, hasNumerics, numericErrors, sexErrors, rangeDate } from "@/utils/validations";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
+import moment from "moment";
 
 export default {
   name: 'Onboarding',
@@ -239,41 +250,40 @@ export default {
       birthdayDate: null,
       activityLevel: 'Sedentary',
     },
-    menu: false,
+    dateMenu: false,
     activePicker: null,
     activityIndex: 0,
-    activities: {
-      labels: ['Sedentary', 'Light', 'Moderate', 'Very', 'Extra'],
-      titles: ['Sedentary', 'Lightly Active', 'Moderate Active', 'Very Active', 'Extra Active'],
-      descriptions: [
-        'Desk job with little or no exercise.',
-        'Work a job with light physical demands, or work a desk job and perform light exercise (at the level of a brisk walk) for 30 minutes per day, 3-5 times per week.',
-        'Work a moderately physically demanding job, such as construction worker, or work a desk job and engage in moderate exercise for 1 hour per day, 3-5 times per week.',
-        'Work a consistently physically demanding job, such as agricultural worker, or work a desk job and engage in intense exercise for 1 hour per day, or moderate exercise for 2 hours per day, 5-7 times per week.',
-        'Work an extremely physically demanding job, such as professional athlete, competitive cyclist, or fitness professional, or engage in intense exercise for at least 2 hours per day.'
-      ]
-    },
     loading: false
   }),
   created() {
     this.userData.accountId = this.user.id
+    this.getById(this.userData.accountId).then(() => {
+      this.getUserData.subscribe(userData => this.userData = userData)
+      this.userData.birthdayDate = moment(this.userData.birthdayDate).format('YYYY-MM-DD')
+      this.userData.goalWeight = null
+    }).catch(error => {
+      console.log(error.response)
+    })
   },
   validations: {
     userData: {
       currentWeight: {
         required,
         hasNumerics,
-        between: between(1, 1000)
+        minValue: minValue(25),
+        maxValue: maxValue(300)
       },
       goalWeight: {
         required,
         hasNumerics,
-        between: between(1, 1000)
+        minValue: minValue(25),
+        maxValue: maxValue(300)
       },
       height: {
         required,
         hasNumerics,
-        between: between(90, 240)
+        minValue: minValue(90),
+        maxValue: maxValue(250)
       },
       sex: {
         required
@@ -288,6 +298,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('userData', ['getActivities', 'getUserData']),
     currentTitle() {
       return this.content[this.step - 1].title
     },
@@ -310,22 +321,22 @@ export default {
       return (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().slice(0, 10)
     },
     activityImage() {
-      return `/img/activities/${this.userData.sex}-${this.activities.labels[this.activityIndex].toLowerCase()}.svg`
+      return `/img/activities/${this.userData.sex}-${this.getActivities.labels[this.activityIndex].toLowerCase()}.svg`
     },
     activityLabels() {
-      return this.$vuetify.breakpoint.smAndUp ? this.activities.labels : []
+      return this.$vuetify.breakpoint.smAndUp ? this.getActivities.labels : []
     },
     activityTitle() {
-      return this.activities.titles[this.activityIndex]
+      return this.getActivities.titles[this.activityIndex]
     },
     activityDescription() {
-      return this.activities.descriptions[this.activityIndex]
+      return this.getActivities.descriptions[this.activityIndex]
     },
     currentWeightErrors() {
-      return numericErrors(this.$v.userData.currentWeight, this.content[this.step - 1].step, [1, 1000])
+      return numericErrors(this.$v.userData.currentWeight, this.content[this.step - 1].step, [25, 300])
     },
     goalWeightErrors() {
-      return numericErrors(this.$v.userData.goalWeight, this.content[this.step - 1].step, [1, 1000])
+      return numericErrors(this.$v.userData.goalWeight, this.content[this.step - 1].step, [25, 300])
     },
     heightErrors() {
       return numericErrors(this.$v.userData.height, this.content[this.step - 1].step, [90, 240])
@@ -338,10 +349,8 @@ export default {
     },
   },
   methods: {
-    ...mapActions({
-      setSnackbar: 'notification/setSnackbar',
-      create: 'userData/create'
-    }),
+    ...mapActions('userData', ['getById', 'create']),
+    ...mapActions('notification', ['setSnackbar']),
     increment(property) {
       this.userData[property] = parseInt(this.userData[property],10) + 1
       this.$v.userData[property].$touch()
@@ -351,7 +360,7 @@ export default {
       this.$v.userData[property].$touch()
     },
     save(date) {
-      this.$refs.menu.save(date)
+      this.$refs.dateMenu.save(date)
     },
     nextStep() {
       const model = this.content[this.step - 1].model
@@ -388,18 +397,18 @@ export default {
     height(value) {
       value < 0 || !value ? this.userData.height = 0 : null
     },
-    menu(value) {
+    dateMenu(value) {
       value && setTimeout(() => (this.activePicker = 'YEAR'))
     },
     activityIndex(value) {
-      this.userData.activityLevel = this.activities.labels[value]
+      this.userData.activityLevel = this.getActivities.labels[value]
     }
   }
 }
 </script>
 
 <style>
-.chip-group span {
+.chip-item span {
   width: 150px;
   justify-content: center;
 }

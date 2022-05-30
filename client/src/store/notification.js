@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid'
+
 const state = () => ({
   alerts: [],
   snackbars: []
@@ -9,10 +11,12 @@ const actions = {
     commit('SET_ALERT', alert)
   },
   setSnackbar: ({ commit }, snackbar) => {
+    snackbar.id = uuidv4()
     snackbar.active = true
     snackbar.color = snackbar.color || 'primary'
     snackbar.timeout = snackbar.timeout || 5000
     snackbar.createdAt = new Date().getTime()
+    snackbar.position = snackbar.position || 'bottom'
     commit('SET_SNACKBAR', snackbar)
   },
   clearAlerts: ({ commit }) => {

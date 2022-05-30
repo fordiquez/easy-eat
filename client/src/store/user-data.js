@@ -3,11 +3,23 @@ import { BehaviorSubject } from "rxjs";
 import { excludedFilter } from "@/utils/filters";
 
 const state = () => ({
-  userData: new BehaviorSubject(null)
+  userData: new BehaviorSubject(null),
+  activities: {
+    labels: ['Sedentary', 'Light', 'Moderate', 'Very', 'Extra'],
+    titles: ['Sedentary', 'Lightly Active', 'Moderate Active', 'Very Active', 'Extra Active'],
+    descriptions: [
+      'Desk job with little or no exercise.',
+      'Work a job with light physical demands, or work a desk job and perform light exercise (at the level of a brisk walk) for 30 minutes per day, 3-5 times per week.',
+      'Work a moderately physically demanding job, such as construction worker, or work a desk job and engage in moderate exercise for 1 hour per day, 3-5 times per week.',
+      'Work a consistently physically demanding job, such as agricultural worker, or work a desk job and engage in intense exercise for 1 hour per day, or moderate exercise for 2 hours per day, 5-7 times per week.',
+      'Work an extremely physically demanding job, such as professional athlete, competitive cyclist, or fitness professional, or engage in intense exercise for at least 2 hours per day.'
+    ]
+  },
 });
 
 const getters = {
-  getUserData: state => state.userData.asObservable()
+  getUserData: state => state.userData.asObservable(),
+  getActivities: state => state.activities
 }
 
 const actions = {
@@ -24,7 +36,7 @@ const actions = {
     })
   },
   async update({ commit }, payload) {
-    return await userDataService.edit(payload).then(response => {
+    return await userDataService.update(payload).then(response => {
       commit('SET_USER_DATA', response.data.userData)
       return response
     })

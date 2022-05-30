@@ -64,12 +64,13 @@ export const roleErrors = (role) => {
   return errors
 }
 
-export const numericErrors = (number, model, between) => {
+export const numericErrors = (number, model, range) => {
   const errors = []
   if (number.$dirty) {
     !number.required && errors.push(`${model} field is required`)
     !number.hasNumerics && errors.push(`${model} must be a numeric`)
-    !number.between && errors.push(`Please enter a number between ${between[0]} and ${between[1]}`)
+    !number.minValue && errors.push(`A number must be more or equal ${range[0]}`)
+    !number.maxValue && errors.push(`A number must be lower or equal ${range[1]}`)
   }
   return errors
 }

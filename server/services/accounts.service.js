@@ -197,17 +197,19 @@ const create = async (params) => {
 
 const update = async (id, params) => {
   const account = await getAccount(id)
-
+  let message = 'The user account updated successfully'
   // validate (if email was changed)
   if (params.email && account.email !== params.email && await db.Account.findOne({ email: params.email })) {
     throw 'Email "' + params.email + '" is already taken';
   }
+  message = 'Email address updated successfully'
 
   if (params.password) {
     if (!bcrypt.compareSync(params.password, account.passwordHash)) throw 'Unfortunately, your current password is incorrect'
     if (params.updatedPassword && params.updatedPasswordConfirm) {
       // hash password if it was changed
       params.passwordHash = hash(params.updatedPassword)
+      message = 'Password updated successfully'
     }
   }
   // copy params to account and save
@@ -217,7 +219,7 @@ const update = async (id, params) => {
 
   return {
     ...basicDetails(account),
-    message: 'The user account has been successfully updated'
+    message
   };
 }
 
@@ -233,7 +235,6 @@ const _delete = async (id) => {
 
 const uploadAvatar = async (req) => {
   const account = await getAccount(req.params.id)
-  console.log(req.file)
   if (account.avatar.id && account.avatar.filename) await db.deleteAvatar(account.avatar.id)
   account.avatar = {
     id: req.file.id,

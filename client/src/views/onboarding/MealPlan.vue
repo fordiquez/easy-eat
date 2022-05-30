@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container v-if="userData.accountId">
     <h5 class="text-h5 text-center">Your <strong>meal plan</strong> is ready!</h5>
     <v-card class="mt-5" rounded>
       <v-row>
@@ -379,7 +379,6 @@ export default {
         payload.caloriesGoal = this.mealGoals[this.caloriesGoal].title
         payload.selectedPlan = this.selectedPlan.id
         if (this.isCustomPlan) payload.customProportions = this.userData.selectedPlan.proportions
-        console.log(payload)
         this.editUserData(payload).then(response => {
           this.$router.push({ name: 'DailyLog' }).then(() => this.setSnackbar({ color: 'success', text: response.data.message }))
         }).catch(error => {

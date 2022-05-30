@@ -1,7 +1,7 @@
 <template>
   <v-app dark>
     <v-navigation-drawer v-model="application.drawer" @input="drawer" :clipped="application.clipped" :mini-variant="application.miniVariant" app fixed>
-      <v-list-item class="d-flex justify-center align-center">
+      <v-list-item class="d-flex justify-center align-center" @click.native="logoNav">
         <v-list-item-avatar>
           <v-img alt="Logo" title="Logo" :src="require('@/assets/logo.svg')" />
         </v-list-item-avatar>
@@ -142,8 +142,8 @@ export default {
       ]
     }
   }),
-  async created() {
-    await this.init()
+  created() {
+    this.init()
     this.application = this.getApplication
   },
   computed: {
@@ -168,13 +168,18 @@ export default {
       setAlert: 'notification/setAlert',
       setSnackbar: 'notification/setSnackbar'
     }),
+    logoNav() {
+      if (this.$route.name !== 'DailyLog') this.$router.push({ name: 'DailyLog' })
+    },
     onLogout() {
       this.loading = true
-      this.logout().then(async response => {
-        console.log(response)
-        this.$route.name !== 'Login' ? await this.$router.push({ name: 'Login' }) : null
-        await this.setAlert({ type: 'success', text: response.data.message })
-        await this.setSnackbar({ color: 'success', text: response.data.message })
+      this.logout().then(response => {
+        if (this.$route.name !== 'Login') {
+          this.$router.push({ name: 'Login' }).then(() => {
+            this.setAlert({ type: 'success', text: response.data.message })
+            this.setSnackbar({ color: 'success', text: response.data.message })
+          })
+        }
       }).catch(error => {
         console.log(error.response)
         this.setAlert({ type: 'error', text: error.response.data.message })

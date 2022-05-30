@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="foodSearchDialog" @click:outside="onClose" scrollable max-width="800">
+  <v-dialog v-model="dialog" @input="onClose" scrollable max-width="800">
     <v-card>
       <v-card-title>
         <v-row class="d-flex flex-sm-row-reverse align-center">
@@ -98,9 +98,11 @@ export default {
     mealTime: '',
     query: null,
     loading: false,
-    selection: null
+    selection: null,
+    dialog: false
   }),
   created() {
+    this.dialog = this.foodSearchDialog
     this.mealTime = this.getMealTime
   },
   computed: {

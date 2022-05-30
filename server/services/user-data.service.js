@@ -11,7 +11,7 @@ const create = async (params) => {
   await newUserData.save()
   return {
     newUserData,
-    message: 'The user data has been successfully created'
+    message: 'The user data created successfully'
   }
 }
 
@@ -22,11 +22,10 @@ const update = async (id, params) => {
   await updatedUserData.save()
 
   const userData = await getUserData(id)
-  console.log(userData)
 
   return {
     userData,
-    message: 'The user data has been successfully updated'
+    message: 'The user data updated successfully'
   }
 }
 
@@ -35,7 +34,7 @@ const _delete = async (id) => {
   await userData.remove()
 
   return {
-    message: 'The user data has been successfully deleted'
+    message: 'The user data deleted successfully'
   }
 }
 

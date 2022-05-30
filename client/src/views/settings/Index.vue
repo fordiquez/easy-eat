@@ -29,19 +29,19 @@ export default {
   data: () => ({
     user: null,
   }),
-  async created() {
+  created() {
     this.user = this.getUserValue
-    await this.getCurrentUser()
+    this.getCurrentUser()
   },
   computed: {
     ...mapGetters('account', ['getUser', 'getUserValue'])
   },
   methods: {
     ...mapActions('account', ['getById']),
-    async getCurrentUser() {
-      console.log("index: " + this.user.id)
-      await this.getById(this.user.id).then(async () => {
-        await this.getUser.subscribe(user => this.user = user)
+    getCurrentUser() {
+      this.getById(this.user.id).then((response) => {
+        console.log(response)
+        this.getUser.subscribe(user => this.user = user)
       }).catch(error => {
         console.log(error.response)
       })
