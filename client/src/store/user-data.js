@@ -19,6 +19,7 @@ const state = () => ({
 
 const getters = {
   getUserData: state => state.userData.asObservable(),
+  getUserDataValue: state => state.userData.value,
   getActivities: state => state.activities
 }
 

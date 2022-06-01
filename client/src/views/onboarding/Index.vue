@@ -373,7 +373,6 @@ export default {
       }
     },
     addUserData() {
-      console.log(this.userData)
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loading = true

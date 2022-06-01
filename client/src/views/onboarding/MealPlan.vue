@@ -60,9 +60,9 @@
       </v-row>
       <v-divider class="mt-5" />
       <v-row>
-        <v-col cols="12">
+        <v-col cols="12" class="pb-0">
           <div class="d-flex flex-row justify-center">
-            <v-card-text class="pb-0 pl-2 d-flex flex-column">
+            <v-card-text class="my-0 py-0 pl-2 d-flex flex-column">
               <v-subheader class="text-subtitle-1">
                 <v-icon class="mr-1" :color="'#E53935'">mdi-nutrition</v-icon>
                 <label>Net Carbs</label>
@@ -77,7 +77,7 @@
                   v-model="userData.macros.CARBS"
                   type="number"
                   color="success"
-                  class="input-number"
+                  class="input-number pt-0 mt-0"
                   suffix="g"
                   append-outer-icon="mdi-plus"
                   @click:append-outer="increment('CARBS')"
@@ -96,11 +96,11 @@
               <v-subheader class="text-subtitle-1 font-weight-bold" style="color: #E53935">{{ percentageCarbs }}%</v-subheader>
             </v-card-actions>
           </div>
-          <v-slider v-if="userData.macros.CARBS >= 0" v-model="userData.macros.CARBS" :max="maxCarbs" class="px-5" :color="'#E53935'" :readonly="!isCustomPlan" />
+          <v-slider v-if="userData.macros.CARBS >= 0" v-model="userData.macros.CARBS" :max="maxCarbs" class="px-5" :color="'#E53935'" :readonly="!isCustomPlan" hide-details />
         </v-col>
-        <v-col cols="12">
+        <v-col cols="12" class="pb-0">
           <div class="d-flex flex-row justify-center">
-            <v-card-text class=" pb-0 pl-2 d-flex flex-column">
+            <v-card-text class="my-0 py-0 pl-2 d-flex flex-column">
               <v-subheader class="text-subtitle-1">
                 <v-icon class="mr-1" :color="'#1565C0'">mdi-nutrition</v-icon>
                 <label>Protein</label>
@@ -113,7 +113,7 @@
                   v-model="userData.macros.PROTEIN"
                   type="number"
                   color="success"
-                  class="input-number"
+                  class="input-number pt-0 mt-0"
                   suffix="g"
                   append-outer-icon="mdi-plus"
                   @click:append-outer="increment('PROTEIN')"
@@ -132,11 +132,11 @@
               <v-subheader class="text-subtitle-1 font-weight-bold" style="color: #1565C0">{{ percentageProtein }}%</v-subheader>
             </v-card-actions>
           </div>
-          <v-slider v-if="userData.macros.PROTEIN >= 0" v-model="userData.macros.PROTEIN" :max="maxProtein" class="px-5" :color="'#1565C0'" :readonly="!isCustomPlan" />
+          <v-slider v-if="userData.macros.PROTEIN >= 0" v-model="userData.macros.PROTEIN" :max="maxProtein" class="px-5" :color="'#1565C0'" :readonly="!isCustomPlan" hide-details />
         </v-col>
         <v-col cols="12">
           <div class="d-flex flex-row justify-center">
-            <v-card-text class=" pb-0 pl-2 d-flex flex-column">
+            <v-card-text class="my-0 py-0 pl-2 d-flex flex-column">
               <v-subheader class="text-subtitle-1">
                 <v-icon class="mr-1" :color="'#FF9100'">mdi-nutrition</v-icon>
                 <label>Fat</label>
@@ -149,7 +149,7 @@
                   v-model.number="userData.macros.FAT"
                   type="number"
                   color="success"
-                  class="input-number"
+                  class="input-number pt-0 mt-0"
                   suffix="g"
                   append-outer-icon="mdi-plus"
                   @click:append-outer="increment('FAT')"
@@ -168,7 +168,7 @@
               <v-subheader class="text-subtitle-1 font-weight-bold" style="color: #FF9100">{{ percentageFat }}%</v-subheader>
             </v-card-actions>
           </div>
-          <v-slider v-if="userData.macros.FAT >= 0" v-model="userData.macros.FAT" :max="maxFat" class="px-5" :color="'#FF9100'" :readonly="!isCustomPlan" />
+          <v-slider v-if="userData.macros.FAT >= 0" v-model="userData.macros.FAT" :max="maxFat" class="px-5" :color="'#FF9100'" :readonly="!isCustomPlan" hide-details />
         </v-col>
         <v-col cols="12" class="px-10">
           <v-btn color="success" @click="onCreatePlan" block>Apply meal plan</v-btn>
@@ -198,7 +198,7 @@
 import RoundSlider from 'vue-round-slider'
 import {mapActions, mapGetters} from "vuex";
 import moment from "moment";
-import DoughnutChart from "@/components/Doughnut";
+import DoughnutChart from "@/components/charts/mealPlanDoughnut";
 
 export default {
   name: "MealPlan",

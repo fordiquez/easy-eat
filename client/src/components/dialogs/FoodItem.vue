@@ -29,11 +29,13 @@
                 <label class="text-subtitle-2">Net Carbs</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
-                <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text">22g left</label>
+                <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
+                  {{ carbsSign === 'left' ? carbsLeft : carbsOver }}g {{ carbsSign }}
+                </label>
                 <label class="font-weight-bold red--text">{{ selectedNutrients.CARBS | fixed }}g</label>
               </v-card-text>
             </div>
-            <v-progress-linear v-model="selectedNutrients.CARBS" color="red" class="my-2" rounded />
+            <v-progress-linear :value="dailyPercentageCarbs" color="red" class="my-2" rounded />
 
             <div class="d-flex justify-space-between">
               <v-card-text class="pa-0">
@@ -41,11 +43,13 @@
                 <label class="text-subtitle-2">Protein</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
-                <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text">22g left</label>
+                <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
+                  {{ proteinSign === 'left' ? proteinLeft : proteinOver }}g {{ proteinSign }}
+                </label>
                 <label class="font-weight-bold blue--text">{{ selectedNutrients.PROTEIN | fixed }}g</label>
               </v-card-text>
             </div>
-            <v-progress-linear v-model="selectedNutrients.PROTEIN" color="blue" class="my-2" rounded />
+            <v-progress-linear :value="dailyPercentageProtein" color="blue" class="my-2" rounded />
 
             <div class="d-flex justify-space-between">
               <v-card-text class="pa-0">
@@ -53,11 +57,13 @@
                 <label class="text-subtitle-2">Fat</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
-                <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text">22g left</label>
+                <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
+                  {{ fatSign === 'left' ? fatLeft : fatOver }}g {{ fatSign }}
+                </label>
                 <label class="font-weight-bold orange--text">{{ selectedNutrients.FAT | fixed }}g</label>
               </v-card-text>
             </div>
-            <v-progress-linear v-model="selectedNutrients.FAT" color="orange" class="my-2" rounded />
+            <v-progress-linear :value="dailyPercentageFat" color="orange" class="my-2" rounded />
 
             <div class="d-flex justify-space-between">
               <v-card-text class="pa-0">
@@ -65,11 +71,13 @@
                 <label class="text-subtitle-2">Calories</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
-                <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text">22g left</label>
+                <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
+                  {{ calsSign === 'left' ? calsLeft : calsOver }} {{ calsSign }}
+                </label>
                 <label class="font-weight-bold teal--text">{{ selectedNutrients.CALS | fixed }}</label>
               </v-card-text>
             </div>
-            <v-progress-linear disabled="true" v-model="selectedNutrients.CALS" color="teal" class="my-2" rounded />
+            <v-progress-linear :value="dailyPercentageCals" color="teal" class="my-2" rounded />
 
           </v-col>
         </v-row>
@@ -93,14 +101,17 @@
                 type="number"
                 color="success"
                 label="Servings"
-                append-outer-icon="mdi-plus"
-                @click:append-outer="increment"
                 @input="setServings"
                 hide-spin-buttons
             >
               <template v-slot:prepend>
-                <v-btn icon :disabled="servings <= 0" :style="{ cursor: cursorType, pointerEvents: 'auto' }" @click="decrement">
+                <v-btn icon color="success" :disabled="servings <= 0" :style="{ cursor: cursorType, pointerEvents: 'auto' }" @click="decrement">
                   <v-icon>mdi-minus</v-icon>
+                </v-btn>
+              </template>
+              <template v-slot:append-outer>
+                <v-btn icon color="success" @click="increment">
+                  <v-icon>mdi-plus</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -108,7 +119,7 @@
 
           <v-col cols="12">
             <v-slide-group v-model="mealTime" show-arrows>
-              <v-slide-item v-for="mealTime in mealTimes.labels" :key="mealTime" v-slot="{ active, toggle }">
+              <v-slide-item v-for="mealTime in getMealTimes.labels" :key="mealTime" v-slot="{ active, toggle }">
                 <v-btn class="mx-2" active-class="success" :input-value="active" depressed rounded @click="toggle">
                   {{ mealTime }}
                 </v-btn>
@@ -169,21 +180,66 @@ export default {
     !this.itemAdding ? this.servings = this.selectedFood.servings : this.servings = 100
     !this.itemAdding ? this.measure = this.selectedFood.measure : this.measure = 'gram'
     this.measure === 'gram' || this.measure === 'milliliter' ? this.coefficient = 1 : this.coefficient = 1000
-    this.mealTime = this.mealTimes.labels.findIndex(item => item === this.getMealTime || item === this.selectedFood.mealTime)
+    this.mealTime = this.getMealTimes.labels.findIndex(item => item === this.getMealTime || item === this.selectedFood.mealTime)
   },
   computed: {
-    ...mapGetters({
-      user: 'account/getUserValue',
-      date: 'food/getDate',
-      getMealTime: 'food/getMealTime',
-      mealTimes: 'food/getMealTimes'
-    }),
+    ...mapGetters('account', ['getUserValue']),
+    ...mapGetters('userData', ['getUserDataValue']),
+    ...mapGetters('food', ['getDate', 'getMealTime', 'getMealTimes', 'getDailyMacros', 'getUserFood']),
     cursorType() {
       return this.servings === 0 ? 'not-allowed' : 'pointer'
+    },
+    dailyPercentageCarbs() {
+      return this.selectedNutrients.CARBS * 100 / this.getUserDataValue?.macros.CARBS
+    },
+    dailyPercentageProtein() {
+      return this.selectedNutrients.PROTEIN * 100 / this.getUserDataValue?.macros.PROTEIN
+    },
+    dailyPercentageFat() {
+      return this.selectedNutrients.FAT * 100 / this.getUserDataValue?.macros.FAT
+    },
+    dailyPercentageCals() {
+      return this.selectedNutrients.CALS * 100 / this.getUserDataValue?.TDEE
+    },
+    carbsLeft() {
+      return this.parsedNumber(this.getUserDataValue?.macros.CARBS - this.getDailyMacros.CARBS - this.selectedNutrients.CARBS)
+    },
+    carbsOver() {
+      return this.parsedNumber(this.carbsLeft - this.carbsLeft * 2)
+    },
+    carbsSign() {
+      return this.carbsOver > this.carbsLeft ? 'over' : 'left'
+    },
+    proteinLeft() {
+      return this.parsedNumber(this.getUserDataValue?.macros.PROTEIN - this.getDailyMacros.PROTEIN - this.selectedNutrients.PROTEIN)
+    },
+    proteinOver() {
+      return this.parsedNumber(this.proteinLeft - this.proteinLeft * 2)
+    },
+    proteinSign() {
+      return this.proteinOver > this.proteinLeft ? 'over' : 'left'
+    },
+    fatLeft() {
+      return this.parsedNumber(this.getUserDataValue?.macros.FAT - this.getDailyMacros.FAT - this.selectedNutrients.FAT)
+    },
+    fatOver() {
+      return this.parsedNumber(this.fatLeft - this.fatLeft * 2)
+    },
+    fatSign() {
+      return this.fatOver > this.fatLeft ? 'over' : 'left'
+    },
+    calsLeft() {
+      return this.parsedNumber(this.getUserDataValue?.TDEE - this.getDailyMacros.CALS - this.selectedNutrients.CALS)
+    },
+    calsOver() {
+      return this.parsedNumber(this.calsLeft - this.calsLeft * 2)
+    },
+    calsSign() {
+      return this.calsOver > this.calsLeft ? 'over' : 'left'
     }
   },
   methods: {
-    ...mapActions('food', ['add', 'edit', 'delete', 'selectedMealTime']),
+    ...mapActions('food', ['add', 'update', 'delete', 'selectedMealTime', 'updateDailyMacros']),
     ...mapActions('notification', ['setSnackbar']),
     increment() {
       this.servings = parseInt(this.servings,10) + 1
@@ -194,9 +250,9 @@ export default {
       this.setServings()
     },
     onAddFood() {
-      const { id } = this.user
+      const { id } = this.getUserValue
       const { foodId, label, category, categoryLabel, image } = this.selectedFood
-      const [nutrients, date, mealTime, measure, servings] = [this.selectedNutrients, this.date, this.mealTimes.labels[this.mealTime], this.measure, this.servings]
+      const [nutrients, date, mealTime, measure, servings] = [this.selectedNutrients, this.getDate, this.getMealTimes.labels[this.mealTime], this.measure, this.servings]
       const payload = {
         userId: id,
         date,
@@ -223,8 +279,8 @@ export default {
       foodItem.nutrients = this.selectedNutrients
       foodItem.servings = this.servings
       foodItem.measure = this.measure
-      foodItem.mealTime = this.mealTimes.labels[this.mealTime]
-      this.edit(foodItem).then(response => {
+      foodItem.mealTime = this.getMealTimes.labels[this.mealTime]
+      this.update(foodItem).then(response => {
         console.log(response)
         this.setSnackbar({ color: 'success', text: response.data.message })
       }).catch(error => {
@@ -276,6 +332,9 @@ export default {
     },
     setServings() {
       this.setMeasure(this.measure)
+    },
+    parsedNumber(formula) {
+      return Number.parseInt((formula).toFixed(0))
     }
   },
   watch: {

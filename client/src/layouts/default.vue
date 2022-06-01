@@ -1,7 +1,7 @@
 <template>
   <v-app dark>
     <v-navigation-drawer v-model="application.drawer" @input="drawer" :clipped="application.clipped" :mini-variant="application.miniVariant" app fixed>
-      <v-list-item class="d-flex justify-center align-center" @click.native="logoNav">
+      <v-list-item class="d-flex justify-center align-center" @click="logoNav">
         <v-list-item-avatar>
           <v-img alt="Logo" title="Logo" :src="require('@/assets/logo.svg')" />
         </v-list-item-avatar>

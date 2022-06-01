@@ -31,7 +31,6 @@ export default {
   methods: {
     ...mapActions('account', ['getById']),
     getCurrentUser() {
-      console.log("index: " + this.user.id)
       this.getById(this.user.id).then(() => {
         this.getUser.subscribe(user => this.user = user)
       }).catch(error => {

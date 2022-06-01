@@ -18,7 +18,7 @@ const get = async (params) => {
   return await DefaultAPI.get(`${baseURL}/`, { params })
 }
 
-const edit = async (payload) => {
+const update = async (payload) => {
   return await DefaultAPI.put(`${baseURL}/${payload.id}`, payload)
 }
 
@@ -31,6 +31,6 @@ export const foodService = {
   search,
   add,
   get,
-  edit,
+  update,
   delete: _delete
 }

@@ -1,14 +1,15 @@
 <template>
   <div>
     <v-card elevation="5" outlined shaped>
-      <v-card-title>
-        <v-icon class="mr-1">{{ getMealTimes.icons[getMealTimes.labels.indexOf(mealTime)] }}</v-icon>
-        <span>{{ mealTime }}</span>
+      <v-card-title class="pb-1">
+        <v-icon class="mr-1">{{ mealTimeIcon }}</v-icon>
+        <label>{{ mealTime }}</label>
       </v-card-title>
-      <v-btn color="success" block text rounded elevation="5" @click="onFoodSearchDialog">
-        <v-icon class="mr-1">mdi-hamburger-plus</v-icon>
-        <span>Add {{ mealTime }}</span>
-      </v-btn>
+      <v-card-text class="pb-1">
+        Recommended: {{ recommendedCals | zeroFixed }} cals —
+        {{ calsSign === 'left' ? calsLeft : calsOver }} cals {{ calsSign }}
+      </v-card-text>
+      <v-divider v-if="mealTimeItems.length" />
       <v-list v-if="mealTimeItems.length">
         <v-list-item-group v-model="selection" color="success">
           <v-list-item v-for="item in mealTimeItems" :key="item.id" @click="onSelectedFoodItem(item)">
@@ -44,7 +45,8 @@
             </v-row>
           </v-list-item>
         </v-list-item-group>
-        <v-list-item v-if="mealTimeItems.length" class="hidden-xs-only">
+        <v-divider v-if="mealTimeItems.length && $vuetify.breakpoint.smAndUp" />
+        <v-list-item v-if="mealTimeItems.length && $vuetify.breakpoint.smAndUp">
           <v-row class="d-flex flex-column flex-sm-row">
             <v-col cols="12" sm="4" md="6" xs="2" class="d-flex">
               <v-list-item-title class="text-h6">{{ mealTime }} Total</v-list-item-title>
@@ -67,41 +69,39 @@
                 <v-list-item-subtitle>{{ mealTotals.CALS | fixed }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-col>
-
           </v-row>
         </v-list-item>
       </v-list>
+      <v-divider />
+      <v-btn color="success" block text rounded elevation="5" @click="onFoodSearchDialog">
+        <v-icon class="mr-1">mdi-hamburger-plus</v-icon>
+        <span>Add {{ mealTime }}</span>
+      </v-btn>
     </v-card>
 
-    <food-item v-if="foodItemDialog"
-               :food-item-dialog="foodItemDialog"
-               :selected-food="selectedFood"
-               :selected-nutrients="selectedNutrients"
-               :item-adding="false"
-               @close-dialog="foodItemDialog = false"
+    <food-item
+        v-if="foodItemDialog"
+        :food-item-dialog="foodItemDialog"
+        :selected-food="selectedFood"
+        :selected-nutrients="selectedNutrients"
+        :item-adding="false"
+        @close-dialog="foodItemDialog = false"
     />
   </div>
 </template>
 
 <script>
 import FoodItem from "@/components/dialogs/FoodItem";
-import {mapActions, mapGetters} from "vuex";
+import { mapActions, mapGetters } from "vuex";
+
 export default {
   name: "MealTimeList",
   components: { FoodItem },
   props: {
-    userFood: {
-      type: Array,
-      default: null
-    },
     mealTime: {
       type: String,
       default: null,
     },
-    date: {
-      type: String,
-      default: null
-    }
   },
   data: () => ({
     image: process.env.VUE_APP_STATIC_IMAGE_PATH,
@@ -126,13 +126,29 @@ export default {
     })
   },
   computed: {
-    ...mapGetters('food', ['getDate', 'getMealTimes']),
+    ...mapGetters('food', ['getUserFood', 'getDate', 'getMealTimes']),
+    ...mapGetters('userData', ['getUserDataValue']),
     mealTimeItems() {
-      return this.userFood.filter(item => item.mealTime === this.mealTime)
+      return this.getUserFood.filter(item => item.mealTime === this.mealTime)
     },
+    mealTimeIcon() {
+      return this.getMealTimes.icons[this.getMealTimes.labels.indexOf(this.mealTime)]
+    },
+    recommendedCals() {
+      return this.getUserDataValue?.TDEE ? this.mealTime !== 'Snack' ? this.getUserDataValue.TDEE * 30 / 100 : this.getUserDataValue.TDEE * 10 / 100 : 0
+    },
+    calsLeft() {
+      return Number.parseInt((this.recommendedCals - this.mealTotals.CALS).toFixed(0))
+    },
+    calsOver() {
+      return Number.parseInt((this.calsLeft - this.calsLeft * 2).toFixed(0))
+    },
+    calsSign() {
+      return this.calsOver > this.calsLeft ? 'over' : 'left'
+    }
   },
   methods: {
-    ...mapActions('food', ['selectedMealTime']),
+    ...mapActions('food', ['selectedMealTime', 'setSelectedNutrients', 'setDailyMacros', 'clearDailyMacros']),
     onFoodSearchDialog() {
       this.$emit('food-search', this.mealTime)
     },
@@ -147,16 +163,23 @@ export default {
         FAT: foodItem.nutrients.FAT || null
       }
       this.selectedNutrients = Object.assign({}, nutrients)
+      this.setSelectedNutrients(this.selectedNutrients)
     }
   },
   watch: {
     foodItemDialog(value) {
-      !value ? this.selection = this.selectedFood = this.selectedNutrients = null : null
+      if (!value) {
+        this.selection = this.selectedFood = this.selectedNutrients = null
+        this.setSelectedNutrients(this.selectedNutrients)
+      }
     }
   },
   filters: {
     fixed(number) {
       return number > 0 ? number.toFixed(2) : 0
+    },
+    zeroFixed(number) {
+      return number > 0 ? number.toFixed(0) : 0
     }
   }
 }

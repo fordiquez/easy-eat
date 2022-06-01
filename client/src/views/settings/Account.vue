@@ -106,7 +106,6 @@ export default {
   }),
   mounted() {
     this.account = this.user
-    console.log("account: " + this.account.id)
   },
   methods: {
     ...mapActions('account', ['delete']),

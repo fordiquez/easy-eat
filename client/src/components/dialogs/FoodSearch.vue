@@ -117,6 +117,7 @@ export default {
       }).finally(() => this.loading = false)
     },
     onFoodItemDialog(foodItem) {
+      this.selectedMealTime(this.mealTime)
       this.$emit('food-item', foodItem)
     },
     onClose() {

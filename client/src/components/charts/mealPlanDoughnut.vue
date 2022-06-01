@@ -1,15 +1,15 @@
 <template>
-    <Doughnut
-        :chart-options="chartOptions"
-        :chart-data="chartData"
-        :chart-id="chartId"
-        :dataset-id-key="datasetIdKey"
-        :plugins="plugins"
-        :css-classes="cssClasses"
-        :styles="styles"
-        :width="width"
-        :height="height"
-    />
+  <Doughnut
+      :chart-options="chartOptions"
+      :chart-data="chartData"
+      :chart-id="chartId"
+      :dataset-id-key="datasetIdKey"
+      :plugins="plugins"
+      :css-classes="cssClasses"
+      :styles="styles"
+      :width="width"
+      :height="height"
+  />
 </template>
 
 <script>
@@ -19,14 +19,14 @@ import { mapGetters } from "vuex";
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
 
 export default {
-  name: 'DoughnutChart',
+  name: 'mealPlanDoughnutChart',
   components: {
     Doughnut
   },
   props: {
     chartId: {
       type: String,
-      default: 'doughnut-chart'
+      default: 'meal-plan-doughnut-chart'
     },
     datasetIdKey: {
       type: String,
@@ -41,8 +41,8 @@ export default {
       default: 200
     },
     cssClasses: {
-      default: '',
-      type: String
+      type: String,
+      default: ''
     },
     styles: {
       type: Object,
@@ -73,10 +73,8 @@ export default {
       maintainAspectRatio: false
     },
   }),
-  created() {
-    setTimeout(() => {
-      this.updateChartData()
-    }, 0)
+  mounted() {
+    setTimeout(() => this.updateChartData(), 0)
   },
   computed: {
     ...mapGetters('mealPlan', ['getSelectedPlan']),
