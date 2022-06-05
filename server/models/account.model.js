@@ -6,10 +6,7 @@ const schema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   avatar: {
-    id: {
-      type: Schema.Types.ObjectId,
-      ref: 'avatars.files'
-    },
+    id: { type: Schema.Types.ObjectId,  ref: 'avatars.files' },
     filename: String
   },
   role: { type: String, required: true },

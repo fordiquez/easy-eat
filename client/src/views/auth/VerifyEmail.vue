@@ -37,8 +37,10 @@ export default {
         this.$router.replace(location.pathname).then(() => {
           this.verifyEmail(token).then(response => {
             console.log(response)
-            this.setAlert({ type: 'success', text: response.data.message })
-            this.setSnackbar({ color: 'success', text: response.data.message })
+            this.$router.push({ name: 'Login' }).then(() => {
+              this.setAlert({ type: 'success', text: response.data.message })
+              this.setSnackbar({ color: 'success', text: response.data.message })
+            })
           }).catch(error => {
             console.log(error.response)
             if (error.response.data.message === 'Account has already been verified') {

@@ -17,12 +17,12 @@ const getById = (req, res, next) => {
 const createSchema = (req, res, next) => {
   const schema = Joi.object({
     accountId: Joi.string().required(),
-    currentWeight: Joi.number().required(),
-    goalWeight: Joi.number().required(),
-    height: Joi.number().required(),
-    sex: Joi.string().required(),
-    birthdayDate: Joi.date().required(),
-    activityLevel: Joi.string().required()
+    currentWeight: Joi.number(),
+    goalWeight: Joi.number(),
+    height: Joi.number(),
+    sex: Joi.string(),
+    birthdayDate: Joi.date(),
+    activityLevel: Joi.string()
   });
   validateRequest(req, next, schema);
 }
@@ -34,12 +34,12 @@ const create = (req, res, next) => {
 const updateSchema = (req, res, next) => {
   const schema = Joi.object({
     accountId: Joi.string().required(),
-    currentWeight: Joi.number().required(),
-    goalWeight: Joi.number().required(),
-    height: Joi.number().required(),
-    sex: Joi.string().required(),
-    birthdayDate: Joi.date().required(),
-    activityLevel: Joi.string().required(),
+    currentWeight: Joi.number(),
+    goalWeight: Joi.number(),
+    height: Joi.number(),
+    sex: Joi.string(),
+    birthdayDate: Joi.date(),
+    activityLevel: Joi.string(),
     caloriesGoal: Joi.string(),
     BMR: Joi.number(),
     TDEE: Joi.number(),

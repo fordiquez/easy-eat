@@ -3,12 +3,12 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
   accountId: { type: Schema.Types.ObjectId, ref: 'Account' },
-  currentWeight: Number,
-  goalWeight: Number,
-  height: Number,
-  sex: String,
-  birthdayDate: Date,
-  activityLevel: String,
+  currentWeight: { type: Number, default: null },
+  goalWeight: { type: Number, default: null },
+  height: { type: Number, default: null },
+  sex: { type: String, default: null },
+  birthdayDate: { type: Date, default: null },
+  activityLevel: { type: String, default: null },
   caloriesGoal: { type: String, default: null },
   BMR: { type: Number, default: null },
   TDEE: { type: Number, default: null },

@@ -76,12 +76,10 @@ const authenticateSchema = (req, res, next) => {
 const authenticate = (req, res, next) => {
   const { email, password } = req.body;
   const ipAddress = req.ip;
-  accountService.authenticate({ email, password, ipAddress })
-    .then(({ refreshToken, ...account }) => {
+  accountService.authenticate({ email, password, ipAddress }).then(({ refreshToken, ...account }) => {
       setTokenCookie(res, refreshToken);
       res.json(account);
-    })
-    .catch(next);
+    }).catch(next);
 }
 
 const refreshToken = (req, res, next) => {
@@ -102,14 +100,11 @@ const revokeTokenSchema = (req, res, next) => {
 
 const revokeToken = (req, res, next) => {
   const token = req.cookies.refreshToken
-
   if (!token) return res.status(400).json({ message: 'Token is required' });
 
-  // users can revoke their own tokens and admins can revoke any tokens
   if (!req.user.ownsToken(token) && req.user.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
-
   accountService.revokeToken(token).then(response => res.json(response)).catch(next);
 }
 
@@ -118,7 +113,6 @@ const getAll = (req, res, next) => {
 }
 
 const getById = (req, res, next) => {
-  // users can get their own account and admins can get any account
   if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
@@ -151,18 +145,15 @@ const updateSchema = (req, res, next) => {
     updatedPasswordConfirm: Joi.string().valid(Joi.ref('updatedPassword')).empty('')
   };
 
-  // only admins can update role
   if (req.user.role === Role.Admin) {
     schemaRules.role = Joi.string().valid(Role.Admin, Role.User).empty('');
   }
 
   const schema = Joi.object(schemaRules).with('updatedPassword', 'updatedPasswordConfirm');
-  // const schema = Joi.object(schemaRules);
   validateRequest(req, next, schema);
 }
 
 const update = async (req, res, next) => {
-  // users can update their own account and admins can update any account
   if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
@@ -170,11 +161,9 @@ const update = async (req, res, next) => {
 }
 
 const _delete = (req, res, next) => {
-  // users can delete their own account and admins can delete any account
   if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
-
   accountService.delete(req.params.id).then(account => res.json(account)).catch(next);
 }
 
@@ -197,7 +186,7 @@ const deleteAvatar = async (req, res, next) => {
 // helper functions
 
 const setTokenCookie = async (res, token) => {
-  // create cookie with refresh token that expires in 7 days
+  // cookie refresh token expires in 7 days
   const cookieOptions = {
     httpOnly: false,
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)

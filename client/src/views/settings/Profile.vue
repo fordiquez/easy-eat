@@ -20,7 +20,7 @@
             <v-icon color="success" size="100" v-else>mdi-account-circle</v-icon>
           </v-avatar>
         </v-col>
-        <v-col xl="3" lg="4" md="5" sm="9" xs="2">
+        <v-col xl="3" lg="4" md="5" sm="9">
           <v-file-input
               :rules="rules"
               accept="image/png, image/jpeg, image/bmp"
@@ -32,25 +32,19 @@
               @change="selectImage"
               ref="avatar"
           />
+          <v-btn v-if="previewImageUrl" outlined block color="success" @click="previewImage = true">
+            <v-icon class="mr-1">mdi-image-search</v-icon>
+            <span>Preview</span>
+          </v-btn>
           <v-btn color="success" class="mt-2" block :loading="loadingUpload" :disabled="loadingUpload" @click="upload">
+            <v-icon class="mr-1">mdi-cloud-upload</v-icon>
             <span>Upload</span>
-            <v-icon class="ml-1">mdi-cloud-upload</v-icon>
           </v-btn>
           <div v-if="progress" class="mt-2">
             <v-progress-linear v-model="progress" color="success" height="20" reactive>
               <strong>{{ progress }} %</strong>
             </v-progress-linear>
           </div>
-        </v-col>
-        <v-col v-if="previewImage" cols="12" xl="7" lg="6">
-          <v-expansion-panels>
-            <v-expansion-panel>
-              <v-expansion-panel-header class="text-subtitle-2">Preview Image</v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-img :src="previewImage" :lazy-src="previewImage" />
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
         </v-col>
       </v-row>
       <v-row>
@@ -81,7 +75,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-btn-toggle v-model="userData.sex" :class="$vuetify.breakpoint.xsOnly ? 'd-flex' : ''" @change="updateUserData" mandatory shaped>
+          <v-btn-toggle v-model="userData.sex" :class="$vuetify.breakpoint.xsOnly ? 'd-flex' : ''" @change="updateUserData('sex')" :mandatory="userData.sex !== null" shaped>
             <v-btn
                 value="male" x-large text
                 :style="$vuetify.breakpoint.xsOnly ? { width: '50%' } : ''" :color="userData.sex === 'male' ? 'success' : ''"
@@ -128,7 +122,7 @@
               placeholder="Enter weight"
               @blur="$v.userData.currentWeight.$touch()"
               @input="$v.userData.currentWeight.$touch()"
-              @change="updateUserData"
+              @change="updateUserData('currentWeight')"
               hide-spin-buttons
           >
             <template v-slot:prepend>
@@ -157,17 +151,17 @@
               label="Height"
               placeholder="Enter height"
               append-outer-icon="mdi-plus"
-              @click:append-outer="increment('height')"
               @blur="$v.userData.height.$touch()"
               @input="$v.userData.height.$touch()"
-              @change="updateUserData"
+              @change="updateUserData('height')"
               hide-spin-buttons
           >
             <template v-slot:prepend>
               <v-btn icon color="success"
                      :disabled="userData.height <= 0"
                      :style="{ cursor: userData.height === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
-                     @click="decrement('height')">
+                     @click="decrement('height')"
+              >
                 <v-icon>mdi-minus</v-icon>
               </v-btn>
             </template>
@@ -181,62 +175,80 @@
       </v-row>
       <v-row>
         <v-col cols="12" sm="8" md="6">
-          <v-select v-model="userData.activityLevel" :items="getActivities.labels" color="success" item-color="success" label="Activity level" @change="updateUserData" />
+          <v-select
+              v-model="userData.activityLevel"
+              :items="getActivities.labels"
+              color="success"
+              item-color="success"
+              label="Activity level"
+              @change="updateUserData('activityLevel')"
+          />
           <v-card-text class="pt-0 grey--text text-center">{{ getActivities.descriptions[activityIndex] }}</v-card-text>
         </v-col>
       </v-row>
     </v-container>
-    <v-row justify="center">
-      <v-dialog v-model="dialog" max-width="600px">
-        <v-card :loading="loadingUpdate" flat>
-          <v-card-title>
-            <span class="text-h5">Update Full Name</span>
-          </v-card-title>
-          <v-form @submit.prevent="updateFullName">
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                        v-model="fullName.firstName"
-                        :error-messages="firstNameErrors"
-                        color="success"
-                        label="First Name"
-                        prepend-icon="mdi-account-outline"
-                        placeholder="Enter your First Name"
-                        @focus="loadingFirstName = true"
-                        @blur="onBlur('firstName')"
-                        @input="$v.fullName.firstName.$touch()"
-                    />
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                        v-model="fullName.lastName"
-                        :error-messages="lastNameErrors"
-                        color="success"
-                        ref="lastName"
-                        label="Last Name"
-                        prepend-icon="mdi-account-outline"
-                        placeholder="Enter your Last Name"
-                        @focus="loadingLastName = true"
-                        @blur="onBlur('lastName')"
-                        @input="$v.fullName.lastName.$touch()"
-                    />
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn color="success" @click="dialog = false" text large>Close</v-btn>
-              <v-spacer />
-              <v-btn color="success" type="submit" :disabled="($v.$invalid && $v.$error) || loadingUpdate" :loading="loadingUpdate" large text>
-                Save
-              </v-btn>
-            </v-card-actions>
-          </v-form>
-        </v-card>
-      </v-dialog>
-    </v-row>
+    <v-dialog v-model="dialog" max-width="600px">
+      <v-card :loading="loadingUpdate" flat>
+        <v-card-title>
+          <span class="text-h5">Update Full Name</span>
+        </v-card-title>
+        <v-form @submit.prevent="updateFullName">
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                      v-model="fullName.firstName"
+                      :error-messages="firstNameErrors"
+                      color="success"
+                      label="First Name"
+                      prepend-icon="mdi-account-outline"
+                      placeholder="Enter your First Name"
+                      @focus="loadingFirstName = true"
+                      @blur="onBlur('firstName')"
+                      @input="$v.fullName.firstName.$touch()"
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                      v-model="fullName.lastName"
+                      :error-messages="lastNameErrors"
+                      color="success"
+                      ref="lastName"
+                      label="Last Name"
+                      prepend-icon="mdi-account-outline"
+                      placeholder="Enter your Last Name"
+                      @focus="loadingLastName = true"
+                      @blur="onBlur('lastName')"
+                      @input="$v.fullName.lastName.$touch()"
+                  />
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="success" @click="dialog = false" text large>Cancel</v-btn>
+            <v-spacer />
+            <v-btn color="success" type="submit" :disabled="($v.$invalid && $v.$error) || loadingUpdate" :loading="loadingUpdate" large text>
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-form>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="previewImage" scrollable>
+      <v-card>
+        <v-card-title class="text-h5">Preview Image</v-card-title>
+        <v-card-text>
+          <v-img :src="previewImageUrl" :lazy-src="previewImageUrl" alt="Preview image" title="Preview image" />
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="success" outlined block @click="previewImage = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -273,9 +285,10 @@ export default {
       }
     ],
     avatar: false,
-    avatarPath: process.env.VUE_APP_ACCOUNT_AVATAR_ROUTE,
+    avatarPath: `${process.env.VUE_APP_BASE_API_URL}${process.env.VUE_APP_ACCOUNT_AVATAR_PATH}`,
     currentImage: null,
-    previewImage: null,
+    previewImage: false,
+    previewImageUrl: null,
     progress: 0,
     profile: null,
     dialog: false,
@@ -295,9 +308,20 @@ export default {
     if (this.profile.avatar?.id && this.profile.avatar?.filename) this.avatar = true
     this.getUserDataById(this.profile.id).then(() => {
       this.getUserData.subscribe(userData => this.userData = userData)
-      this.birthdayDate = moment(this.userData.birthdayDate).format('YYYY-MM-DD')
+      if (this.userData?.birthdayDate) this.birthdayDate = moment(this.userData.birthdayDate).format('YYYY-MM-DD')
     }).catch(error => {
-      console.log(error.response)
+      if (error.response.data.message === 'User data not found') {
+        this.status = 'Loading...'
+        this.userData.accountId = this.user.id
+        this.create(this.userData).then(response => {
+          console.log(response)
+        }).catch(error => {
+          console.log(error.response)
+          this.setSnackbar({ color: 'error', text: error.response.data.message })
+        }).finally(() => this.status = null)
+      } else {
+        this.setSnackbar({ color: 'error', text: error.response.data.message })
+      }
     }).finally(() => this.status = null)
     this.avatarPath += `/${this.profile.id}`
   },
@@ -316,17 +340,14 @@ export default {
     },
     userData: {
       birthdayDate: {
-        required,
         rangeDate
       },
       currentWeight: {
-        required,
         hasNumerics,
         minValue: minValue(25),
         maxValue: maxValue(300)
       },
       height: {
-        required,
         hasNumerics,
         minValue: minValue(90),
         maxValue: maxValue(250)
@@ -361,12 +382,13 @@ export default {
     ...mapActions({
       getUserDataById: 'userData/getById',
       userDataUpdate: 'userData/update',
+      create: 'userData/create',
       accountUpdate: 'account/update',
       setSnackbar: 'notification/setSnackbar'
     }),
     selectImage(image) {
       this.currentImage = image
-      image ? this.previewImage = URL.createObjectURL(this.currentImage) : this.previewImage = null
+      image ? this.previewImageUrl = URL.createObjectURL(this.currentImage) : this.previewImageUrl = null
       if (!image) this.$refs.avatar.resetValidation()
     },
     upload() {
@@ -378,14 +400,14 @@ export default {
       }).then(response => {
         console.log(response)
         this.avatar = true
-        this.avatarPath = `${process.env.VUE_APP_ACCOUNT_AVATAR_ROUTE}/${this.profile.id}/${response.data.avatar.filename}`
+        this.avatarPath = `${process.env.VUE_APP_BASE_API_URL}${process.env.VUE_APP_ACCOUNT_AVATAR_PATH}/${this.profile.id}/${response.data.avatar.filename}`
         this.setSnackbar({ color: 'success', text: response.data.message })
-        this.previewImage = undefined
+        this.previewImageUrl = null
         this.$refs.avatar.reset()
       }).catch((error) => {
         this.avatar = false
         this.currentImage = undefined
-        this.setSnackbar({ color: 'error', text: error.res })
+        this.setSnackbar({ color: 'error', text: error.response.data.message })
       }).finally(() => {
         this.loadingUpload = false
         setTimeout(() => this.progress = 0, 1000)
@@ -402,8 +424,8 @@ export default {
       textField === 'firstName' ? this.$v.fullName.firstName.$touch() : this.$v.fullName.lastName.$touch()
     },
     updateFullName() {
-      this.$v.$touch()
-      if (!this.$v.$invalid) {
+      this.$v.fullName.$touch()
+      if (!this.$v.fullName.$invalid) {
         this.loadingUpdate = true
         this.profile.firstName = this.fullName.firstName
         this.profile.lastName = this.fullName.lastName
@@ -421,23 +443,29 @@ export default {
       this.$refs.dateMenu.save(date)
       this.birthdayDate = moment(date).format('YYYY-MM-DD')
       this.userData.birthdayDate = this.birthdayDate
-      this.updateUserData()
+      this.updateUserData('birthdayDate')
     },
     increment(property) {
-      this.userData[property] = parseInt(this.userData[property],10) + 1
-      this.$v.userData[property].$touch()
-      if (!this.$v.userData[property].$invalid) this.updateUserData()
+      if (!this.userData[property]) this.userData[property] = 1
+      else this.userData[property] += 1
+      this.updateUserData(property)
     },
     decrement(property) {
-      this.userData[property] = parseInt(this.userData[property],10) - 1
-      this.$v.userData[property].$touch()
-      if (!this.$v.userData[property].$invalid) this.updateUserData()
+      if (!this.userData[property]) this.userData[property] = 1
+      else this.userData[property] -= 1
+      this.updateUserData(property)
     },
-    updateUserData() {
-      if (!this.status && !this.$v.userData.$invalid) {
+    updateUserData(property) {
+      console.log(property)
+      this.$v.userData[property]?.$touch()
+      if (!this.status && !this.$v.userData[property]?.$invalid) {
         this.status = 'Saving...'
-        this.userData.selectedPlan = this.userData.selectedPlan.id
-        this.userDataUpdate(this.userData).then(response => {
+        const payload = {}
+        payload.accountId = this.userData.accountId
+        payload[property] = this.userData[property]
+        console.log(payload)
+        if (this.userData.selectedPlan) this.userData.selectedPlan = this.userData.selectedPlan.id
+        this.userDataUpdate(payload).then(response => {
           console.log(response)
           this.setSnackbar({ color: 'success', position: 'right', text: response.data.message })
         }).catch(error => {

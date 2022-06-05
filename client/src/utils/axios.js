@@ -1,26 +1,16 @@
 import axios from "axios";
-import {getCookie, getToken, isTokenExpired, tokenExpirationTime} from "@/utils/storage";
+import { getCookie, getToken, isTokenExpired, tokenExpirationTime } from "@/utils/storage";
 import store from '@/store/index'
 
-const nutritionAnalysisConfig = {
-  baseURL: process.env.VUE_APP_API_NUTRITION_ANALYSIS_URL,
-  headers: {
-    'x-rapidapi-host': process.env.VUE_APP_API_NUTRITION_ANALYSIS_HOST,
-    'x-rapidapi-key': process.env.VUE_APP_RAPID_API_KEY
+const foodDatabaseConfig = {
+  baseURL: process.env.VUE_APP_FOOD_DATABASE_API_URL,
+  params: {
+    app_id: process.env.VUE_APP_FOOD_DATABASE_API_APP_ID,
+    app_key: process.env.VUE_APP_FOOD_DATABASE_API_APP_KEY
   }
 }
 
-export const NutritionAnalysisAPI = axios.create(nutritionAnalysisConfig)
-
-const nutritionInfoConfig = {
-  baseURL: process.env.VUE_APP_API_FOOD_DATABASE_URL,
-  headers: {
-    'x-rapidapi-host': process.env.VUE_APP_API_FOOD_DATABASE_HOST,
-    'x-rapidapi-key': process.env.VUE_APP_RAPID_API_KEY
-  }
-}
-
-export const NutritionInfoAPI = axios.create(nutritionInfoConfig)
+export const FoodDatabaseAPI = axios.create(foodDatabaseConfig)
 
 const defaultConfig = {
   baseURL: process.env.VUE_APP_BASE_API_URL,

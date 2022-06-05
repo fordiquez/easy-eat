@@ -12,7 +12,7 @@
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Users</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-divider class="mx-4" inset vertical />
           <v-text-field
               v-model="search"
               append-icon="mdi-magnify"

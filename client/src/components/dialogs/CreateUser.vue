@@ -133,7 +133,7 @@ export default {
   }),
   created() {
     this.dialog = this.isCreating
-    this.isCreating ? setTimeout(() => this.$refs.firstName.focus(), 0) : null
+    if (this.isCreating) setTimeout(() => this.$refs.firstName.focus(), 0)
   },
   validations: {
     user: {

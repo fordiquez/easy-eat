@@ -44,7 +44,7 @@
       <v-btn v-if="!user" :to="{ name: 'Register' }" active-class="success--text" text>Sign Up</v-btn>
       <v-menu v-if="user" bottom left offset-y>
         <template v-slot:activator="{ on: menu, attrs }">
-          <v-tooltip bottom>
+          <v-tooltip bottom color="success">
             <template v-slot:activator="{ on: tooltip }">
               <v-btn v-bind="attrs" v-on="{ ...tooltip, ...menu }" icon active-class="success--text">
                 <v-icon>mdi-account-cog-outline</v-icon>
@@ -64,7 +64,7 @@
           </v-list-item>
         </v-list>
       </v-menu>
-      <v-tooltip bottom>
+      <v-tooltip bottom color="success">
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click.stop="onRightDrawer" icon>
             <v-icon v-bind="attrs" v-on="on">mdi-cog-outline</v-icon>
@@ -161,19 +161,21 @@ export default {
     },
   },
   methods: {
-    ...mapActions({
-      logout: 'account/logout',
-      init: 'application/init',
-      update: 'application/update',
-      setAlert: 'notification/setAlert',
-      setSnackbar: 'notification/setSnackbar'
-    }),
+    ...mapActions('account', ['logout']),
+    ...mapActions('food', ['clearUserFood']),
+    ...mapActions('userData', ['clearUserData']),
+    ...mapActions('mealPlan', ['clearSelectedPlan']),
+    ...mapActions('application', ['init', 'update']),
+    ...mapActions('notification', ['setSnackbar', 'setAlert']),
     logoNav() {
       if (this.$route.name !== 'DailyLog') this.$router.push({ name: 'DailyLog' })
     },
     onLogout() {
       this.loading = true
       this.logout().then(response => {
+        this.clearUserFood()
+        this.clearUserData()
+        this.clearSelectedPlan()
         if (this.$route.name !== 'Login') {
           this.$router.push({ name: 'Login' }).then(() => {
             this.setAlert({ type: 'success', text: response.data.message })

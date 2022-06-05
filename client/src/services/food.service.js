@@ -1,13 +1,17 @@
-import { DefaultAPI, NutritionAnalysisAPI, NutritionInfoAPI } from "@/utils/axios";
+import { DefaultAPI, FoodDatabaseAPI } from "@/utils/axios";
+import qs from "qs";
 
 const baseURL = '/foods'
 
-const nutritionAnalysis = async (options) => {
-  return await NutritionAnalysisAPI.get('/api/nutrition-data', options)
+const searchParser = async (params) => {
+  return await FoodDatabaseAPI.get('/api/food-database/v2/parser', {
+    params,
+    paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
+  })
 }
 
-const search = async (options) => {
-  return await NutritionInfoAPI.get('/parser', options)
+const searchNextPage = async (nextUrl) => {
+  return await FoodDatabaseAPI.get(nextUrl)
 }
 
 const add = async (payload) => {
@@ -27,8 +31,8 @@ const _delete = async (id) => {
 }
 
 export const foodService = {
-  nutritionAnalysis,
-  search,
+  searchParser,
+  searchNextPage,
   add,
   get,
   update,

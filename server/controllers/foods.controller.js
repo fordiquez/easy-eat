@@ -7,18 +7,18 @@ const get = (req, res, next) => {
 }
 
 const createSchema = (req, res, next) => {
+  console.log(req.body)
   const schema = Joi.object({
-    userId: Joi.string().required(),
+    accountId: Joi.string().required(),
     date: Joi.date().required(),
     mealTime: Joi.string().required(),
     measure: Joi.string().required(),
     servings: Joi.number().required(),
-    foodId: Joi.string().required(),
     label: Joi.string().required(),
     category: Joi.string().required(),
-    categoryLabel: Joi.string().required(),
-    nutrients: Joi.object().required(),
+    foodContentsLabel: Joi.array().items(Joi.string()),
     image: Joi.string(),
+    nutrients: Joi.object().required(),
   });
   validateRequest(req, next, schema);
 }
@@ -30,17 +30,16 @@ const create = (req, res, next) => {
 const updateSchema = (req, res, next) => {
   const schema = Joi.object({
     id: Joi.string().required(),
-    account: Joi.string().required(),
+    accountId: Joi.string().required(),
     date: Joi.date().required(),
     mealTime: Joi.string().required(),
     measure: Joi.string().required(),
     servings: Joi.number().required(),
-    foodId: Joi.string().required(),
     label: Joi.string().required(),
     category: Joi.string().required(),
-    categoryLabel: Joi.string().required(),
-    nutrients: Joi.object().required(),
+    foodContentsLabel: Joi.array().items(Joi.string()),
     image: Joi.string(),
+    nutrients: Joi.object().required()
   });
   validateRequest(req, next, schema);
 }

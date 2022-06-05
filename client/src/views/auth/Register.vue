@@ -231,9 +231,3 @@ export default {
   },
 }
 </script>
-
-<style>
-.custom-link:hover {
-  text-decoration: underline;
-}
-</style>

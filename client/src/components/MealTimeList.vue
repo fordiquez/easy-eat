@@ -27,19 +27,19 @@
               <v-col cols="12" sm="8" md="6" class="d-sm-flex hidden-xs-only">
                 <v-list-item-content class="d-flex flex-column align-center">
                   <v-list-item-title class="text-subtitle-1">Net Carbs</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.nutrients.CARBS | fixed }}</v-list-item-subtitle>
+                  <v-list-item-subtitle class="red--text darken-3 font-weight-bold">{{ item.nutrients.CARBS | fixed }}g</v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-content class="d-flex flex-column align-center">
                   <v-list-item-title class="text-subtitle-1">Protein</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.nutrients.PROTEIN | fixed }}</v-list-item-subtitle>
+                  <v-list-item-subtitle class="blue--text darken-3 font-weight-bold">{{ item.nutrients.PROTEIN | fixed }}g</v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-content class="d-flex flex-column align-center">
                   <v-list-item-title class="text-subtitle-1">Fat</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.nutrients.FAT | fixed }}</v-list-item-subtitle>
+                  <v-list-item-subtitle class="orange--text darken-3 font-weight-bold">{{ item.nutrients.FAT | fixed }}g</v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-content class="d-flex flex-column align-center">
                   <v-list-item-title class="text-subtitle-1">Cals</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.nutrients.CALS | fixed }}</v-list-item-subtitle>
+                  <v-list-item-subtitle class="teal--text darken-3 font-weight-bold">{{ item.nutrients.CALS | fixed }}</v-list-item-subtitle>
                 </v-list-item-content>
               </v-col>
             </v-row>
@@ -54,19 +54,19 @@
             <v-col cols="12" sm="8" md="6" xs="2" class="d-flex">
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Net Carbs</v-list-item-title>
-                <v-list-item-subtitle>{{ mealTotals.CARBS | fixed }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="red--text darken-3 font-weight-bold">{{ mealTotals.CARBS | fixed }}g</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Protein</v-list-item-title>
-                <v-list-item-subtitle>{{ mealTotals.PROTEIN | fixed }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="blue--text darken-3 font-weight-bold">{{ mealTotals.PROTEIN | fixed }}g</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Fat</v-list-item-title>
-                <v-list-item-subtitle>{{ mealTotals.FAT | fixed }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="orange--text darken-3 font-weight-bold">{{ mealTotals.FAT | fixed }}g</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Cals</v-list-item-title>
-                <v-list-item-subtitle>{{ mealTotals.CALS | fixed }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="teal--text darken-3 font-weight-bold">{{ mealTotals.CALS | fixed }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-col>
           </v-row>

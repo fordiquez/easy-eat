@@ -5,7 +5,6 @@ const authorize = require("middlewares/authorize")
 
 router.get('/', authorize(), foodsController.get);
 router.post('/', authorize(), foodsController.createSchema, foodsController.create);
-// router.get('/:id', authorize(), accountController.getById);
 router.put('/:id', authorize(), foodsController.updateSchema, foodsController.update);
 router.delete('/:id', authorize(), foodsController.delete);
 

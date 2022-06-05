@@ -64,14 +64,16 @@
       <div class="text-center">
         <v-dialog v-model="deleteDialog" max-width="500">
           <v-card>
-            <v-card-title class="text-h5">Delete Account</v-card-title>
-            <v-card-text>{{ deleteText }}</v-card-text>
-            <v-text-field v-model="deleteField" class="px-5" label="Please type in delete to confirm" color="success" />
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="success" text :disabled="deleteField !== 'delete'" @click="onDelete">I accept</v-btn>
-            </v-card-actions>
+            <v-form @submit.prevent="onDelete">
+              <v-card-title class="text-h5">Delete Account</v-card-title>
+              <v-card-text>{{ deleteText }}</v-card-text>
+              <v-text-field v-model="deleteField" class="px-5" label="Please type in delete to confirm" color="success" />
+              <v-divider></v-divider>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="success" text :disabled="deleteField !== 'delete'" type="submit">I accept</v-btn>
+              </v-card-actions>
+            </v-form>
           </v-card>
         </v-dialog>
       </div>

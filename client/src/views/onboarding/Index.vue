@@ -173,7 +173,7 @@
       </v-window-item>
     </v-window>
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <v-card-actions>
       <v-btn :disabled="step === 1" text @click="step--" width="100">Back</v-btn>
@@ -376,7 +376,10 @@ export default {
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loading = true
-        this.create(this.userData).then(response => {
+        const payload = {};
+        [payload.accountId, payload.currentWeight, payload.goalWeight, payload.height, payload.sex, payload.birthdayDate, payload.activityLevel] =
+            [this.userData.accountId, this.userData.currentWeight, this.userData.goalWeight, this.userData.height, this.userData.sex, this.userData.birthdayDate, this.userData.activityLevel]
+        this.create(payload).then(response => {
           console.log(response)
           this.$router.push({ name: 'MealPlan' }).then(() => this.setSnackbar({ color: 'success', text: response.data.message }))
         }).catch(error => {
@@ -405,16 +408,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.chip-item span {
-  width: 150px;
-  justify-content: center;
-}
-.chip-group div {
-  justify-content: center;
-}
-.v-slider__thumb {
-  cursor: grab;
-}
-</style>

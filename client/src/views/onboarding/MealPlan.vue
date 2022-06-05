@@ -10,7 +10,6 @@
           <v-divider />
         </v-col>
         <v-col cols="12">
-          <v-card-text class="pt-0 text-subtitle-2">I want to</v-card-text>
           <v-slide-group v-model="caloriesGoal" show-arrows center-active>
             <v-slide-item v-for="goal in mealGoals" :key="goal.title" v-slot="{ active, toggle }">
               <v-btn class="mx-2" :color="goal.title === range.title ? mealGoals[caloriesGoal].color : ''"
@@ -67,8 +66,8 @@
                 <v-icon class="mr-1" :color="'#E53935'">mdi-nutrition</v-icon>
                 <label>Net Carbs</label>
               </v-subheader>
-              <v-subheader class="text-subtitle-2 grey--text">
-                Based on the {{ selectedPlan.title }} diet.
+              <v-subheader v-if="selectedPlan.title" class="text-subtitle-2 grey--text">
+                <span>Based on the {{ selectedPlan.title }} diet.</span>
                 <span v-if="isCustomPlan" class="ml-1">Slide to modify.</span>
               </v-subheader>
             </v-card-text>
@@ -105,8 +104,10 @@
                 <v-icon class="mr-1" :color="'#1565C0'">mdi-nutrition</v-icon>
                 <label>Protein</label>
               </v-subheader>
-              <v-subheader class="text-subtitle-2 grey--text">Based on the {{ selectedPlan.title }} diet. Slide to
-                modify.</v-subheader>
+              <v-subheader v-if="selectedPlan.title" class="text-subtitle-2 grey--text">
+                <span>Based on the {{ selectedPlan.title }} diet.</span>
+                <span v-if="isCustomPlan" class="ml-1">Slide to modify.</span>
+              </v-subheader>
             </v-card-text>
             <v-card-actions class="px-5 d-flex flex-column align-end py-0">
               <v-text-field
@@ -141,8 +142,10 @@
                 <v-icon class="mr-1" :color="'#FF9100'">mdi-nutrition</v-icon>
                 <label>Fat</label>
               </v-subheader>
-              <v-subheader class="text-subtitle-2 grey--text">Based on the {{ selectedPlan.title }} diet. Slide to
-                modify.</v-subheader>
+              <v-subheader v-if="selectedPlan.title" class="text-subtitle-2 grey--text">
+                <span>Based on the {{ selectedPlan.title }} diet.</span>
+                <span v-if="isCustomPlan" class="ml-1">Slide to modify.</span>
+              </v-subheader>
             </v-card-text>
             <v-card-actions class="px-5 d-flex flex-column align-end py-0">
               <v-text-field
@@ -243,7 +246,7 @@ export default {
     caloriesMismatch: false,
   }),
   created() {
-    this.loadPlans().then(() => this.getData()).catch(error => this.setSnackbar({ color: 'error', text: error.response.data.message }))
+    this.getAll().then(() => this.getData()).catch(error => this.setSnackbar({ color: 'error', text: error.response.data.message }))
   },
   computed: {
     ...mapGetters('userData', ['getUserData']),
@@ -272,7 +275,7 @@ export default {
       return (this.weightDifference * 750) / (this.weightDifference / this.weightPerWeek)
     },
     selectedPlan() {
-      return this.userData.selectedPlan
+      return this.userData?.selectedPlan
     },
     isCustomPlan() {
       return this.userData.selectedPlan ? this.userData.selectedPlan.title === 'Custom' : false
@@ -303,13 +306,9 @@ export default {
     },
   },
   methods: {
-    ...mapActions({
-      getUserDataById: 'userData/getById',
-      editUserData: 'userData/update',
-      loadPlans: 'mealPlan/getPlans',
-      setSelectedPlan: 'mealPlan/setSelectedPlan',
-      setSnackbar: 'notification/setSnackbar'
-    }),
+    ...mapActions('mealPlan', ['getAll', 'setSelectedPlan']),
+    ...mapActions('notification', ['setAlert', 'setSnackbar']),
+    ...mapActions('userData', ['getById', 'update']),
     sliderChange(slider) {
       let currentRange
       this.mealGoals.forEach(mealGoal => mealGoal.range[0] <= slider.value && mealGoal.range[1] >= slider.value ? currentRange = mealGoal : null)
@@ -337,8 +336,14 @@ export default {
       Object.assign(this.range, this.mealGoals[value])
     },
     getData() {
-      this.getUserDataById(this.user.id).then(() => {
+      this.getById(this.user.id).then(() => {
         this.getUserData.subscribe(userData => this.userData = userData)
+        if (!this.userData.currentWeight || !this.userData?.goalWeight || !this.userData?.height || !this.userData?.sex || !this.userData?.birthdayDate || !this.userData?.activityLevel) {
+          this.$router.push({ name: 'Onboarding' }).then(() => {
+            this.setSnackbar({ color: 'error', text: 'Not enough user data' })
+            this.setAlert({ type: 'info', text: 'To continue using this service, we need to collect data about you and prepare it for the formation and setting of goals for daily calories and macronutrients.' })
+          })
+        }
         if (!this.userData.BMR) {
           if (this.userData.sex === 'male') {
             this.userData.BMR = 10 * this.userData.currentWeight + 6.25 * this.userData.height - 5 * this.age + 5
@@ -354,8 +359,8 @@ export default {
           mealGoal.range[0] = this.fixedNumber(this.fixedTDEE + this.fixedTDEE * mealGoal.range[0] / 100)
           mealGoal.range[1] = this.fixedNumber(this.fixedTDEE + this.fixedTDEE * mealGoal.range[1] / 100)
         })
-        if (!this.userData.selectedPlan) this.userData.selectedPlan = this.getPlans[6]
-        !this.userData.caloriesGoal ? this.caloriesGoal = this.weightGoal : this.caloriesGoal = this.mealGoals.findIndex(mealGoal => mealGoal.title === this.userData.caloriesGoal)
+        if (!this.userData.selectedPlan) this.userData.selectedPlan = this.getPlans[1]
+        !this.userData?.caloriesGoal ? this.caloriesGoal = this.weightGoal : this.caloriesGoal = this.mealGoals.findIndex(mealGoal => mealGoal.title === this.userData.caloriesGoal)
         Object.assign(this.range, this.mealGoals[this.caloriesGoal])
         if (!this.userData.macros) {
           this.userData.macros = {
@@ -379,7 +384,7 @@ export default {
         payload.caloriesGoal = this.mealGoals[this.caloriesGoal].title
         payload.selectedPlan = this.selectedPlan.id
         if (this.isCustomPlan) payload.customProportions = this.userData.selectedPlan.proportions
-        this.editUserData(payload).then(response => {
+        this.update(payload).then(response => {
           this.$router.push({ name: 'DailyLog' }).then(() => this.setSnackbar({ color: 'success', text: response.data.message }))
         }).catch(error => {
           console.log(error.response)

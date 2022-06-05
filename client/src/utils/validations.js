@@ -1,4 +1,4 @@
-export const firstNameErrors = (firstName) => {
+export const firstNameErrors = firstName => {
   const errors = []
   if (firstName.$dirty) {
     !firstName.required && errors.push('First Name is required')
@@ -8,7 +8,7 @@ export const firstNameErrors = (firstName) => {
   return errors
 }
 
-export const lastNameErrors = (lastName) => {
+export const lastNameErrors = lastName => {
   const errors = []
   if (lastName.$dirty) {
     !lastName.required && errors.push('Last Name is required')
@@ -18,7 +18,7 @@ export const lastNameErrors = (lastName) => {
   return errors
 }
 
-export const emailErrors = (email) => {
+export const emailErrors = email => {
   const errors = []
   if (email.$dirty) {
     !email.email && errors.push('Must be valid e-mail')
@@ -27,7 +27,7 @@ export const emailErrors = (email) => {
   return errors
 }
 
-export const passwordErrors = (password) => {
+export const passwordErrors = password => {
   const errors = []
   if (password.$dirty) {
     !password.required && errors.push('Password is required')
@@ -37,7 +37,7 @@ export const passwordErrors = (password) => {
   return errors
 }
 
-export const passwordConfirmErrors = (passwordConfirm) => {
+export const passwordConfirmErrors = passwordConfirm => {
   const errors = []
   if (passwordConfirm.$dirty) {
     !passwordConfirm.required && errors.push('You must confirm your password')
@@ -48,7 +48,7 @@ export const passwordConfirmErrors = (passwordConfirm) => {
   return errors
 }
 
-export const acceptedTermsErrors = (acceptedTerms) => {
+export const acceptedTermsErrors = acceptedTerms => {
   const errors = []
   if (acceptedTerms.$dirty) {
     !acceptedTerms.sameAs && errors.push('You don\'t have a choice, you eat it')
@@ -56,7 +56,7 @@ export const acceptedTermsErrors = (acceptedTerms) => {
   return errors
 }
 
-export const roleErrors = (role) => {
+export const roleErrors = role => {
   const errors = []
   if (role.$dirty) {
     !role.required && errors.push('Role is required')
@@ -67,7 +67,7 @@ export const roleErrors = (role) => {
 export const numericErrors = (number, model, range) => {
   const errors = []
   if (number.$dirty) {
-    !number.required && errors.push(`${model} field is required`)
+    if (number.params?.required) !number.required && errors.push(`${model} field is required`)
     !number.hasNumerics && errors.push(`${model} must be a numeric`)
     !number.minValue && errors.push(`A number must be more or equal ${range[0]}`)
     !number.maxValue && errors.push(`A number must be lower or equal ${range[1]}`)
@@ -78,8 +78,8 @@ export const numericErrors = (number, model, range) => {
 export const birthdayDateErrors = (birthdayDate, range) => {
   const errors = []
   if (birthdayDate.$dirty) {
-    !birthdayDate.required && errors.push('Birthday date field is required')
-    !birthdayDate.rangeDate && errors.push(`Please select a birthday date between ${range[0]} and ${range[1]}`)
+    if (birthdayDate.$params?.required) !birthdayDate.required && errors.push('Birthday date is required')
+    if (birthdayDate.$params.rangeDate) !birthdayDate.rangeDate && errors.push(`Please select a birthday date between ${range[0]} and ${range[1]}`)
   }
   return errors
 }
@@ -90,7 +90,7 @@ export const rangeDate = value => {
   return value > minDate && value < maxDate
 }
 
-export const sexErrors = (sex) => {
+export const sexErrors = sex => {
   const errors = []
   if (!['male', 'female'].includes(sex.$model)) {
     !sex.required && errors.push('Sex field is required')
@@ -98,7 +98,37 @@ export const sexErrors = (sex) => {
   return errors
 }
 
+export const foodString = (string, displayedTitle) => {
+  const errors = []
+  if (string.$dirty) {
+    !string.required && errors.push(`${displayedTitle} field is required`)
+    string.hasNotSpecialChars || string.hasNotNumerics && errors.push(`${displayedTitle} field accepts only alphabet characters`)
+  }
+  return errors
+}
+
+export const foodImage = image => {
+  const errors = []
+  if (image.$dirty) {
+    !image.required && errors.push('Food image field is required')
+    !image.url && errors.push('Food image must be a URL')
+  }
+  return errors
+}
+
+export const foodNumerics = (numeric, displayedTitle, minValue) => {
+  const errors = []
+  if (numeric.$dirty) {
+    !numeric.required && errors.push(`${displayedTitle} field is required`)
+    !numeric.numeric && errors.push(`${displayedTitle} must be a numeric`)
+    if (numeric.params?.minValue) !numeric.minValue && errors.push(`${displayedTitle} should be equal or greater than ${minValue}`)
+  }
+  return errors
+}
+
 export const hasUppercase = val => /[A-Z]/.test(val)
 export const hasLowercase = val => /[a-z]/.test(val)
-export const hasSpecialChars = val => /[$%#]/.test(val)
+export const hasSpecialChars = val => /[!@#$%^&*()\\/<>|"№;:?+-=']/.test(val)
 export const hasNumerics = val => /\d/.test(val)
+export const hasNotSpecialChars = val => !/[!@#$%^&*()\\/<>|"№;:?+-=']/.test(val)
+export const hasNotNumerics = val => !/\d/.test(val)

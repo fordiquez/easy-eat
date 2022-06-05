@@ -10,60 +10,63 @@
       </v-toolbar>
       <v-row class="mx-auto my-auto">
         <v-col cols="5" xs="4">
-          <v-img :src="selectedFood.image || image" :lazy-src="selectedFood.image || image" class="rounded-circle" />
+          <v-img ref="image" :src="selectedFood.image || image" :lazy-src="selectedFood.image || image" class="rounded-circle" />
         </v-col>
         <v-col cols="7" xs="8">
           <v-card-title class="px-0 py-2">{{ selectedFood.label }}</v-card-title>
-          <v-card-subtitle class="px-0 py-2 text-subtitle-1">{{ selectedFood.category }}</v-card-subtitle>
-          <v-card-text class="px-0 py-0 text-subtitle-2">{{ servings }} {{ servings > 1 ? measure + 's' : measure }}</v-card-text>
+          <v-card-subtitle class="px-0 pt-2 pb-0 text-subtitle-1">{{ selectedFood.category }}</v-card-subtitle>
+          <v-card-text class="px-0 py-2 text-subtitle-2">{{ servings }} {{ servings > 1 ? measure + 's' : measure }}</v-card-text>
+          <v-chip-group v-if="selectedFood.foodContentsLabel" class="chip-labels" column>
+            <v-chip v-for="label in selectedFood.foodContentsLabel" outlined text-color="success" :key="label">{{ label }}</v-chip>
+          </v-chip-group>
         </v-col>
       </v-row>
-      <v-divider class="mx-4"></v-divider>
+      <v-divider class="mx-4" />
 
       <v-container fluid>
         <v-row>
           <v-col cols="12">
             <div class="d-flex justify-space-between">
               <v-card-text class="pa-0">
-                <v-icon class="mr-1" color="red">mdi-nutrition</v-icon>
+                <v-icon class="mr-1" color="red darken-1">mdi-nutrition</v-icon>
                 <label class="text-subtitle-2">Net Carbs</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
                 <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
                   {{ carbsSign === 'left' ? carbsLeft : carbsOver }}g {{ carbsSign }}
                 </label>
-                <label class="font-weight-bold red--text">{{ selectedNutrients.CARBS | fixed }}g</label>
+                <label class="red--text darken-3 font-weight-bold">{{ selectedNutrients.CARBS | fixed }}g</label>
               </v-card-text>
             </div>
-            <v-progress-linear :value="dailyPercentageCarbs" color="red" class="my-2" rounded />
+            <v-progress-linear :value="dailyPercentageCarbs" color="red darken-1" class="my-2" rounded />
 
             <div class="d-flex justify-space-between">
               <v-card-text class="pa-0">
-                <v-icon class="mr-1" color="blue">mdi-nutrition</v-icon>
+                <v-icon class="mr-1" color="blue darken-3">mdi-nutrition</v-icon>
                 <label class="text-subtitle-2">Protein</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
                 <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
                   {{ proteinSign === 'left' ? proteinLeft : proteinOver }}g {{ proteinSign }}
                 </label>
-                <label class="font-weight-bold blue--text">{{ selectedNutrients.PROTEIN | fixed }}g</label>
+                <label class="blue--text darken-3 font-weight-bold">{{ selectedNutrients.PROTEIN | fixed }}g</label>
               </v-card-text>
             </div>
-            <v-progress-linear :value="dailyPercentageProtein" color="blue" class="my-2" rounded />
+            <v-progress-linear :value="dailyPercentageProtein" color="blue darken-3" class="my-2" rounded />
 
             <div class="d-flex justify-space-between">
               <v-card-text class="pa-0">
-                <v-icon class="mr-1" color="orange">mdi-nutrition</v-icon>
+                <v-icon class="mr-1" color="orange darken-3">mdi-nutrition</v-icon>
                 <label class="text-subtitle-2">Fat</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
                 <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
                   {{ fatSign === 'left' ? fatLeft : fatOver }}g {{ fatSign }}
                 </label>
-                <label class="font-weight-bold orange--text">{{ selectedNutrients.FAT | fixed }}g</label>
+                <label class="orange--text darken-3 font-weight-bold">{{ selectedNutrients.FAT | fixed }}g</label>
               </v-card-text>
             </div>
-            <v-progress-linear :value="dailyPercentageFat" color="orange" class="my-2" rounded />
+            <v-progress-linear :value="dailyPercentageFat" color="orange darken-3" class="my-2" rounded />
 
             <div class="d-flex justify-space-between">
               <v-card-text class="pa-0">
@@ -74,7 +77,7 @@
                 <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
                   {{ calsSign === 'left' ? calsLeft : calsOver }} {{ calsSign }}
                 </label>
-                <label class="font-weight-bold teal--text">{{ selectedNutrients.CALS | fixed }}</label>
+                <label class="teal--text darken-3 font-weight-bold">{{ selectedNutrients.CALS | fixed }}</label>
               </v-card-text>
             </div>
             <v-progress-linear :value="dailyPercentageCals" color="teal" class="my-2" rounded />
@@ -91,7 +94,7 @@
                 label="Serving size"
                 v-model="measure"
                 :items="measures"
-                @change="setMeasure"
+                @change="setNutrients"
             />
           </v-col>
           <v-col cols="12" sm="6">
@@ -101,6 +104,7 @@
                 type="number"
                 color="success"
                 label="Servings"
+                :suffix="suffix"
                 @input="setServings"
                 hide-spin-buttons
             >
@@ -118,33 +122,31 @@
           </v-col>
 
           <v-col cols="12">
-            <v-slide-group v-model="mealTime" show-arrows>
+            <v-slide-group v-model="mealTime" mandatory show-arrows center-active>
               <v-slide-item v-for="mealTime in getMealTimes.labels" :key="mealTime" v-slot="{ active, toggle }">
-                <v-btn class="mx-2" active-class="success" :input-value="active" depressed rounded @click="toggle">
-                  {{ mealTime }}
-                </v-btn>
+                <v-btn class="mx-2" active-class="success" :input-value="active" depressed rounded @click="toggle">{{ mealTime }}</v-btn>
               </v-slide-item>
             </v-slide-group>
           </v-col>
 
           <v-col cols="12" v-if="!itemAdding">
-            <v-btn color="red" text block @click="onRemove">Remove from food log</v-btn>
+            <v-btn color="red" text block :loading="loading" @click="onRemove">Remove from food log</v-btn>
           </v-col>
         </v-row>
       </v-container>
-      <v-divider class="mx-4"></v-divider>
+      <v-divider class="mx-4" />
       <v-card-actions>
-        <v-btn color="success" text @click="onClose">Close</v-btn>
+        <v-btn color="success" text large @click="onClose">Cancel</v-btn>
         <v-spacer />
-        <v-btn color="success" text v-if="itemAdding" @click="onAddFood">Add</v-btn>
-        <v-btn color="success" text v-else @click="onEditFood">Save changes</v-btn>
+        <v-btn color="success" text large :loading="loading" v-if="itemAdding" @click="onAddFood">Add to food log</v-btn>
+        <v-btn color="success" text large :loading="loading" v-else @click="onEditFood">Save changes</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 export default {
   name: "FoodItemDialog",
@@ -173,7 +175,8 @@ export default {
     measure: 'gram',
     measures: ['gram', 'kilogram', 'milliliter', 'liter'],
     coefficient: null,
-    dialog: false
+    dialog: false,
+    loading: false
   }),
   created() {
     this.dialog = this.foodItemDialog
@@ -181,13 +184,23 @@ export default {
     !this.itemAdding ? this.measure = this.selectedFood.measure : this.measure = 'gram'
     this.measure === 'gram' || this.measure === 'milliliter' ? this.coefficient = 1 : this.coefficient = 1000
     this.mealTime = this.getMealTimes.labels.findIndex(item => item === this.getMealTime || item === this.selectedFood.mealTime)
+    if (this.selectedFood.foodContentsLabel && !Array.isArray(this.selectedFood.foodContentsLabel)) {
+      const foodLabels = this.selectedFood.foodContentsLabel.toLowerCase().split(';')
+      this.selectedFood.foodContentsLabel = foodLabels.filter((v, i, a) => a.indexOf(v) === i)
+    }
   },
   computed: {
     ...mapGetters('account', ['getUserValue']),
     ...mapGetters('userData', ['getUserDataValue']),
     ...mapGetters('food', ['getDate', 'getMealTime', 'getMealTimes', 'getDailyMacros', 'getUserFood']),
     cursorType() {
-      return this.servings === 0 ? 'not-allowed' : 'pointer'
+      return this.servings <= 0 ? 'not-allowed' : 'pointer'
+    },
+    suffix() {
+      return this.measure === 'gram' ? 'g' : this.measure === 'kilogram' ? 'kg' : this.measure === 'liter' ? 'l' : 'ml'
+    },
+    foodMealTime() {
+      return this.getMealTimes.labels[this.mealTime]
     },
     dailyPercentageCarbs() {
       return this.selectedNutrients.CARBS * 100 / this.getUserDataValue?.macros.CARBS
@@ -250,21 +263,21 @@ export default {
       this.setServings()
     },
     onAddFood() {
+      this.loading = true
       const { id } = this.getUserValue
-      const { foodId, label, category, categoryLabel, image } = this.selectedFood
-      const [nutrients, date, mealTime, measure, servings] = [this.selectedNutrients, this.getDate, this.getMealTimes.labels[this.mealTime], this.measure, this.servings]
+      const { label, category, foodContentsLabel, image } = this.selectedFood
+      const [nutrients, date, mealTime, measure, servings] = [this.selectedNutrients, this.getDate, this.foodMealTime, this.measure, this.servings]
       const payload = {
-        userId: id,
+        accountId: id,
         date,
         mealTime,
         measure,
         servings,
-        foodId,
         label,
         category,
-        categoryLabel,
-        nutrients,
-        image
+        foodContentsLabel,
+        image,
+        nutrients
       }
       this.add(payload).then(response => {
         console.log(response)
@@ -275,6 +288,7 @@ export default {
       }).finally(() => this.onClose())
     },
     onEditFood() {
+      this.loading = true
       const foodItem = this.selectedFood
       foodItem.nutrients = this.selectedNutrients
       foodItem.servings = this.servings
@@ -289,6 +303,7 @@ export default {
       }).finally(() => this.onClose())
     },
     onRemove() {
+      this.loading = true
       this.delete(this.selectedFood.id).then(response => {
         console.log(response)
         this.setSnackbar({ color: 'success', text: response.data.message })
@@ -298,40 +313,41 @@ export default {
       }).finally(() => this.onClose())
     },
     onClose() {
+      this.loading = false
       this.selectedMealTime('')
       this.$emit('close-dialog')
     },
     oneUnits() {
       const oneUnits = {}
       if (this.itemAdding) {
-        oneUnits.CAL = this.selectedFood.nutrients.ENERC_KCAL / 100
-        oneUnits.CARB = this.selectedFood.nutrients.CHOCDF / 100
+        oneUnits.CALS = this.selectedFood.nutrients.ENERC_KCAL / 100
+        oneUnits.CARBS = this.selectedFood.nutrients.CHOCDF / 100
         oneUnits.PROTEIN = this.selectedFood.nutrients.PROCNT / 100
         oneUnits.FAT = this.selectedFood.nutrients.FAT / 100
       } else {
-        oneUnits.CAL = this.selectedFood.nutrients.CALS / this.selectedFood.servings / this.coefficient
-        oneUnits.CARB = this.selectedFood.nutrients.CARBS / this.selectedFood.servings / this.coefficient
+        oneUnits.CALS = this.selectedFood.nutrients.CALS / this.selectedFood.servings / this.coefficient
+        oneUnits.CARBS = this.selectedFood.nutrients.CARBS / this.selectedFood.servings / this.coefficient
         oneUnits.PROTEIN = this.selectedFood.nutrients.PROTEIN / this.selectedFood.servings / this.coefficient
         oneUnits.FAT = this.selectedFood.nutrients.FAT / this.selectedFood.servings / this.coefficient
       }
       return oneUnits
     },
-    setMeasure(measure) {
+    setNutrients(measure) {
       const oneUnits = this.oneUnits()
       if (measure === 'gram' || measure === 'milliliter') {
-        this.selectedNutrients.CALS = oneUnits.CAL * this.servings
-        this.selectedNutrients.CARBS = oneUnits.CARB * this.servings
+        this.selectedNutrients.CALS = oneUnits.CALS * this.servings
+        this.selectedNutrients.CARBS = oneUnits.CARBS * this.servings
         this.selectedNutrients.PROTEIN = oneUnits.PROTEIN * this.servings
         this.selectedNutrients.FAT = oneUnits.FAT * this.servings
       } else if (measure === 'kilogram' || measure === 'liter') {
-        this.selectedNutrients.CALS = oneUnits.CAL * this.servings * 1000
-        this.selectedNutrients.CARBS = oneUnits.CARB * this.servings * 1000
+        this.selectedNutrients.CALS = oneUnits.CALS * this.servings * 1000
+        this.selectedNutrients.CARBS = oneUnits.CARBS * this.servings * 1000
         this.selectedNutrients.PROTEIN = oneUnits.PROTEIN * this.servings * 1000
         this.selectedNutrients.FAT = oneUnits.FAT * this.servings * 1000
       }
     },
     setServings() {
-      this.setMeasure(this.measure)
+      if (this.servings >= 0) this.setNutrients(this.measure)
     },
     parsedNumber(formula) {
       return Number.parseInt((formula).toFixed(0))
@@ -339,7 +355,7 @@ export default {
   },
   watch: {
     servings(value) {
-      value < 0 ? this.servings = 0 : null
+      if (value < 0 || !value) this.servings = 0
     }
   },
   filters: {
@@ -349,3 +365,8 @@ export default {
   }
 }
 </script>
+<style>
+.chip-labels > .v-slide-group__content {
+  justify-content: start;
+}
+</style>

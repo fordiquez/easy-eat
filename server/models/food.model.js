@@ -2,17 +2,16 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
-  account: { type: Schema.Types.ObjectId, ref: 'Account' },
+  accountId: { type: Schema.Types.ObjectId, ref: 'Account' },
   date: Date,
   mealTime: String,
   measure: String,
   servings: Number,
-  foodId: String,
   label: String,
   category: String,
-  categoryLabel: String,
-  nutrients: Object,
+  foodContentsLabel: Array,
   image: String,
+  nutrients: Object,
   created: { type: Date, default: Date.now() },
   updated: Date
 });

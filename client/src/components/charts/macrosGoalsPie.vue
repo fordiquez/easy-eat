@@ -76,13 +76,13 @@ export default {
   computed: {
     ...mapGetters('userData', ['getUserDataValue']),
     percentageCarbs() {
-      return this.getUserDataValue?.selectedPlan.proportions.CARBS
+      return this.getUserDataValue?.selectedPlan?.proportions.CARBS
     },
     percentageProtein() {
-      return this.getUserDataValue?.selectedPlan.proportions.PROTEIN
+      return this.getUserDataValue?.selectedPlan?.proportions.PROTEIN
     },
     percentageFat() {
-      return this.getUserDataValue?.selectedPlan.proportions.FAT
+      return this.getUserDataValue?.selectedPlan?.proportions.FAT
     },
   },
   methods: {
@@ -94,7 +94,9 @@ export default {
     }
   },
   watch: {
-
+    percentageCarbs() {
+      this.updateChartData()
+    }
   },
 }
 </script>

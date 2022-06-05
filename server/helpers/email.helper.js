@@ -3,11 +3,11 @@ const nodemailer = require('nodemailer');
 module.exports = email;
 
 const smtpOptions = {
-  host: "smtp.ethereal.email",
-  port: 587,
+  host: "smtp.mailtrap.io",
+  port: 2525,
   auth: {
-    user: "jeremie.morar70@ethereal.email",
-    pass: "AR4bDZUTQF8kpq62uV"
+    user: "a8251c6ab65852",
+    pass: "6a5ce0d70e53ae"
   }
 }
 

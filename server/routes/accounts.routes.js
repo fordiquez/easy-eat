@@ -3,7 +3,7 @@ const router = express.Router();
 const accountController = require("controllers/accounts.controller");
 const authorize = require("middlewares/authorize");
 const Role = require("helpers/role.helper");
-const upload = require('middlewares/files-storage');
+const uploadAvatar = require('middlewares/avatars-storage');
 
 router.post('/authenticate', accountController.authenticateSchema, accountController.authenticate);
 router.post('/refresh-token', accountController.refreshToken);
@@ -18,7 +18,7 @@ router.post('/', authorize(Role.Admin), accountController.createSchema, accountC
 router.get('/:id', authorize(), accountController.getById);
 router.put('/:id', authorize(), accountController.updateSchema, accountController.update);
 router.delete('/:id', authorize(), accountController.delete);
-router.post('/upload/:id', authorize(), upload.single('file'), accountController.uploadAvatar);
+router.post('/upload/:id', authorize(), uploadAvatar.single('file'), accountController.uploadAvatar);
 router.get('/avatar/:id', accountController.getAvatar);
 router.get('/avatar/:id/:filename', accountController.updatedAvatar);
 router.delete('/avatar/:id', authorize(), accountController.deleteAvatar);

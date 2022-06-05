@@ -6,28 +6,20 @@ const db = require('helpers/db.helper');
 const Role = require('helpers/role.helper');
 
 const register = async (params, origin) => {
-  // validate
   if (await db.Account.findOne({ email: params.email })) {
-    // send already registered error in email to prevent account enumeration
-    // await sendAlreadyRegisteredEmail(params.email, origin);
+    await sendAlreadyRegisteredEmail(params.email, origin);
     throw 'Account with such email has already been registered'
   }
-
-  // create account object
   const account = new db.Account(params);
-  // first registered account is an admin
+
   const isFirstAccount = (await db.Account.countDocuments({})) === 0;
   account.role = isFirstAccount ? Role.Admin : Role.User;
   account.isVerified = false;
   account.verificationToken = randomTokenString();
-
-  // hash password
   account.passwordHash = hash(params.password);
 
-  // save account
   await account.save();
 
-  // send email
   await sendVerificationEmail(account, origin);
   const messages = {
     success: `Congratulations, ${params.firstName}! Your account has been successfully registered`,
@@ -59,10 +51,9 @@ const verifyEmail = async ({ token }) => {
 const forgotPassword = async ({ email }, origin) => {
   const account = await db.Account.findOne({ email });
 
-  // always return ok response to prevent email enumeration
   if (!account) throw 'Account with such email has not found';
 
-  // create reset token that expires after 24 hours
+  // reset token expires after 24 hours
   account.resetToken = {
     token: randomTokenString(),
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
@@ -71,6 +62,7 @@ const forgotPassword = async ({ email }, origin) => {
 
   // send email
   await sendPasswordResetEmail(account, origin);
+
   return {
     message: 'Please check your email for password reset instructions'
   }
@@ -97,7 +89,6 @@ const resetPassword = async ({ token, password }) => {
 
   if (!account) throw 'Invalid token';
 
-  // update password and remove reset token
   account.passwordHash = hash(password);
   account.passwordReset = Date.now();
   account.resetToken = undefined;
@@ -114,16 +105,11 @@ const authenticate = async ({ email, password, ipAddress }) => {
   else if (!bcrypt.compareSync(password, account.passwordHash)) throw 'Email or password is incorrect'
   else if (!account.isVerified) throw 'Account has not been verified';
 
-  // authentication successful so generate jwt and refresh tokens
   const jwtToken = generateJwtToken(account);
   const refreshToken = generateRefreshToken(account, ipAddress);
-
-  // save refresh token
   await refreshToken.save();
-
   const message = 'You have successfully logged in'
 
-  // return basic details and tokens
   return {
     ...basicDetails(account),
     jwtToken,
@@ -136,7 +122,6 @@ const refreshToken = async ({ token, ipAddress }) => {
   const refreshToken = await getRefreshToken(token);
   const { account } = refreshToken;
 
-  // replace old refresh token with a new one and save
   const newRefreshToken = generateRefreshToken(account, ipAddress);
   refreshToken.revoked = Date.now();
   refreshToken.revokedByIp = ipAddress;
@@ -144,10 +129,8 @@ const refreshToken = async ({ token, ipAddress }) => {
   await refreshToken.save();
   await newRefreshToken.save();
 
-  // generate new jwt
   const jwtToken = generateJwtToken(account);
 
-  // return basic details and tokens
   return {
     ...basicDetails(account),
     jwtToken,
@@ -157,7 +140,6 @@ const refreshToken = async ({ token, ipAddress }) => {
 
 const revokeToken = async (token) => {
   const refreshToken = await getRefreshToken(token);
-  // remove token from the collection
   await refreshToken.remove();
   return {
     message: 'Your session has ended successfully'
@@ -224,9 +206,10 @@ const update = async (id, params) => {
 }
 
 const _delete = async (id) => {
-  const account = await getAccount(id);
+  const account = await getAccount(id)
+  await db.MealPlan.findByIdAndDelete(id)
   await db.RefreshToken.deleteMany({ account: id })
-  await account.remove();
+  await account.remove()
 
   return {
     message: 'The user account has been successfully deleted'
@@ -324,13 +307,13 @@ const sendVerificationEmail = async (account, origin) => {
     message = `<p>Please click the below link to verify your email address:</p>
                    <p><a href="${verifyUrl}" target="_blank">${verifyUrl}</a></p>`;
   } else {
-    message = `<p>Please use the below token to verify your email address with the <code>/account/verify-email</code> api route:</p>
+    message = `<p>Please use the below token to verify your email address with the <code>/accounts/verify-email</code> api route:</p>
                    <p><code>${account.verificationToken}</code></p>`;
   }
 
   await sendEmail({
     to: account.email,
-    subject: 'Sign-up Verification API - Verify Email',
+    subject: 'EasyEat — Verify Email',
     html: `<h4>Verify Email</h4>
                <p>Thanks for registering!</p>
                ${message}`
@@ -342,12 +325,12 @@ const sendAlreadyRegisteredEmail = async (email, origin) => {
   if (origin) {
     message = `<p>If you don't know your password please visit the <a href="${origin}/auth/forgot-password">forgot password</a> page.</p>`;
   } else {
-    message = `<p>If you don't know your password you can reset it via the <code>/account/forgot-password</code> api route.</p>`;
+    message = `<p>If you don't know your password you can reset it via the <code>/accounts/forgot-password</code> api route.</p>`;
   }
 
   await sendEmail({
     to: email,
-    subject: 'Sign-up Verification API - Email Already Registered',
+    subject: 'EasyEat — Email Already Registered',
     html: `<h4>Email Already Registered</h4>
                <p>Your email <strong>${email}</strong> is already registered.</p>
                ${message}`
@@ -361,13 +344,13 @@ const sendPasswordResetEmail = async (account, origin) => {
     message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
                    <p><a href="${resetUrl}" target="_blank">${resetUrl}</a></p>`;
   } else {
-    message = `<p>Please use the below token to reset your password with the <code>/account/reset-password</code> api route:</p>
+    message = `<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
                    <p><code>${account.resetToken.token}</code></p>`;
   }
 
   await sendEmail({
     to: account.email,
-    subject: 'Sign-up Verification API - Reset Password',
+    subject: 'EasyEat — Reset Password',
     html: `<h4>Reset Password Email</h4>
                ${message}`
   });

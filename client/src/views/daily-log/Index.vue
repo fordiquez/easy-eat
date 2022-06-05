@@ -33,25 +33,32 @@
               <v-icon v-else>mdi-plus</v-icon>
             </v-btn>
           </template>
-          <v-btn fab dark small color="green">
-            <v-icon>mdi-hamburger-plus</v-icon>
-          </v-btn>
-          <v-btn fab dark small color="indigo">
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
-          <v-btn fab dark small color="red">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
+          <v-tooltip left color="green">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn fab small color="green" v-on="on" v-bind="attrs" @click="onFoodSearchDialog">
+                <v-icon>mdi-hamburger-plus</v-icon>
+              </v-btn>
+            </template>
+            <span>Add Daily Food</span>
+          </v-tooltip>
+          <v-tooltip left color="green">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn fab small color="green" v-on="on" v-bind="attrs" @click="onCustomFoodDialog">
+                <v-icon>mdi-playlist-plus</v-icon>
+              </v-btn>
+            </template>
+            <span>Create Custom Food</span>
+          </v-tooltip>
         </v-speed-dial>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col cols="4" lg="3" class="d-flex flex-column align-center">
+    <v-row class="justify-center">
+      <v-col cols="12" sm="6" md="4" lg="3" class="d-flex flex-column align-center">
         <v-card-title class="justify-center py-0">My Macros</v-card-title>
         <daily-macros-pie v-if="getDailyMacros.CALS" />
         <div v-else class="mt-5 grey darken-3 rounded-circle" style="width: 175px; height: 175px" />
       </v-col>
-      <v-col cols="4" lg="6">
+      <v-col cols="12" sm="10" md="4" lg="6" class="flex justify-center" :class="$vuetify.breakpoint.smAndDown ? 'order-1' : ''">
         <div class="d-flex justify-space-between">
           <v-card-text class="pa-0">
             <v-icon class="mr-1" color="red darken-1">mdi-nutrition</v-icon>
@@ -113,9 +120,10 @@
           </label>
         </v-progress-linear>
       </v-col>
-      <v-col cols="4" lg="3" class="d-flex flex-column align-center">
+      <v-col cols="12" sm="6" md="4" lg="3" class="d-flex flex-column align-center">
         <v-card-title class="justify-center py-0">My Goals</v-card-title>
-        <macros-goals-pie />
+        <macros-goals-pie v-if="isSelectedPlan" />
+        <div v-else class="mt-5 grey darken-3 rounded-circle" style="width: 175px; height: 175px" />
       </v-col>
     </v-row>
     <v-row>
@@ -149,6 +157,12 @@
         @close-dialog="foodItemDialog = false"
     />
 
+    <custom-food-dialog
+        v-if="customFoodDialog"
+        :custom-food-dialog="customFoodDialog"
+        @close-dialog="customFoodDialog = false"
+    />
+
   </v-container>
 </template>
 
@@ -160,10 +174,11 @@ import FoodItem from "@/components/dialogs/FoodItem";
 import FoodSearchDialog from "@/components/dialogs/FoodSearch";
 import dailyMacrosPie from "@/components/charts/dailyMacrosPie";
 import macrosGoalsPie from "@/components/charts/macrosGoalsPie";
+import CustomFoodDialog from "@/components/dialogs/CustomFood";
 
 export default {
   name: 'DailyLog',
-  components: { dailyMacrosPie, macrosGoalsPie, FoodSearchDialog, FoodItem, MealTimeList },
+  components: {CustomFoodDialog, dailyMacrosPie, macrosGoalsPie, FoodSearchDialog, FoodItem, MealTimeList },
   props: {
     user: {
       type: Object,
@@ -180,6 +195,7 @@ export default {
     dateDialog: false,
     foodSearchDialog: false,
     foodItemDialog: false,
+    customFoodDialog: false,
     selectedFood: null,
     selectedNutrients: {
       CALS: null,
@@ -193,37 +209,27 @@ export default {
     this.date = moment().format('yyyy-MM-DD')
     this.dateFormatted = this.computedDateFormatted
     this.getUserData.subscribe(userData => this.userData = userData)
-    if (this.user && !this.userData) {
-      this.getById(this.user.id).then(response => {
-        console.log(response)
-      }).catch(error => {
-        console.log(error.response)
-      })
-    }
-    this.get().then(response => {
-      console.log(response)
-      this.setDailyMacros(this.getUserFood)
-    }).catch(error => {
-      console.log(error.response)
-    })
+    if (this.getDailyMacros) this.clearDailyMacros()
+    this.validateUserData()
+    this.loadUserFood()
   },
   computed: {
-    ...mapGetters('food', ["getFoundFood", "getUserFood", 'getDailyMacros']),
+    ...mapGetters('food', ['getUserFood', 'getDailyMacros']),
     ...mapGetters('userData', ['getUserData']),
     greetingsTitle() {
-      return this.user ? `Good ${this.timeOfDay(moment().hours())}, ` + this.user.firstName + '!' : null
+      return this.user ? `Good ${this.timeOfDay(moment().hours())}, ` + this.user.firstName + '!' : 'Good' + this.timeOfDay(moment().hours())
     },
     computedDateFormatted() {
       return this.formatDate(this.date)
     },
     userMacrosCarbs() {
-      return this.userData?.macros.CARBS
+      return this.userData?.macros?.CARBS
     },
     userMacrosProtein() {
-      return this.userData?.macros.PROTEIN
+      return this.userData?.macros?.PROTEIN
     },
     userMacrosFat() {
-      return this.userData?.macros.FAT
+      return this.userData?.macros?.FAT
     },
     userCals() {
       return this.userData?.TDEE
@@ -275,26 +281,35 @@ export default {
     },
     calsSign() {
       return this.calsOver > this.calsLeft ? 'over' : 'left'
+    },
+    customMealTime() {
+      const timeOfDay = this.timeOfDay(moment().hours())
+      return timeOfDay === 'morning' ? 'Breakfast' : timeOfDay === 'day' ? 'Lunch' : timeOfDay === 'evening' ? 'Dinner' : 'Snack'
+    },
+    isSelectedPlan() {
+      return !!this.userData?.selectedPlan
     }
   },
   methods: {
-    ...mapActions('food', ['get', 'selectedDate', 'selectedMealTime', 'clearDailyMacros', 'setDailyMacros']),
+    ...mapActions('food', ['get', 'selectedDate', 'selectedMealTime', 'setDailyMacros', 'clearDailyMacros', 'clearFoundFood', 'clearLinks']),
     ...mapActions('userData', ['getById']),
+    ...mapActions('notification', ['setSnackbar', 'setAlert']),
     formatDate(date) {
-      date ? [this.year, this.month, this.day] = date.split('-') : null
+      if (date) [this.year, this.month, this.day] = date.split('-')
       return `${this.day}/${this.month}/${this.year}`
     },
     parseDate(date) {
-      date ? [this.month, this.day, this.year] = date.split('/') : null
+      if (date) [this.month, this.day, this.year] = date.split('/')
       return `${this.year}-${this.month.padStart(2, '0')}-${this.day.padStart(2, '0')}`
     },
     changeDay(duration) {
       this.date = moment(this.date).add(duration, 'days').format('yyyy-MM-DD')
     },
     timeOfDay(hours) {
-      return hours >= 0 && hours < 6 ? 'night' : hours >= 6 && hours < 12 ? 'morning' : hours >= 12 && hours < 18 ? 'day' : 'evening'
+      return hours >= 0 && hours < 6 ? 'night' : hours >= 6 && hours < 12 ? 'morning' : hours >= 12 && hours < 15 ? 'day' : hours >= 15 && hours < 18 ? 'afternoon' : 'evening'
     },
     onFoodSearchDialog(mealTime) {
+      if (typeof mealTime !== 'string') mealTime = this.customMealTime
       this.selectedMealTime(mealTime)
       this.foodSearchDialog = true
     },
@@ -308,14 +323,57 @@ export default {
         FAT: foodItem.food.nutrients.FAT || null
       }
       this.selectedNutrients = Object.assign({}, nutrients)
+    },
+    onCustomFoodDialog() {
+      this.selectedMealTime(this.customMealTime)
+      this.customFoodDialog = true
+    },
+    validateUserData() {
+      this.getById(this.user.id).then(() => {
+        if (!this.userData.currentWeight || !this.userData?.goalWeight || !this.userData?.height || !this.userData?.sex || !this.userData?.birthdayDate || !this.userData?.activityLevel) {
+          this.$router.push({ name: 'Onboarding' }).then(() => {
+            this.setSnackbar({ color: 'error', text: 'Not enough user data' })
+            this.setAlert({ type: 'info', text: 'To continue using this service, we need to collect data about you and prepare it for the formation and setting of goals for daily calories and macronutrients.' })
+          })
+        } else if (!this.userData?.TDEE || !this.userData?.macros || !this.userData?.selectedPlan) {
+          console.log('Not enough user data 2')
+          this.$router.push({ name: 'MealPlan' }).then(() => {
+            this.setSnackbar({ color: 'error', text: 'Not enough user data' })
+            this.setAlert({ type: 'info', text: 'To continue using this service, you need to set your daily calorie and macronutrient goals.' })
+          })
+        }
+      }).catch(error => {
+        console.log(error.response)
+        if (error.response.data.message === 'User data not found') {
+          this.$router.push({ name: 'Onboarding' }).then(() => {
+            this.setSnackbar({ color: 'error', text: error.response.data.message })
+            this.setAlert({ type: 'info', text: 'To continue using this service, we need to collect data about you and prepare it for the formation and setting of goals for daily calories and macronutrients.' })
+          })
+        }
+      })
+    },
+    loadUserFood() {
+      this.get().then(response => {
+        console.log(response)
+        this.setDailyMacros(this.getUserFood)
+      }).catch(error => {
+        console.log(error.response)
+        this.setSnackbar({ color: 'error', text: error.response.data.message })
+      })
     }
   },
   watch: {
-    date(value) {
+    date(value, prev) {
       this.clearDailyMacros()
       this.dateFormatted = this.formatDate(value)
       this.selectedDate(value)
-      this.setDailyMacros(this.getUserFood)
+      if (prev) this.setDailyMacros(this.getUserFood)
+    },
+    foodSearchDialog(value) {
+      if (!value) {
+        this.clearFoundFood()
+        this.clearLinks()
+      }
     },
     foodItemDialog(value) {
       if (!value) this.selectedFood = this.selectedNutrients = null
@@ -334,9 +392,3 @@ export default {
   },
 }
 </script>
-
-<style>
-.input-number input {
-  text-align: center;
-}
-</style>

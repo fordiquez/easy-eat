@@ -32,6 +32,7 @@ const actions = {
   },
   async getById({ commit }, id) {
     return await userDataService.getById(id).then(response => {
+      console.log(response)
       commit('SET_USER_DATA', response.data)
       return response
     })
@@ -47,13 +48,15 @@ const actions = {
       commit('SET_USER_DATA', response.data)
       return response
     })
-  }
+  },
+  clearUserData: ({ commit }) => commit('CLEAR_USER_DATA')
 };
 
 const mutations = {
   SET_USER_DATA: (state, userData) => {
     state.userData.next(excludedFilter(userData, ['message']))
-  }
+  },
+  CLEAR_USER_DATA: state => state.userData.next(null)
 };
 
 export const userData = {

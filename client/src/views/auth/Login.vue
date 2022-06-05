@@ -2,7 +2,7 @@
   <v-card :loading="loading" rounded>
     <v-card-title>Log In</v-card-title>
     <v-card-subtitle class="pb-0">Please enter your account information for authorization</v-card-subtitle>
-    <v-form ref="form" @submit.prevent="submit">
+    <v-form @submit.prevent="submit">
       <v-container fluid>
         <v-row>
           <v-col cols="12">
@@ -77,13 +77,11 @@ export default {
     passwordErrors() {
       return passwordErrors(this.$v.form.password)
     },
+
   },
   methods: {
-    ...mapActions({
-      login: 'account/login',
-      setAlert: 'notification/setAlert',
-      setSnackbar: 'notification/setSnackbar'
-    }),
+    ...mapActions('account', ['login']),
+    ...mapActions('notification', ['setAlert', 'setSnackbar']),
     submit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {

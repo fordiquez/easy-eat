@@ -39,7 +39,7 @@
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-btn color="blue darken-1" @click="onCloseDialog" text large>Close</v-btn>
+          <v-btn color="blue darken-1" @click="onCloseDialog" text large>Cancel</v-btn>
           <v-spacer />
           <v-btn
               color="blue darken-1"
@@ -88,7 +88,7 @@ export default {
   created() {
     this.updatedAccount.id = this.accountId
     this.isDialog = this.updateEmailDialog
-    this.isDialog ? setTimeout(() => this.$refs.email.focus(), 0) : null
+    if (this.isDialog) setTimeout(() => this.$refs.email.focus(), 0)
   },
   validations: {
     updatedAccount: {

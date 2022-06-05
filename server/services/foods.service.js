@@ -1,19 +1,18 @@
 const db = require('helpers/db.helper')
 
 const create = async (params) => {
-  const { id } = await db.Account.findById(params.userId);
+  const { id } = await db.Account.findById(params.accountId);
   const food = new db.Food({
-    account: id,
+    accountId: id,
     date: params.date,
     mealTime: params.mealTime,
     measure: params.measure,
     servings: params.servings,
-    foodId: params.foodId,
     label: params.label,
     category: params.category,
-    categoryLabel: params.categoryLabel,
-    nutrients: params.nutrients,
-    image: params.image
+    foodContentsLabel: params.foodContentsLabel,
+    image: params.image,
+    nutrients: params.nutrients
   })
   await food.save()
   return {
@@ -22,8 +21,8 @@ const create = async (params) => {
   }
 }
 
-const get = async ({ account }) => {
-  return db.Food.find({ account })
+const get = async ({ accountId }) => {
+  return db.Food.find({ accountId })
 }
 
 const update = async (id, params) => {

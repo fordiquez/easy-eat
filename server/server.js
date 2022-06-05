@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-const whiteList = ['http://localhost:8080']
+const whiteList = ['http://localhost:8080', 'http://192.168.31.112:8080']
 
 const corsOptions = {
   origin: (origin, callback) => whiteList.indexOf(origin) !== -1 ? callback(null, true) : callback(null, false),

@@ -7,10 +7,10 @@ const getById = async (id) => await getUserData(id)
 const create = async (params) => {
   const existedUserData = await db.UserData.findOne({ accountId: params.accountId })
   if (existedUserData) existedUserData.remove()
-  const newUserData = new db.UserData(params)
-  await newUserData.save()
+  const userData = new db.UserData(params)
+  await userData.save()
   return {
-    newUserData,
+    userData,
     message: 'The user data created successfully'
   }
 }

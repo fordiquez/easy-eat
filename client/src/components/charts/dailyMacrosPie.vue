@@ -79,13 +79,13 @@ export default {
       return this.getDailyMacros.CARBS + this.getDailyMacros.PROTEIN + this.getDailyMacros.FAT
     },
     percentageCarbs() {
-      return parseInt(this.getDailyMacros.CARBS * 100 / this.totalDailyMacros, 10)
+      return Math.round(this.getDailyMacros.CARBS * 100 / this.totalDailyMacros)
     },
     percentageProtein() {
-      return parseInt(this.getDailyMacros.PROTEIN * 100 / this.totalDailyMacros, 10)
+      return Math.round(this.getDailyMacros.PROTEIN * 100 / this.totalDailyMacros)
     },
     percentageFat() {
-      return parseInt(this.getDailyMacros.FAT * 100 / this.totalDailyMacros, 10)
+      return Math.round(this.getDailyMacros.FAT * 100 / this.totalDailyMacros)
     },
   },
   methods: {

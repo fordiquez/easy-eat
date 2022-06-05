@@ -14,7 +14,7 @@ const getters = {
 }
 
 const actions = {
-  async getPlans({ commit }) {
+  async getAll({ commit }) {
     return await mealPlanService.getAll().then(response => {
       console.log(response)
       commit('SET_PLANS', response.data)
@@ -24,7 +24,8 @@ const actions = {
   },
   setSelectedPlan({ commit }, selectedDiet) {
     commit('SET_SELECTED_PLAN', selectedDiet)
-  }
+  },
+  clearSelectedPlan: ({ commit }) => commit('CLEAR_SELECTED_PLAN')
 };
 
 const mutations = {
@@ -33,7 +34,8 @@ const mutations = {
   },
   SET_SELECTED_PLAN: (state, selectedPlan) => {
     Object.assign(state.selectedPlan, selectedPlan)
-  }
+  },
+  CLEAR_SELECTED_PLAN: state => Object.assign({ title: null, proportions: {} }, state.selectedPlan)
 };
 
 export const mealPlan = {

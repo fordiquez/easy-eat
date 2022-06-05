@@ -28,8 +28,29 @@ export default {
   },
   watch: {
     $route() {
-      this.alerts.length ? this.clearAlerts() : null
+      if (this.alerts.length) this.clearAlerts()
     }
   }
 };
 </script>
+<style>
+.v-slide-group div div div {
+  justify-content: center;
+}
+.custom-link:hover {
+  text-decoration: underline;
+}
+.input-number input {
+  text-align: center;
+}
+.chip-item span {
+  width: 150px;
+  justify-content: center;
+}
+.chip-group div {
+  justify-content: center;
+}
+.v-slider__thumb {
+  cursor: grab;
+}
+</style>
