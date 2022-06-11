@@ -5,6 +5,10 @@ const state = () => ({
   snackbars: []
 });
 
+const getters = {
+  activeSnackbars: state => state.snackbars
+}
+
 const actions = {
   setAlert: ({ commit }, alert) => {
     alert.active = true
@@ -39,6 +43,7 @@ const mutations = {
 export const notification = {
   namespaced: true,
   state,
+  getters,
   actions,
   mutations
 };

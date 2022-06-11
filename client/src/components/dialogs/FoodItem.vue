@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-if="selectedFood" v-model="dialog" @input="onClose" max-width="550">
+  <v-dialog v-if="selectedFood" v-model="dialog" :fullscreen="$vuetify.breakpoint.xsOnly" @input="onClose" max-width="550">
     <v-card class="mx-auto" rounded>
       <v-toolbar color="success" dense>
         <v-toolbar-title>{{ selectedFood.label }}</v-toolbar-title>
@@ -9,15 +9,17 @@
         </v-btn>
       </v-toolbar>
       <v-row class="mx-auto my-auto">
-        <v-col cols="5" xs="4">
-          <v-img ref="image" :src="selectedFood.image || image" :lazy-src="selectedFood.image || image" class="rounded-circle" />
+        <v-col cols="12" class="d-flex justify-start" :class="$vuetify.breakpoint.xsOnly ? 'flex-column' : ''">
+          <v-img ref="image" :src="selectedFood.image || image" :lazy-src="selectedFood.image || image" class="rounded-circle" :class="$vuetify.breakpoint.xsOnly ? 'align-self-center' : ''" max-width="185" max-height="185" />
+          <v-flex class="flex-column" :class="$vuetify.breakpoint.smAndUp ? 'ml-5' : ''">
+            <v-card-title class="px-0 py-2">{{ selectedFood.label }}</v-card-title>
+            <v-card-subtitle class="px-0 pt-2 pb-0 text-subtitle-1">{{ selectedFood.category }}</v-card-subtitle>
+            <v-card-text class="px-0 py-2 text-subtitle-2">{{ servings }} {{ servings > 1 ? measure + 's' : measure }}</v-card-text>
+          </v-flex>
         </v-col>
-        <v-col cols="7" xs="8">
-          <v-card-title class="px-0 py-2">{{ selectedFood.label }}</v-card-title>
-          <v-card-subtitle class="px-0 pt-2 pb-0 text-subtitle-1">{{ selectedFood.category }}</v-card-subtitle>
-          <v-card-text class="px-0 py-2 text-subtitle-2">{{ servings }} {{ servings > 1 ? measure + 's' : measure }}</v-card-text>
-          <v-chip-group v-if="selectedFood.foodContentsLabel" class="chip-labels" column>
-            <v-chip v-for="label in selectedFood.foodContentsLabel" outlined text-color="success" :key="label">{{ label }}</v-chip>
+        <v-col class="pt-0">
+          <v-chip-group v-if="selectedFood.healthLabels" class="chip-labels" column>
+            <v-chip v-for="label in selectedFood.healthLabels" outlined text-color="success" :key="label">{{ label }}</v-chip>
           </v-chip-group>
         </v-col>
       </v-row>
@@ -26,49 +28,49 @@
       <v-container fluid>
         <v-row>
           <v-col cols="12">
-            <div class="d-flex justify-space-between">
+            <v-flex class="d-flex justify-space-between">
               <v-card-text class="pa-0">
-                <v-icon class="mr-1" color="red darken-1">mdi-nutrition</v-icon>
+                <v-icon class="mr-1" color="red">mdi-nutrition</v-icon>
                 <label class="text-subtitle-2">Net Carbs</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
                 <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
                   {{ carbsSign === 'left' ? carbsLeft : carbsOver }}g {{ carbsSign }}
                 </label>
-                <label class="red--text darken-3 font-weight-bold">{{ selectedNutrients.CARBS | fixed }}g</label>
+                <label class="red--text font-weight-bold">{{ selectedNutrients.CARBS | fixed }}g</label>
               </v-card-text>
-            </div>
-            <v-progress-linear :value="dailyPercentageCarbs" color="red darken-1" class="my-2" rounded />
+            </v-flex>
+            <v-progress-linear :value="dailyPercentageCarbs" color="red" class="my-2" rounded />
 
-            <div class="d-flex justify-space-between">
+            <v-flex class="d-flex justify-space-between">
               <v-card-text class="pa-0">
-                <v-icon class="mr-1" color="blue darken-3">mdi-nutrition</v-icon>
+                <v-icon class="mr-1" color="light-blue">mdi-nutrition</v-icon>
                 <label class="text-subtitle-2">Protein</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
                 <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
                   {{ proteinSign === 'left' ? proteinLeft : proteinOver }}g {{ proteinSign }}
                 </label>
-                <label class="blue--text darken-3 font-weight-bold">{{ selectedNutrients.PROTEIN | fixed }}g</label>
+                <label class="light-blue--text font-weight-bold">{{ selectedNutrients.PROTEIN | fixed }}g</label>
               </v-card-text>
-            </div>
-            <v-progress-linear :value="dailyPercentageProtein" color="blue darken-3" class="my-2" rounded />
+            </v-flex>
+            <v-progress-linear :value="dailyPercentageProtein" color="light-blue" class="my-2" rounded />
 
-            <div class="d-flex justify-space-between">
+            <v-flex class="d-flex justify-space-between">
               <v-card-text class="pa-0">
-                <v-icon class="mr-1" color="orange darken-3">mdi-nutrition</v-icon>
+                <v-icon class="mr-1" color="orange">mdi-nutrition</v-icon>
                 <label class="text-subtitle-2">Fat</label>
               </v-card-text>
               <v-card-text class="pa-0" style="max-width: max-content">
                 <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
                   {{ fatSign === 'left' ? fatLeft : fatOver }}g {{ fatSign }}
                 </label>
-                <label class="orange--text darken-3 font-weight-bold">{{ selectedNutrients.FAT | fixed }}g</label>
+                <label class="orange--text font-weight-bold">{{ selectedNutrients.FAT | fixed }}g</label>
               </v-card-text>
-            </div>
-            <v-progress-linear :value="dailyPercentageFat" color="orange darken-3" class="my-2" rounded />
+            </v-flex>
+            <v-progress-linear :value="dailyPercentageFat" color="orange" class="my-2" rounded />
 
-            <div class="d-flex justify-space-between">
+            <v-flex class="d-flex justify-space-between">
               <v-card-text class="pa-0">
                 <v-icon class="mr-1" color="teal">mdi-nutrition</v-icon>
                 <label class="text-subtitle-2">Calories</label>
@@ -77,9 +79,9 @@
                 <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text" v-if="itemAdding">
                   {{ calsSign === 'left' ? calsLeft : calsOver }} {{ calsSign }}
                 </label>
-                <label class="teal--text darken-3 font-weight-bold">{{ selectedNutrients.CALS | fixed }}</label>
+                <label class="teal--text font-weight-bold">{{ selectedNutrients.CALS | fixed }}</label>
               </v-card-text>
-            </div>
+            </v-flex>
             <v-progress-linear :value="dailyPercentageCals" color="teal" class="my-2" rounded />
 
           </v-col>
@@ -109,13 +111,13 @@
                 hide-spin-buttons
             >
               <template v-slot:prepend>
-                <v-btn icon color="success" :disabled="servings <= 0" :style="{ cursor: cursorType, pointerEvents: 'auto' }" @click="decrement">
-                  <v-icon>mdi-minus</v-icon>
+                <v-btn icon color="success" :disabled="disabled" :style="{ cursor: cursorType, pointerEvents: 'auto' }" @click="decrement">
+                  <v-icon>mdi-numeric-negative-1</v-icon>
                 </v-btn>
               </template>
               <template v-slot:append-outer>
                 <v-btn icon color="success" @click="increment">
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-numeric-positive-1</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -130,16 +132,22 @@
           </v-col>
 
           <v-col cols="12" v-if="!itemAdding">
-            <v-btn color="red" text block :loading="loading" @click="onRemove">Remove from food log</v-btn>
+            <v-btn color="red" text block :loading="loading" @click="onRemove">
+              <v-icon class="mr-1">mdi-hamburger-remove</v-icon>
+              <span>Remove from food log</span>
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
       <v-divider class="mx-4" />
       <v-card-actions>
-        <v-btn color="success" text large @click="onClose">Cancel</v-btn>
+        <v-btn text large color="success" @click="onClose">Cancel</v-btn>
         <v-spacer />
-        <v-btn color="success" text large :loading="loading" v-if="itemAdding" @click="onAddFood">Add to food log</v-btn>
-        <v-btn color="success" text large :loading="loading" v-else @click="onEditFood">Save changes</v-btn>
+        <v-btn text large color="success" :loading="loading" v-if="itemAdding" @click="onAddFood" :disabled="disabled">
+          <v-icon class="mr-1">mdi-hamburger-plus</v-icon>
+          <span>Add to food log</span>
+        </v-btn>
+        <v-btn text large color="success" :loading="loading" v-else @click="onEditFood" :disabled="disabled">Save changes</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -184,9 +192,10 @@ export default {
     !this.itemAdding ? this.measure = this.selectedFood.measure : this.measure = 'gram'
     this.measure === 'gram' || this.measure === 'milliliter' ? this.coefficient = 1 : this.coefficient = 1000
     this.mealTime = this.getMealTimes.labels.findIndex(item => item === this.getMealTime || item === this.selectedFood.mealTime)
-    if (this.selectedFood.foodContentsLabel && !Array.isArray(this.selectedFood.foodContentsLabel)) {
+    if (this.itemAdding && this.selectedFood.foodContentsLabel && !Array.isArray(this.selectedFood.foodContentsLabel)) {
       const foodLabels = this.selectedFood.foodContentsLabel.toLowerCase().split(';')
-      this.selectedFood.foodContentsLabel = foodLabels.filter((v, i, a) => a.indexOf(v) === i)
+      this.selectedFood.healthLabels = foodLabels.filter((v, i, a) => a.indexOf(v) === i)
+      delete this.selectedFood.foodContentsLabel
     }
   },
   computed: {
@@ -195,6 +204,9 @@ export default {
     ...mapGetters('food', ['getDate', 'getMealTime', 'getMealTimes', 'getDailyMacros', 'getUserFood']),
     cursorType() {
       return this.servings <= 0 ? 'not-allowed' : 'pointer'
+    },
+    disabled() {
+      return this.loading || this.servings < 1
     },
     suffix() {
       return this.measure === 'gram' ? 'g' : this.measure === 'kilogram' ? 'kg' : this.measure === 'liter' ? 'l' : 'ml'
@@ -265,7 +277,7 @@ export default {
     onAddFood() {
       this.loading = true
       const { id } = this.getUserValue
-      const { label, category, foodContentsLabel, image } = this.selectedFood
+      const { label, category, healthLabels, image } = this.selectedFood
       const [nutrients, date, mealTime, measure, servings] = [this.selectedNutrients, this.getDate, this.foodMealTime, this.measure, this.servings]
       const payload = {
         accountId: id,
@@ -275,7 +287,7 @@ export default {
         servings,
         label,
         category,
-        foodContentsLabel,
+        healthLabels,
         image,
         nutrients
       }
@@ -304,7 +316,7 @@ export default {
     },
     onRemove() {
       this.loading = true
-      this.delete(this.selectedFood.id).then(response => {
+      this.delete(this.selectedFood).then(response => {
         console.log(response)
         this.setSnackbar({ color: 'success', text: response.data.message })
       }).catch(error => {

@@ -9,8 +9,7 @@ const registerSchema = (req, res, next) => {
     lastName: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
-    passwordConfirm: Joi.string().valid(Joi.ref('password')).required(),
-    acceptedTerms: Joi.boolean().valid(true).required()
+    passwordConfirm: Joi.string().valid(Joi.ref('password')).required()
   });
   validateRequest(req, next, schema);
 }
@@ -76,19 +75,15 @@ const authenticateSchema = (req, res, next) => {
 const authenticate = (req, res, next) => {
   const { email, password } = req.body;
   const ipAddress = req.ip;
-  accountService.authenticate({ email, password, ipAddress }).then(({ refreshToken, ...account }) => {
-      setTokenCookie(res, refreshToken);
-      res.json(account);
-    }).catch(next);
+  accountService.authenticate({ email, password, ipAddress })
+    .then(({ refreshToken, ...account }) => setTokenCookie(res, refreshToken).then(() => res.json(account))).catch(next);
 }
 
 const refreshToken = (req, res, next) => {
   const token = req.cookies.refreshToken;
   const ipAddress = req.ip;
-  accountService.refreshToken({ token, ipAddress }).then(({ refreshToken, ...account }) => {
-      setTokenCookie(res, refreshToken);
-      res.json(account);
-    }).catch(next);
+  accountService.refreshToken({ token, ipAddress })
+    .then(({ refreshToken, ...account }) => setTokenCookie(res, refreshToken).then(() => res.json(account))).catch(next);
 }
 
 const revokeTokenSchema = (req, res, next) => {

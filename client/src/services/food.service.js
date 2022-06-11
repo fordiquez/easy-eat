@@ -26,8 +26,12 @@ const update = async (payload) => {
   return await DefaultAPI.put(`${baseURL}/${payload.id}`, payload)
 }
 
-const _delete = async (id) => {
-  return await DefaultAPI.delete(`${baseURL}/${id}`)
+const _delete = async (id, params) => {
+  return await DefaultAPI.delete(`${baseURL}/${id}`, { params })
+}
+
+const bulkDelete = async (params) => {
+  return await DefaultAPI.delete(`${baseURL}/`, { params })
 }
 
 export const foodService = {
@@ -36,5 +40,6 @@ export const foodService = {
   add,
   get,
   update,
-  delete: _delete
+  delete: _delete,
+  bulkDelete
 }

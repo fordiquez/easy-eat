@@ -6,79 +6,79 @@
         <v-list-item-content class="pt-0">
           <v-row class="mx-auto" dense>
             <v-col cols="6">
-              <v-card class="py-3 px-4 text-center d-flex align-center justify-space-between" :color="isDrawer.active" @click="onDrawer" flat link rounded>
-                <span class="hidden-sm-and-down">Show</span>
+              <v-card class="py-3 px-4 d-flex align-center justify-center" :color="isDrawer.active" @click="onDrawer" rounded>
+                <span>Show</span>
                 <v-icon right>mdi-projector-screen-variant</v-icon>
               </v-card>
             </v-col>
             <v-col cols="6">
-              <v-card class="py-3 px-4 text-center d-flex align-center justify-space-between" :color="isDrawer.inactive" @click="offDrawer" flat link rounded>
-                <span class="hidden-sm-and-down">Hide</span>
+              <v-card class="py-3 px-4 d-flex align-center justify-center" :color="isDrawer.inactive" @click="offDrawer" rounded>
+                <span>Hide</span>
                 <v-icon right>mdi-projector-screen-variant-off</v-icon>
               </v-card>
             </v-col>
           </v-row>
         </v-list-item-content>
       </v-list-item-group>
-      <div class="mt-2 mb-3 mx-n3">
+      <v-flex class="mt-2 mb-3 mx-n3">
         <v-divider />
-      </div>
+      </v-flex>
       <v-list-item-group>
         <v-list-item-title class="mb-0 pl-1 text-subtitle-2 font-weight-black">Drawer variant</v-list-item-title>
         <v-list-item-content class="pt-0">
           <v-row class="mx-auto" dense>
             <v-col cols="6">
-              <v-card class="py-3 px-4 text-center d-flex align-center justify-space-between" :color="isMiniVariant.active" @click="onMiniVariant" flat link rounded>
-                <span class="hidden-sm-and-down">Mini</span>
+              <v-card class="py-3 px-4 d-flex align-center justify-center" :color="isMiniVariant.active" @click="onMiniVariant" rounded>
+                <span>Mini</span>
                 <v-icon right>mdi-window-minimize</v-icon>
               </v-card>
             </v-col>
             <v-col cols="6">
-              <v-card class="py-3 px-4 text-center d-flex align-center justify-space-between" :color="isMiniVariant.inactive" @click="offMiniVariant" flat link rounded>
-                <span class="hidden-sm-and-down">Full</span>
+              <v-card class="py-3 px-4 d-flex align-center justify-center" :color="isMiniVariant.inactive" @click="offMiniVariant" rounded>
+                <span>Full</span>
                 <v-icon right>mdi-fullscreen</v-icon>
               </v-card>
             </v-col>
           </v-row>
         </v-list-item-content>
       </v-list-item-group>
-      <div class="mt-2 mb-3 mx-n3">
+      <v-flex class="mt-2 mb-3 mx-n3">
         <v-divider />
-      </div>
+      </v-flex>
       <v-list-item-group>
         <v-list-item-title class="mb-0 pl-1 text-subtitle-2 font-weight-black">Clipped drawer</v-list-item-title>
         <v-list-item-content class="pt-0">
           <v-row class="mx-auto" dense>
             <v-col cols="6">
-              <v-card class="py-3 px-4 text-center d-flex align-center justify-center" :color="isClipped.active" @click="onClipped" flat link rounded>
-                <span class="hidden-sm-and-down">Clipped</span>
+              <v-card class="py-3 px-4 d-flex align-center justify-center" :color="isClipped.active" @click="onClipped" rounded>
+                <span>Clipped</span>
                 <v-icon right>mdi-scissors-cutting</v-icon>
               </v-card>
             </v-col>
             <v-col cols="6">
-              <v-card class="py-3 px-4 text-center d-flex align-center justify-center" :color="isClipped.inactive" @click="offClipped" flat link rounded>
-                <span class="hidden-sm-and-down">Unclipped</span>
+              <v-card class="py-3 px-4 d-flex align-center justify-center" :color="isClipped.inactive" @click="offClipped" rounded>
+                <span>Unclipped</span>
                 <v-icon right>mdi-window-maximize</v-icon>
               </v-card>
             </v-col>
           </v-row>
         </v-list-item-content>
       </v-list-item-group>
-      <div class="mt-2 mb-3 mx-n3">
+      <v-flex class="mt-2 mb-3 mx-n3">
         <v-divider />
-      </div>
+      </v-flex>
       <v-list-item-group>
         <v-list-item-title class="mb-0 pl-1 text-subtitle-2 font-weight-black">Fixed footer</v-list-item-title>
         <v-list-item-content class="pt-0">
           <v-row class="mx-auto" dense>
             <v-col cols="6">
-              <v-card class="py-3 px-4 text-center d-flex align-center justify-space-between" :color="isFixed.active" @click="onFixed" flat link rounded>
+              <v-card class="py-3 px-4 d-flex align-center justify-center" :color="isFixed.active" @click="onFixed" rounded>
                 <span class="hidden-sm-and-down">Fixed</span>
                 <v-icon right>mdi-pin</v-icon>
               </v-card>
             </v-col>
             <v-col cols="6">
-              <v-card class="py-3 px-4 text-center d-flex align-center justify-space-between" :color="isFixed.inactive" @click="offFixed" flat link rounded>
+              <v-card class="py-3 px-4 d-flex align-center justify-center" :color="isFixed.inactive" @click="offFixed" rounded>
                 <span class="hidden-sm-and-down">Unfixed</span>
                 <v-icon right>mdi-pin-off-outline</v-icon>
               </v-card>

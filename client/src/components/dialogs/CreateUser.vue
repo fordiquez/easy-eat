@@ -1,6 +1,6 @@
 <template>
-  <v-dialog v-model="dialog" @input="onCloseDialog" max-width="700px">
-    <v-card flat :loading="loading">
+  <v-dialog v-model="dialog" max-width="700" :fullscreen="$vuetify.breakpoint.xsOnly" @input="onCloseDialog">
+    <v-card :loading="loading">
       <v-card-title>
         <span class="text-h5">Creating a new user account</span>
       </v-card-title>
@@ -86,9 +86,12 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="onCloseDialog">Cancel</v-btn>
-          <v-btn color="blue darken-1" text type="submit" :disabled="($v.$invalid && $v.$error) || loading" :loading="loading">Save</v-btn>
+          <v-btn text color="success" @click="onCloseDialog">Cancel</v-btn>
+          <v-spacer />
+          <v-btn text color="success" type="submit" :disabled="$v.$anyError || loading" :loading="loading">
+            <v-icon color="success" class="mr-1">mdi-account-check</v-icon>
+            <span>Save</span>
+          </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -189,11 +192,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      getAll: 'account/getAll',
-      create: 'account/create',
-      setSnackbar: 'notification/setSnackbar'
-    }),
+    ...mapActions('account', ['getAll', 'create']),
+    ...mapActions('notification', ['setSnackbar']),
     onSubmit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {

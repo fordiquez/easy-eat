@@ -1,17 +1,17 @@
 <template>
-  <div>
+  <v-flex>
     <v-card elevation="5" outlined shaped>
       <v-card-title class="pb-1">
         <v-icon class="mr-1">{{ mealTimeIcon }}</v-icon>
         <label>{{ mealTime }}</label>
       </v-card-title>
-      <v-card-text class="pb-1">
+      <v-card-text class="pb-1" v-if="getApplication.recommended">
         Recommended: {{ recommendedCals | zeroFixed }} cals —
         {{ calsSign === 'left' ? calsLeft : calsOver }} cals {{ calsSign }}
       </v-card-text>
       <v-divider v-if="mealTimeItems.length" />
       <v-list v-if="mealTimeItems.length">
-        <v-list-item-group v-model="selection" color="success">
+        <v-list-item-group v-model="selection">
           <v-list-item v-for="item in mealTimeItems" :key="item.id" @click="onSelectedFoodItem(item)">
             <v-row class="d-flex flex-column flex-sm-row">
               <v-col cols="12" sm="4" md="6" class="d-flex">
@@ -19,7 +19,7 @@
                   <v-img :src="item.image || image" :lazy-src="item.image || image" />
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-title class="text-h6">{{ item.label }}</v-list-item-title>
+                  <v-list-item-title class="text-h6" style="white-space: break-spaces">{{ item.label }}</v-list-item-title>
                   <v-list-item-subtitle>{{ item.category }}</v-list-item-subtitle>
                   <v-list-item-subtitle>{{ item.servings }} {{ item.servings > 1 ? item.measure + 's' : item.measure }}</v-list-item-subtitle>
                 </v-list-item-content>
@@ -27,19 +27,19 @@
               <v-col cols="12" sm="8" md="6" class="d-sm-flex hidden-xs-only">
                 <v-list-item-content class="d-flex flex-column align-center">
                   <v-list-item-title class="text-subtitle-1">Net Carbs</v-list-item-title>
-                  <v-list-item-subtitle class="red--text darken-3 font-weight-bold">{{ item.nutrients.CARBS | fixed }}g</v-list-item-subtitle>
+                  <v-list-item-subtitle class="red--text font-weight-bold">{{ item.nutrients.CARBS | fixed }}g</v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-content class="d-flex flex-column align-center">
                   <v-list-item-title class="text-subtitle-1">Protein</v-list-item-title>
-                  <v-list-item-subtitle class="blue--text darken-3 font-weight-bold">{{ item.nutrients.PROTEIN | fixed }}g</v-list-item-subtitle>
+                  <v-list-item-subtitle class="light-blue--text font-weight-bold">{{ item.nutrients.PROTEIN | fixed }}g</v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-content class="d-flex flex-column align-center">
                   <v-list-item-title class="text-subtitle-1">Fat</v-list-item-title>
-                  <v-list-item-subtitle class="orange--text darken-3 font-weight-bold">{{ item.nutrients.FAT | fixed }}g</v-list-item-subtitle>
+                  <v-list-item-subtitle class="orange--text font-weight-bold">{{ item.nutrients.FAT | fixed }}g</v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-content class="d-flex flex-column align-center">
                   <v-list-item-title class="text-subtitle-1">Cals</v-list-item-title>
-                  <v-list-item-subtitle class="teal--text darken-3 font-weight-bold">{{ item.nutrients.CALS | fixed }}</v-list-item-subtitle>
+                  <v-list-item-subtitle class="teal--text font-weight-bold">{{ item.nutrients.CALS | fixed }}</v-list-item-subtitle>
                 </v-list-item-content>
               </v-col>
             </v-row>
@@ -54,26 +54,26 @@
             <v-col cols="12" sm="8" md="6" xs="2" class="d-flex">
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Net Carbs</v-list-item-title>
-                <v-list-item-subtitle class="red--text darken-3 font-weight-bold">{{ mealTotals.CARBS | fixed }}g</v-list-item-subtitle>
+                <v-list-item-subtitle class="red--text font-weight-bold">{{ mealTotals.CARBS | fixed }}g</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Protein</v-list-item-title>
-                <v-list-item-subtitle class="blue--text darken-3 font-weight-bold">{{ mealTotals.PROTEIN | fixed }}g</v-list-item-subtitle>
+                <v-list-item-subtitle class="light-blue--text font-weight-bold">{{ mealTotals.PROTEIN | fixed }}g</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Fat</v-list-item-title>
-                <v-list-item-subtitle class="orange--text darken-3 font-weight-bold">{{ mealTotals.FAT | fixed }}g</v-list-item-subtitle>
+                <v-list-item-subtitle class="orange--text font-weight-bold">{{ mealTotals.FAT | fixed }}g</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="d-flex flex-column align-center">
                 <v-list-item-title class="text-subtitle-1">Cals</v-list-item-title>
-                <v-list-item-subtitle class="teal--text darken-3 font-weight-bold">{{ mealTotals.CALS | fixed }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="teal--text font-weight-bold">{{ mealTotals.CALS | fixed }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-col>
           </v-row>
         </v-list-item>
       </v-list>
       <v-divider />
-      <v-btn color="success" block text rounded elevation="5" @click="onFoodSearchDialog">
+      <v-btn block text rounded elevation="5" color="success" @click="onFoodSearchDialog">
         <v-icon class="mr-1">mdi-hamburger-plus</v-icon>
         <span>Add {{ mealTime }}</span>
       </v-btn>
@@ -87,7 +87,7 @@
         :item-adding="false"
         @close-dialog="foodItemDialog = false"
     />
-  </div>
+  </v-flex>
 </template>
 
 <script>
@@ -128,6 +128,7 @@ export default {
   computed: {
     ...mapGetters('food', ['getUserFood', 'getDate', 'getMealTimes']),
     ...mapGetters('userData', ['getUserDataValue']),
+    ...mapGetters('application', ['getApplication']),
     mealTimeItems() {
       return this.getUserFood.filter(item => item.mealTime === this.mealTime)
     },

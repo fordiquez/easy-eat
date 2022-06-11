@@ -43,7 +43,7 @@
         <v-col cols="12">
           <v-card-text class="text-uppercase font-weight-bold pb-0 success--text">STEP 2</v-card-text>
           <v-card-title>Macronutrient Goals</v-card-title>
-          <v-card-text>Let's calculate your macronutrient goals based on your preferred diet. Or set your custom goals.</v-card-text>
+          <v-card-text>Calculate your macronutrient goals based on your preferred diet or set your custom goals.</v-card-text>
           <v-divider />
         </v-col>
       </v-row>
@@ -60,10 +60,10 @@
       <v-divider class="mt-5" />
       <v-row>
         <v-col cols="12" class="pb-0">
-          <div class="d-flex flex-row justify-center">
+          <v-flex class="d-flex flex-row justify-center">
             <v-card-text class="my-0 py-0 pl-2 d-flex flex-column">
               <v-subheader class="text-subtitle-1">
-                <v-icon class="mr-1" :color="'#E53935'">mdi-nutrition</v-icon>
+                <v-icon class="mr-1" color="red">mdi-nutrition</v-icon>
                 <label>Net Carbs</label>
               </v-subheader>
               <v-subheader v-if="selectedPlan.title" class="text-subtitle-2 grey--text">
@@ -78,7 +78,7 @@
                   color="success"
                   class="input-number pt-0 mt-0"
                   suffix="g"
-                  append-outer-icon="mdi-plus"
+                  append-outer-icon="mdi-numeric-positive-1"
                   @click:append-outer="increment('CARBS')"
                   :disabled="!isCustomPlan"
                   hide-spin-buttons
@@ -88,20 +88,20 @@
                          :disabled="!isCustomPlan || userData.macros.CARBS <= 0"
                          :style="{ cursor: userData.macros.CARBS <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                          @click="decrement('CARBS')">
-                    <v-icon>mdi-minus</v-icon>
+                    <v-icon>mdi-numeric-negative-1</v-icon>
                   </v-btn>
                 </template>
               </v-text-field>
               <v-subheader class="text-subtitle-1 font-weight-bold" style="color: #E53935">{{ percentageCarbs }}%</v-subheader>
             </v-card-actions>
-          </div>
-          <v-slider v-if="userData.macros.CARBS >= 0" v-model="userData.macros.CARBS" :max="maxCarbs" class="px-5" :color="'#E53935'" :readonly="!isCustomPlan" hide-details />
+          </v-flex>
+          <v-slider v-if="userData.macros.CARBS >= 0" v-model="userData.macros.CARBS" color="red" class="px-5" :max="maxCarbs" :readonly="!isCustomPlan" hide-details />
         </v-col>
         <v-col cols="12" class="pb-0">
-          <div class="d-flex flex-row justify-center">
+          <v-flex class="d-flex flex-row justify-center">
             <v-card-text class="my-0 py-0 pl-2 d-flex flex-column">
               <v-subheader class="text-subtitle-1">
-                <v-icon class="mr-1" :color="'#1565C0'">mdi-nutrition</v-icon>
+                <v-icon class="mr-1" color="light-blue">mdi-nutrition</v-icon>
                 <label>Protein</label>
               </v-subheader>
               <v-subheader v-if="selectedPlan.title" class="text-subtitle-2 grey--text">
@@ -116,7 +116,7 @@
                   color="success"
                   class="input-number pt-0 mt-0"
                   suffix="g"
-                  append-outer-icon="mdi-plus"
+                  append-outer-icon="mdi-numeric-positive-1"
                   @click:append-outer="increment('PROTEIN')"
                   :disabled="!isCustomPlan"
                   hide-spin-buttons
@@ -126,20 +126,20 @@
                          :disabled="!isCustomPlan || userData.macros.PROTEIN <= 0"
                          :style="{ cursor: userData.macros.PROTEIN <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                          @click="decrement('PROTEIN')">
-                    <v-icon>mdi-minus</v-icon>
+                    <v-icon>mdi-numeric-negative-1</v-icon>
                   </v-btn>
                 </template>
               </v-text-field>
-              <v-subheader class="text-subtitle-1 font-weight-bold" style="color: #1565C0">{{ percentageProtein }}%</v-subheader>
+              <v-subheader class="text-subtitle-1 font-weight-bold" style="color: #03A9F4">{{ percentageProtein }}%</v-subheader>
             </v-card-actions>
-          </div>
-          <v-slider v-if="userData.macros.PROTEIN >= 0" v-model="userData.macros.PROTEIN" :max="maxProtein" class="px-5" :color="'#1565C0'" :readonly="!isCustomPlan" hide-details />
+          </v-flex>
+          <v-slider v-if="userData.macros.PROTEIN >= 0" v-model="userData.macros.PROTEIN" color="light-blue" class="px-5" :max="maxProtein" :readonly="!isCustomPlan" hide-details />
         </v-col>
         <v-col cols="12">
-          <div class="d-flex flex-row justify-center">
+          <v-flex class="d-flex flex-row justify-center">
             <v-card-text class="my-0 py-0 pl-2 d-flex flex-column">
               <v-subheader class="text-subtitle-1">
-                <v-icon class="mr-1" :color="'#FF9100'">mdi-nutrition</v-icon>
+                <v-icon class="mr-1" color="orange">mdi-nutrition</v-icon>
                 <label>Fat</label>
               </v-subheader>
               <v-subheader v-if="selectedPlan.title" class="text-subtitle-2 grey--text">
@@ -154,7 +154,7 @@
                   color="success"
                   class="input-number pt-0 mt-0"
                   suffix="g"
-                  append-outer-icon="mdi-plus"
+                  append-outer-icon="mdi-numeric-positive-1"
                   @click:append-outer="increment('FAT')"
                   :disabled="!isCustomPlan"
                   hide-spin-buttons
@@ -164,22 +164,25 @@
                          :disabled="!isCustomPlan || userData.macros.FAT <= 0"
                          :style="{ cursor: userData.macros.FAT <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                          @click="decrement('FAT')">
-                    <v-icon>mdi-minus</v-icon>
+                    <v-icon>mdi-numeric-negative-1</v-icon>
                   </v-btn>
                 </template>
               </v-text-field>
-              <v-subheader class="text-subtitle-1 font-weight-bold" style="color: #FF9100">{{ percentageFat }}%</v-subheader>
+              <v-subheader class="text-subtitle-1 font-weight-bold" style="color: #FF9800">{{ percentageFat }}%</v-subheader>
             </v-card-actions>
-          </div>
-          <v-slider v-if="userData.macros.FAT >= 0" v-model="userData.macros.FAT" :max="maxFat" class="px-5" :color="'#FF9100'" :readonly="!isCustomPlan" hide-details />
+          </v-flex>
+          <v-slider v-if="userData.macros.FAT >= 0" v-model="userData.macros.FAT" color="orange" class="px-5" :max="maxFat" :readonly="!isCustomPlan" hide-details />
         </v-col>
         <v-col cols="12" class="px-10">
-          <v-btn color="success" @click="onCreatePlan" block>Apply meal plan</v-btn>
+          <v-btn block color="success" @click="onCreatePlan">
+            <v-icon class="mr-1">mdi-clipboard-check</v-icon>
+            <span>Apply meal plan</span>
+          </v-btn>
         </v-col>
       </v-row>
     </v-card>
     <template>
-      <div class="text-center">
+      <v-flex class="text-center">
         <v-dialog v-model="caloriesMismatch" width="500">
           <v-card>
             <v-card-title class="text-h5 success">Calories Mismatch</v-card-title>
@@ -192,7 +195,7 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-      </div>
+      </v-flex>
     </template>
   </v-container>
 </template>
@@ -376,7 +379,7 @@ export default {
       })
     },
     onCreatePlan() {
-      if (this.macrosCalories + 20 < this.TDEE || this.macrosCalories - 20 > this.TDEE) this.caloriesMismatch = true
+      if (this.macrosCalories + 25 < this.TDEE || this.macrosCalories - 25 > this.TDEE) this.caloriesMismatch = true
       else {
         this.loading = true
         const payload = {}

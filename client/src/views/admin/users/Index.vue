@@ -10,25 +10,27 @@
         loading-text="Users is loading... Please wait"
     >
       <template v-slot:top>
-        <v-toolbar flat>
+        <v-toolbar>
           <v-toolbar-title>Users</v-toolbar-title>
           <v-divider class="mx-4" inset vertical />
           <v-text-field
               v-model="search"
               append-icon="mdi-magnify"
-              color="success"
-              label="Search"
+              label="Search the user account"
               placeholder="Please enter at least 1 character of the user account email address"
               ref="search"
               @keydown.esc="onSearch"
               @click="onSearch"
-              full-width
+              hide-details
           />
-          <v-btn class="ml-3" color="success" @click="isCreating = true" dark>New Item</v-btn>
+          <v-btn class="ml-3" color="success" @click="isCreating = true">
+            <v-icon class="mr-1">mdi-account-plus</v-icon>
+            <span>Add user</span>
+          </v-btn>
         </v-toolbar>
         <create-user v-if="isCreating" :is-creating="isCreating" @close-dialog="onClose" />
-        <v-dialog v-model="isEditing" max-width="700px">
-          <v-card flat :loading="loading">
+        <v-dialog v-model="isEditing" max-width="700">
+          <v-card :loading="loading">
             <v-card-title>
               <span class="text-h5">{{ editingTitle }}</span>
             </v-card-title>
@@ -82,49 +84,49 @@
               </v-card-text>
 
               <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="onClose">Cancel</v-btn>
-                <v-btn color="blue darken-1" text type="submit" :disabled="($v.$invalid && $v.$error) || loading" :loading="loading">Save</v-btn>
+                <v-btn text color="success" @click="onClose">Cancel</v-btn>
+                <v-spacer />
+                <v-btn color="success" type="submit" :disabled="($v.$invalid && $v.$error) || loading" :loading="loading">Save</v-btn>
               </v-card-actions>
             </v-form>
           </v-card>
         </v-dialog>
-        <v-dialog v-model="isDeleting" max-width="700px">
+        <v-dialog v-model="isDeleting" max-width="700">
           <v-card>
             <v-card-title class="text-h5">{{ deletingTitle }}</v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="onCloseDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="onDeleteUserConfirm">OK</v-btn>
+              <v-btn text color="success" @click="onCloseDelete">Cancel</v-btn>
+              <v-btn text color="red" @click="onDeleteUserConfirm">Confirm</v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
         </v-dialog>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-tooltip bottom color="green accent-3">
+        <v-tooltip bottom color="success">
           <template v-slot:activator="{ on, attrs }">
-            <v-icon small class="mr-2" color="green accent-3" v-bind="attrs" v-on="on" @click="onEditUser(item)">mdi-pencil</v-icon>
+            <v-btn icon color="success" v-on="on" @bind="attrs" :to="{ name: 'UserView', params: { id: item.id } }">
+              <v-icon small>mdi-account-eye</v-icon>
+            </v-btn>
+          </template>
+          <span>View detailed info</span>
+        </v-tooltip>
+        <v-tooltip bottom color="blue">
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon small class="mr-2" color="blue" v-bind="attrs" v-on="on" @click="onEditUser(item)">mdi-account-edit</v-icon>
           </template>
           <span>Edit user account</span>
         </v-tooltip>
         <v-tooltip bottom color="red">
           <template v-slot:activator="{ on, attrs }">
-            <v-icon small color="red" v-bind="attrs" v-on="on" @click="onDeleteUser(item)">mdi-delete</v-icon>
+            <v-icon small color="red" v-bind="attrs" v-on="on" @click="onDeleteUser(item)">mdi-account-remove</v-icon>
           </template>
           <span>Delete user account</span>
         </v-tooltip>
-        <v-tooltip bottom color="primary">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" v-bind="attrs" v-on="on" :to="{ name: 'UserEdit', params: { id: item.id } }" icon>
-              <v-icon small>mdi-eye</v-icon>
-            </v-btn>
-          </template>
-          <span>View detailed info</span>
-        </v-tooltip>
       </template>
       <template v-slot:no-data>
-        <v-btn color="primary" @click="getAll">Reset</v-btn>
+        <v-btn color="success" @click="getAll">Reset</v-btn>
       </template>
     </v-data-table>
   </v-card>
@@ -173,8 +175,11 @@ export default {
       role: ''
     },
   }),
-  async created() {
-    setTimeout(async () => await this.getAll(), 1000)
+  created() {
+    this.getAll().catch(error => {
+      console.log(error.response)
+      this.setSnackbar({ color: 'error', text: error.response.data.message })
+    })
   },
   validations: {
     editedUser: {
@@ -203,7 +208,7 @@ export default {
       return 'Editing user account of ' + this.editedUser.firstName + ' ' + this.editedUser.lastName
     },
     deletingTitle() {
-      return 'Are you really want to delete user account ' + this.editedUser.email + '?'
+      return 'Delete user account ' + this.editedUser.email + '?'
     },
     firstNameErrors() {
       return firstNameErrors(this.$v.editedUser.firstName)
@@ -219,12 +224,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      getAll: 'account/getAll',
-      update: 'account/update',
-      delete: 'account/delete',
-      setSnackbar: 'notification/setSnackbar'
-    }),
+    ...mapActions('notification', ['setSnackbar']),
+    ...mapActions('account', ['getAll', 'update', 'delete']),
     onEditUser(item) {
       this.editedIndex = this.getUsers.indexOf(item)
       this.editedUser = Object.assign({}, item)
@@ -262,11 +263,11 @@ export default {
         this.editedIndex = -1
       })
     },
-    async onSubmit() {
+    onSubmit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loading = true
-        await this.update(this.editedUser).then(response => {
+        this.update(this.editedUser).then(response => {
           console.log(response)
           this.setSnackbar({ color: 'success', text: response.data.message })
           this.onClose()
@@ -278,7 +279,7 @@ export default {
     },
     onSearch() {
       this.isSearching = !this.isSearching
-      !this.isSearching && !this.search.length ? setTimeout(() => this.$refs.search.blur(), 0) : null
+      if (!this.isSearching && !this.search.length) setTimeout(() => this.$refs.search.blur(), 0)
     },
   },
 }

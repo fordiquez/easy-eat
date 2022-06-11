@@ -207,8 +207,9 @@ const update = async (id, params) => {
 
 const _delete = async (id) => {
   const account = await getAccount(id)
-  await db.MealPlan.findByIdAndDelete(id)
+  await db.Food.deleteMany({ accountId: id })
   await db.RefreshToken.deleteMany({ account: id })
+  await db.UserData.findOneAndDelete({ accountId: id })
   await account.remove()
 
   return {

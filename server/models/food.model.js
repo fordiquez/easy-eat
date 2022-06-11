@@ -9,7 +9,7 @@ const schema = new Schema({
   servings: Number,
   label: String,
   category: String,
-  foodContentsLabel: Array,
+  healthLabels: Array,
   image: String,
   nutrients: Object,
   created: { type: Date, default: Date.now() },

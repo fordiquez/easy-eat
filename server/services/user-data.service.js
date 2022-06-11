@@ -42,7 +42,8 @@ const getUserData = async (accountId) => {
   if (!db.isValidId(accountId)) throw 'User data not found'
   const userData = await db.UserData.findOne({ accountId }).populate('selectedPlan')
   if (!userData) throw 'User data not found'
-  if (userData.customProportions) userData.selectedPlan.proportions = userData.customProportions
+  if (userData.customProportions && userData.selectedPlan) userData.selectedPlan.proportions = userData.customProportions
+  else if (!userData.selectedPlan) userData.selectedPlan = null
   return userData
 }
 

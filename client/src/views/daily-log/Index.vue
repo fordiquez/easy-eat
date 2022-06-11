@@ -28,7 +28,7 @@
       <v-col cols="2" sm="2" md="2">
         <v-speed-dial v-model="fab" absolute right top direction="bottom" class="mr-5" transition="scroll-x-transition">
           <template v-slot:activator>
-            <v-btn v-model="fab" color="green accent-4" dark fab>
+            <v-btn v-model="fab" color="green accent-4" fab>
               <v-icon v-if="fab">mdi-close</v-icon>
               <v-icon v-else>mdi-plus</v-icon>
             </v-btn>
@@ -53,77 +53,77 @@
       </v-col>
     </v-row>
     <v-row class="justify-center">
-      <v-col cols="12" sm="6" md="4" lg="3" class="d-flex flex-column align-center">
+      <v-col v-if="getApplication.dailyMacrosPie" cols="12" sm="6" md="4" lg="3" class="d-flex flex-column align-center">
         <v-card-title class="justify-center py-0">My Macros</v-card-title>
         <daily-macros-pie v-if="getDailyMacros.CALS" />
-        <div v-else class="mt-5 grey darken-3 rounded-circle" style="width: 175px; height: 175px" />
+        <v-flex v-else class="mt-5 grey darken-3 rounded-circle" style="width: 175px; height: 175px" />
       </v-col>
-      <v-col cols="12" sm="10" md="4" lg="6" class="flex justify-center" :class="$vuetify.breakpoint.smAndDown ? 'order-1' : ''">
-        <div class="d-flex justify-space-between">
+      <v-col v-if="getApplication.tracker" cols="12" sm="10" md="4" lg="6" class="justify-center" :class="$vuetify.breakpoint.smAndDown ? 'order-1' : ''">
+        <v-flex class="d-flex justify-space-between">
           <v-card-text class="pa-0">
-            <v-icon class="mr-1" color="red darken-1">mdi-nutrition</v-icon>
+            <v-icon class="mr-1" color="red">mdi-nutrition</v-icon>
             <label class="text-subtitle-2">Net Carbs</label>
           </v-card-text>
           <v-card-text class="pa-0" style="max-width: max-content">
-            <label class="font-weight-bold red--text darken-1">{{ getDailyMacros.CARBS | zeroFixed }}</label>
+            <label class="font-weight-bold red--text">{{ getDailyMacros.CARBS | zeroFixed }}</label>
             <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text"> / {{ userMacrosCarbs }}g</label>
           </v-card-text>
-        </div>
-        <v-progress-linear class="mb-3 mt-2" color="red darken-1" :value="dailyPercentageCarbs" height="15" rounded>
+        </v-flex>
+        <v-progress-linear class="mb-3 mt-2" color="red" :value="dailyPercentageCarbs" height="15" rounded>
           <label class="text-subtitle-2 font-italic blue-grey--text text--lighten-5">
             {{ carbsSign === 'left' ? carbsLeft : carbsOver }}g {{ carbsSign }}
           </label>
         </v-progress-linear>
-        <div class="d-flex justify-space-between">
+        <v-flex class="d-flex justify-space-between">
           <v-card-text class="pa-0">
-            <v-icon class="mr-1" color="blue darken-3">mdi-nutrition</v-icon>
+            <v-icon class="mr-1" color="light-blue">mdi-nutrition</v-icon>
             <label class="text-subtitle-2">Protein</label>
           </v-card-text>
           <v-card-text class="pa-0" style="max-width: max-content">
-            <label class="font-weight-bold blue--text darken-3">{{ getDailyMacros.PROTEIN | zeroFixed }}</label>
+            <label class="font-weight-bold light-blue--text">{{ getDailyMacros.PROTEIN | zeroFixed }}</label>
             <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text"> / {{ userMacrosProtein }}g</label>
           </v-card-text>
-        </div>
-        <v-progress-linear class="mb-3 mt-2" color="blue darken-3" :value="dailyPercentageProtein" height="15" rounded>
+        </v-flex>
+        <v-progress-linear class="mb-3 mt-2" color="light-blue" :value="dailyPercentageProtein" height="15" rounded>
           <label class="text-subtitle-2 font-italic blue-grey--text text--lighten-5">
             {{ proteinSign === 'left' ? proteinLeft : proteinOver }}g {{ proteinSign }}
           </label>
         </v-progress-linear>
-        <div class="d-flex justify-space-between">
+        <v-flex class="d-flex justify-space-between">
           <v-card-text class="pa-0">
-            <v-icon class="mr-1" color="orange darken-3">mdi-nutrition</v-icon>
+            <v-icon class="mr-1" color="orange">mdi-nutrition</v-icon>
             <label class="text-subtitle-2">Fat</label>
           </v-card-text>
           <v-card-text class="pa-0" style="max-width: max-content">
-            <label class="font-weight-bold orange--text darken-3">{{ getDailyMacros.FAT | zeroFixed }}</label>
+            <label class="font-weight-bold orange--text">{{ getDailyMacros.FAT | zeroFixed }}</label>
             <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text"> / {{ userMacrosFat }}g</label>
           </v-card-text>
-        </div>
-        <v-progress-linear class="mb-3 mt-2" color="orange darken-3" :value="dailyPercentageFat" height="15" rounded>
+        </v-flex>
+        <v-progress-linear class="mb-3 mt-2" color="orange" :value="dailyPercentageFat" height="15" rounded>
           <label class="text-subtitle-2 font-italic blue-grey--text text--lighten-5">
             {{ fatSign === 'left' ? fatLeft : fatOver }}g {{ fatSign }}
           </label>
         </v-progress-linear>
-        <div class="d-flex justify-space-between">
+        <v-flex class="d-flex justify-space-between">
           <v-card-text class="pa-0">
             <v-icon class="mr-1" color="teal">mdi-nutrition</v-icon>
             <label class="text-subtitle-2">Calories</label>
           </v-card-text>
           <v-card-text class="pa-0" style="max-width: max-content">
-            <label class="font-weight-bold teal--text darken-3">{{ getDailyMacros.CALS | zeroFixed }}</label>
+            <label class="font-weight-bold teal--text">{{ getDailyMacros.CALS | zeroFixed }}</label>
             <label class="pa-0 mr-2 text-subtitle-2 font-italic grey--text"> / {{ userCals }}</label>
           </v-card-text>
-        </div>
+        </v-flex>
         <v-progress-linear class="mb-3 mt-2" color="teal" :value="dailyPercentageCals" height="15" rounded>
           <label class="text-subtitle-2 font-italic blue-grey--text text--lighten-5">
             {{ calsSign === 'left' ? calsLeft : calsOver }} {{ calsSign }}
           </label>
         </v-progress-linear>
       </v-col>
-      <v-col cols="12" sm="6" md="4" lg="3" class="d-flex flex-column align-center">
+      <v-col v-if="getApplication.macrosGoalsPie" cols="12" sm="6" md="4" lg="3" class="d-flex flex-column align-center">
         <v-card-title class="justify-center py-0">My Goals</v-card-title>
         <macros-goals-pie v-if="isSelectedPlan" />
-        <div v-else class="mt-5 grey darken-3 rounded-circle" style="width: 175px; height: 175px" />
+        <v-flex v-else class="mt-5 grey darken-3 rounded-circle" style="width: 175px; height: 175px" />
       </v-col>
     </v-row>
     <v-row>
@@ -216,6 +216,7 @@ export default {
   computed: {
     ...mapGetters('food', ['getUserFood', 'getDailyMacros']),
     ...mapGetters('userData', ['getUserData']),
+    ...mapGetters('application', ['getApplication']),
     greetingsTitle() {
       return this.user ? `Good ${this.timeOfDay(moment().hours())}, ` + this.user.firstName + '!' : 'Good' + this.timeOfDay(moment().hours())
     },
@@ -336,7 +337,6 @@ export default {
             this.setAlert({ type: 'info', text: 'To continue using this service, we need to collect data about you and prepare it for the formation and setting of goals for daily calories and macronutrients.' })
           })
         } else if (!this.userData?.TDEE || !this.userData?.macros || !this.userData?.selectedPlan) {
-          console.log('Not enough user data 2')
           this.$router.push({ name: 'MealPlan' }).then(() => {
             this.setSnackbar({ color: 'error', text: 'Not enough user data' })
             this.setAlert({ type: 'info', text: 'To continue using this service, you need to set your daily calorie and macronutrient goals.' })
@@ -382,9 +382,6 @@ export default {
   filters: {
     moment(date) {
       return moment(date).format('ddd MMM D');
-    },
-    fixed(number) {
-      return number > 0 ? number.toFixed(2) : 0
     },
     zeroFixed(number) {
       return number > 0 ? number.toFixed(0) : 0

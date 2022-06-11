@@ -5,17 +5,22 @@ const state = () => ({
     clipped: false,
     drawer: false,
     fixed: false,
-    miniVariant: false
+    miniVariant: false,
+    dailyMacrosPie: true,
+    macrosGoalsPie: true,
+    tracker: true,
+    recommended: true,
   }
 });
 
 const getters = {
-  getApplication: (state) => state.application
+  getApplication: state => state.application
 }
 
 const actions = {
-  init: ({ commit, state }, application) => {
-    const requiredFields = application || state.application
+  init: ({ commit, state }) => {
+    state.loading = true
+    const requiredFields = state.application
     const undefinedFields = {}
     const definedFields = {}
     const storageApplication = getApplication()
@@ -36,6 +41,7 @@ const actions = {
     } else {
       commit('SET_STORAGE_FIELDS', requiredFields)
     }
+    state.loading = false
   },
   update: ({ commit }, application) => {
     commit('SET_STORAGE_FIELDS', application)

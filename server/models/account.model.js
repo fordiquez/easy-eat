@@ -17,7 +17,6 @@ const schema = new Schema({
     token: String,
     expires: Date
   },
-  acceptedTerms: Boolean,
   verified: Date,
   created: { type: Date, default: Date.now },
   updated: Date,
@@ -31,7 +30,6 @@ schema.set('toJSON', {
   virtuals: true,
   versionKey: false,
   transform: function (doc, ret) {
-    // remove these props when object is serialized
     delete ret._id;
     delete ret.passwordHash;
   }

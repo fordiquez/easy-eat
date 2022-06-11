@@ -15,14 +15,15 @@
                 @blur="$v.email.$touch()"
                 @input="$v.email.$touch()" />
           </v-col>
-
-          <v-col cols="12">
-            <v-card-actions>
-              <v-btn class="mr-4" :loading="loading" :disabled="loading" color="success" type="submit">Reset</v-btn>
-              <v-btn class="mr-4" color="primary" :to="{ name: 'Login' }">Cancel</v-btn>
-            </v-card-actions>
-          </v-col>
         </v-row>
+        <v-card-actions>
+          <v-btn color="success" :loading="loading" :disabled="loading || $v.email.$anyError" type="submit">
+            <v-icon class="mr-1">mdi-lock-reset</v-icon>
+            <span>Reset Password</span>
+          </v-btn>
+          <v-spacer />
+          <v-btn text color="success" :to="{ name: 'Login' }">Cancel</v-btn>
+        </v-card-actions>
       </v-container>
     </v-form>
   </v-card>

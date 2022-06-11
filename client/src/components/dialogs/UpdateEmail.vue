@@ -1,6 +1,6 @@
 <template>
-  <v-dialog v-model="isDialog" @input="onCloseDialog" max-width="500px">
-    <v-card :loading="loading" flat>
+  <v-dialog v-model="isDialog" @input="onCloseDialog" max-width="500">
+    <v-card :loading="loading">
       <v-card-title>
         <span class="text-h5">Update e-mail address</span>
       </v-card-title>
@@ -39,17 +39,9 @@
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-btn color="blue darken-1" @click="onCloseDialog" text large>Cancel</v-btn>
+          <v-btn text color="success" @click="onCloseDialog">Cancel</v-btn>
           <v-spacer />
-          <v-btn
-              color="blue darken-1"
-              type="submit"
-              :disabled="($v.$invalid && $v.$error) || loading"
-              :loading="loading"
-              large text
-          >
-            Save
-          </v-btn>
+          <v-btn text type="submit" color="success" :disabled="($v.$invalid && $v.$error) || loading" :loading="loading">Update</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>

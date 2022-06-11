@@ -16,7 +16,6 @@
             <v-text-field
                 v-model="foodItem.label"
                 :error-messages="foodLabelErrors"
-                color="success"
                 label="Food label"
                 prepend-icon="mdi-label"
                 @blur="$v.foodItem.label.$touch()"
@@ -27,7 +26,6 @@
             <v-text-field
                 v-model="foodItem.image"
                 :error-messages="foodImageErrors"
-                color="success"
                 label="Food image"
                 placeholder="Input the food image link"
                 prepend-icon="mdi-link-plus"
@@ -45,17 +43,50 @@
             <v-card-text class="text-subtitle-2 pt-0">Food category</v-card-text>
             <v-slide-group v-model="foodItem.category" show-arrows mandatory>
               <v-slide-item v-for="category in getCategories" :key="category.value" v-slot="{ active, toggle }">
-                <v-btn class="mx-2" active-class="success" :input-value="active" depressed rounded @click="toggle">{{ category.title }}</v-btn>
+                <v-tooltip top color="success" max-width="500" close-delay="200" open-on-click>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="mx-2" active-class="success" v-on="on" @bind="attrs" :input-value="active" depressed rounded @click="toggle">{{ category.title }}</v-btn>
+                  </template>
+                  <span>{{ category.description }}</span>
+                </v-tooltip>
               </v-slide-item>
             </v-slide-group>
+          </v-col>
+          <v-col cols="12">
+            <v-card-text class="text-subtitle-2 pt-0">Select the health labels</v-card-text>
+            <v-autocomplete
+                v-model="foodItem.healthLabels" :items="getHealthLabels"
+                label="Select options" item-text="title" item-value="value"
+                filled chips multiple clearable hide-details single-line
+            >
+              <template v-slot:selection="data">
+                <v-tooltip top max-width="500" color="success" close-delay="200" open-delay="200">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-chip color="success" v-on="on" @bind="data.attrs && attrs" :input-value="data.selected" @click="data.select" @click:close="remove(data.item)" close>
+                      {{ data.item.title }}
+                    </v-chip>
+                  </template>
+                  <span>{{ data.item.description }}</span>
+                </v-tooltip>
+              </template>
+              <template v-slot:item="data">
+                <template v-if="typeof data.item !== 'object'">
+                  <v-list-item-content v-text="data.item" />
+                </template>
+                <template v-else>
+                  <v-list-item-content style="max-width: 485px">
+                    <v-list-item-title v-text="data.item.title" />
+                    <v-list-item-subtitle v-text="data.item.description" style="white-space: break-spaces" />
+                  </v-list-item-content>
+                </template>
+              </template>
+            </v-autocomplete>
           </v-col>
         </v-row>
         <v-card-text class="text-subtitle-1 white--text">Servings</v-card-text>
         <v-row class="mx-auto">
           <v-col cols="12" sm="6">
             <v-select
-                color="success"
-                item-color="success"
                 label="Serving size"
                 v-model="foodItem.measure"
                 :items="measures"
@@ -67,7 +98,6 @@
                 :error-messages="foodServingsErrors"
                 class="input-number"
                 type="number"
-                color="success"
                 label="Servings"
                 :suffix="suffix"
                 @blur="$v.foodItem.servings.$touch()"
@@ -80,12 +110,12 @@
                        :disabled="foodItem.servings <= 0"
                        :style="{ cursor: foodItem.servings <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                        @click="decrement">
-                  <v-icon>mdi-minus</v-icon>
+                  <v-icon>mdi-numeric-negative-1</v-icon>
                 </v-btn>
               </template>
               <template v-slot:append-outer>
                 <v-btn icon color="success" @click="increment">
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-numeric-positive-1</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -102,7 +132,6 @@
                 :error-messages="foodNutrientsCALSErrors"
                 class="input-number"
                 type="number"
-                color="success"
                 label="Calories"
                 suffix="cals"
                 @blur="$v.foodItem.nutrients.CALS.$touch()"
@@ -114,18 +143,18 @@
                 <v-btn icon color="success" :disabled="foodItem.nutrients.CALS <= 0"
                        :style="{ cursor: foodItem.nutrients.CALS <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                        @click="decrement('CALS')">
-                  <v-icon>mdi-minus</v-icon>
+                  <v-icon>mdi-numeric-negative-1</v-icon>
                 </v-btn>
               </template>
               <template v-slot:append-outer>
                 <v-btn icon color="success" @click="increment('CALS')">
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-numeric-positive-1</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
           </v-col>
           <v-col cols="1" class="d-flex justify-center align-center pl-5">
-            <v-icon color="red darken-1">mdi-nutrition</v-icon>
+            <v-icon color="red">mdi-nutrition</v-icon>
           </v-col>
           <v-col cols="11" class="pl-0">
             <v-text-field
@@ -133,7 +162,6 @@
                 :error-messages="foodNutrientsCARBSErrors"
                 class="input-number"
                 type="number"
-                color="success"
                 label="Net Carbs"
                 suffix="g"
                 @blur="$v.foodItem.nutrients.CARBS.$touch()"
@@ -145,18 +173,18 @@
                 <v-btn icon color="success" :disabled="foodItem.nutrients.CARBS <= 0"
                        :style="{ cursor: foodItem.nutrients.CARBS <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                        @click="decrement('CARBS')">
-                  <v-icon>mdi-minus</v-icon>
+                  <v-icon>mdi-numeric-negative-1</v-icon>
                 </v-btn>
               </template>
               <template v-slot:append-outer>
                 <v-btn icon color="success" @click="increment('CARBS')">
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-numeric-positive-1</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
           </v-col>
           <v-col cols="1" class="d-flex justify-center align-center pl-5">
-            <v-icon color="blue darken-3">mdi-nutrition</v-icon>
+            <v-icon color="light-blue">mdi-nutrition</v-icon>
           </v-col>
           <v-col cols="11" class="pl-0">
             <v-text-field
@@ -164,7 +192,6 @@
                 :error-messages="foodNutrientsPROTEINErrors"
                 class="input-number"
                 type="number"
-                color="success"
                 label="Protein"
                 suffix="g"
                 @blur="$v.foodItem.nutrients.PROTEIN.$touch()"
@@ -176,18 +203,18 @@
                 <v-btn icon color="success" :disabled="foodItem.nutrients.PROTEIN <= 0"
                        :style="{ cursor: foodItem.nutrients.PROTEIN <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                        @click="decrement('PROTEIN')">
-                  <v-icon>mdi-minus</v-icon>
+                  <v-icon>mdi-numeric-negative-1</v-icon>
                 </v-btn>
               </template>
               <template v-slot:append-outer>
                 <v-btn icon color="success" @click="increment('PROTEIN')">
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-numeric-positive-1</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
           </v-col>
           <v-col cols="1" class="d-flex justify-center align-center pl-5">
-            <v-icon color="orange darken-3">mdi-nutrition</v-icon>
+            <v-icon color="orange">mdi-nutrition</v-icon>
           </v-col>
           <v-col cols="11" class="pl-0">
             <v-text-field
@@ -195,7 +222,6 @@
                 :error-messages="foodNutrientsFATErrors"
                 class="input-number"
                 type="number"
-                color="success"
                 label="Fat"
                 suffix="g"
                 @blur="$v.foodItem.nutrients.FAT.$touch()"
@@ -207,12 +233,12 @@
                 <v-btn icon color="success" :disabled="foodItem.nutrients.FAT <= 0"
                        :style="{ cursor: foodItem.nutrients.FAT <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                        @click="decrement('FAT')">
-                  <v-icon>mdi-minus</v-icon>
+                  <v-icon>mdi-numeric-negative-1</v-icon>
                 </v-btn>
               </template>
               <template v-slot:append-outer>
                 <v-btn icon color="success" @click="increment('FAT')">
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-numeric-positive-1</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -233,9 +259,9 @@
       </v-card-text>
       <v-divider class="mx-4" />
       <v-card-actions>
-        <v-btn color="success" text large @click="onClose">Cancel</v-btn>
+        <v-btn text large color="success" @click="onClose">Cancel</v-btn>
         <v-spacer />
-        <v-btn color="success" text large @click="onAddFood" :disabled="this.$v.$anyError" :loading="loading">Save</v-btn>
+        <v-btn text large color="success" @click="onAddFood" :disabled="this.$v.$anyError" :loading="loading">Save</v-btn>
       </v-card-actions>
     </v-card>
     <v-dialog v-model="previewImage" scrollable>
@@ -246,7 +272,7 @@
         </v-card-text>
         <v-divider />
         <v-card-actions>
-          <v-btn color="success" outlined block @click="previewImage = false">Close</v-btn>
+          <v-btn outlined block color="success" @click="previewImage = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -275,9 +301,9 @@ export default {
     measures: ['gram', 'kilogram', 'milliliter', 'liter'],
     foodItem: {
       label: '',
-      category: '',
       image: '',
-      mealTime: '',
+      category: '',
+      healthLabels: [],
       measure: 'gram',
       servings: null,
       nutrients: {
@@ -285,7 +311,8 @@ export default {
         CARBS: null,
         PROTEIN: null,
         FAT: null
-      }
+      },
+      mealTime: '',
     }
   }),
   created() {
@@ -330,7 +357,7 @@ export default {
   },
   computed: {
     ...mapGetters('account', ['getUserValue']),
-    ...mapGetters('food', ['getDate', 'getMealTime', 'getMealTimes', 'getCategories']),
+    ...mapGetters('food', ['getDate', 'getMealTime', 'getMealTimes', 'getCategories', 'getHealthLabels']),
     cursorType() {
       return this.foodItem.servings <= 0 ? 'not-allowed' : 'pointer'
     },
@@ -393,6 +420,10 @@ export default {
       if (typeof property === 'string') this.foodItem.nutrients[property] -= 1
       else this.foodItem.servings -= 1
     },
+    remove(item) {
+      const index = this.foodItem.healthLabels.indexOf(item.value)
+      if (index >= 0) this.foodItem.healthLabels.splice(index, 1)
+    },
     onAddFood() {
       this.$v.$touch()
       if (!this.$v.$invalid) {
@@ -428,7 +459,6 @@ export default {
     setNutrients() {
       if (this.foodItem.servings > 0) {
         const oneUnits = this.oneUnits()
-        console.log(oneUnits)
         this.foodItem.nutrients.CALS = parseInt(oneUnits.CALS * this.foodItem.servings * this.coefficient, 10)
         this.foodItem.nutrients.CARBS = parseInt(oneUnits.CARBS * this.foodItem.servings * this.coefficient, 10)
         this.foodItem.nutrients.PROTEIN = parseInt(oneUnits.PROTEIN * this.foodItem.servings * this.coefficient, 10)

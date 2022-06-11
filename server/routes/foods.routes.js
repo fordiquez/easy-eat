@@ -7,5 +7,6 @@ router.get('/', authorize(), foodsController.get);
 router.post('/', authorize(), foodsController.createSchema, foodsController.create);
 router.put('/:id', authorize(), foodsController.updateSchema, foodsController.update);
 router.delete('/:id', authorize(), foodsController.delete);
+router.delete('/', authorize(), foodsController.bulkDelete);
 
 module.exports = router

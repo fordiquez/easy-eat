@@ -39,9 +39,6 @@ const actions = {
   logout: async ({ commit }) => {
     return accountService.logout().finally(() => {
       commit('LOGOUT_USER')
-      // dispatch('food/clearUserFood', { root: true })
-      // commit('userData/CLEAR_USER_DATA', { root: true })
-      // commit('mealPlan/CLEAR_SELECTED_PLAN', { root: true })
     })
   },
   // eslint-disable-next-line no-empty-pattern

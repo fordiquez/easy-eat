@@ -29,13 +29,22 @@
                 @blur="$v.form.password.$touch()"
                 @input="$v.form.password.$touch()" />
           </v-col>
-
-          <v-col cols="12">
-            <v-btn class="mr-4" color="success" :loading="loading" :disabled="loading" type="submit">Log In</v-btn>
-            <v-btn class="mr-4" color="primary" :to="{ name: 'Register' }">Sign Up</v-btn>
-            <v-btn class="mr-4" color="error" :to="{ name: 'ForgotPassword' }">Forgot Password</v-btn>
-          </v-col>
         </v-row>
+        <v-card-actions>
+          <v-btn color="success" class="mr-4" :loading="loading" :disabled="loading || $v.form.$anyError" type="submit">
+            <v-icon class="mr-1">mdi-login</v-icon>
+            <span>Log In</span>
+          </v-btn>
+          <v-btn text color="success" :to="{ name: 'Register' }">
+            <v-icon class="mr-1">mdi-account-plus</v-icon>
+            <span>Sign Up</span>
+          </v-btn>
+          <v-spacer />
+          <v-btn text color="red" :to="{ name: 'ForgotPassword' }">
+            <v-icon class="mr-1">mdi-lock-reset</v-icon>
+            <span>Forgot Password</span>
+          </v-btn>
+        </v-card-actions>
       </v-container>
     </v-form>
   </v-card>

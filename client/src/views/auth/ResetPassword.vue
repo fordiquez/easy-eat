@@ -36,27 +36,29 @@
                 @input="$v.form.passwordConfirm.$touch()"
             />
           </v-col>
-
-          <v-col cols="12">
-            <v-card-actions>
-              <v-btn class="mr-4" color="success" type="submit" :loading="loading" :disabled="loading">
-                Reset
-              </v-btn>
-              <v-btn class="mr-4" color="primary" :to="{ name: 'Login' }">Cancel</v-btn>
-            </v-card-actions>
-          </v-col>
         </v-row>
+        <v-card-actions>
+          <v-btn color="success" type="submit" :loading="loading" :disabled="loading">
+            <v-icon class="mr-1">mdi-lock-reset</v-icon>
+            <span>Reset Password</span>
+          </v-btn>
+          <v-spacer />
+          <v-btn text color="success" :to="{ name: 'Login' }">Cancel</v-btn>
+        </v-card-actions>
       </v-container>
     </v-form>
     <template v-else>
       <v-card-subtitle class="text-subtitle-2 pb-0">Token validation failed</v-card-subtitle>
       <v-card-text class="text-button text--primary">
         <span>If the token has expired you can get a new one at the</span>
-        <v-btn color="primary" :to="{ name: 'ForgotPassword' }" plain text>forgot password</v-btn>
+        <v-btn color="success" :to="{ name: 'ForgotPassword' }" plain text>forgot password</v-btn>
         <span>page</span>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="primary" :to="{ name: 'Login' }" text>Sign in</v-btn>
+        <v-btn color="success" :to="{ name: 'Login' }" text>
+          <v-icon class="mr-1">mdi-login</v-icon>
+          <span>Log In</span>
+        </v-btn>
       </v-card-actions>
     </template>
   </v-card>
@@ -81,10 +83,10 @@ export default {
       passwordConfirm: ''
     }
   }),
-  async mounted() {
+  created() {
     const { token } = this.$route.query
     this.form.token = token
-    await this.validate(token)
+    this.validate(token)
   },
   validations: {
     form: {
@@ -110,12 +112,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      validateResetToken: 'account/validateResetToken',
-      resetPassword: 'account/resetPassword',
-      setAlert: 'notification/setAlert',
-      setSnackbar: 'notification/setSnackbar'
-    }),
+    ...mapActions('account', ['validateResetToken', 'resetPassword']),
+    ...mapActions('notification', ['setAlert', 'setSnackbar']),
     validate(token) {
       if (token) {
         this.loading = true

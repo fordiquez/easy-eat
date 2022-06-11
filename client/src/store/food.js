@@ -249,10 +249,17 @@ const actions = {
       return response
     })
   },
-  async delete({ commit }, id) {
-    return await foodService.delete(id).then(response => {
-      commit('DELETE_DAILY_MACROS', id)
-      commit('DELETE_USER_FOOD', id)
+  async delete({ commit }, selectedFood) {
+    return await foodService.delete(selectedFood.id, { accountId: selectedFood.accountId }).then(response => {
+      commit('DELETE_DAILY_MACROS', selectedFood.id)
+      commit('DELETE_USER_FOOD', selectedFood.id)
+      return response
+    })
+  },
+  async bulkDelete({ commit }, params) {
+    return await foodService.bulkDelete(params).then(response => {
+      commit('CLEAR_DAILY_MACROS')
+      commit('CLEAR_USER_FOOD')
       return response
     })
   },

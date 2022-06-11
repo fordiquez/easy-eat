@@ -8,7 +8,7 @@ import Register from "@/views/auth/Register"
 import ForgotPassword from "@/views/auth/ForgotPassword"
 import VerifyEmail from "@/views/auth/VerifyEmail"
 import ResetPassword from "@/views/auth/ResetPassword"
-import UserEdit from "@/views/admin/users/Edit"
+import UserView from "@/views/admin/users/Show"
 import Settings from "@/views/settings/Index"
 import Profile from "@/views/settings/Profile"
 import Account from "@/views/settings/Account"
@@ -101,9 +101,9 @@ const routes = [
         meta: { authorized: [Role.Admin] }
       },
       {
-        path: 'users/edit/:id',
-        name: 'UserEdit',
-        component: UserEdit,
+        path: 'users/view/:id',
+        name: 'UserView',
+        component: UserView,
         meta: { authorized: [Role.Admin] }
       }
     ]

@@ -4,11 +4,14 @@
     <v-card-subtitle class="pb-0">Verification failed</v-card-subtitle>
     <v-card-text class="text--primary text-button">
       <span>if you don't have a verification token try to restore the account using the</span>
-      <v-btn color="primary" :to="{ name: 'ForgotPassword' }" plain text>forgot password</v-btn>
+      <v-btn text plain color="success" :to="{ name: 'ForgotPassword' }">forgot password</v-btn>
       <span>page</span>
     </v-card-text>
     <v-card-actions>
-      <v-btn color="primary" :to="{ name: 'Login' }" text>Sign in</v-btn>
+      <v-btn text color="success" :to="{ name: 'Login' }">
+        <v-icon class="mr-1">mdi-login</v-icon>
+        <span>Log In</span>
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>

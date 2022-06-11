@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="account" flat>
+  <v-card v-if="account">
     <v-card-title>
       <span class="text-h5">Account Settings</span>
     </v-card-title>
@@ -13,7 +13,7 @@
               :loading="updateEmailDialog"
               readonly disabled>
             <template v-slot:append>
-              <v-btn color="success" class="mb-2" @click="updateEmailDialog = true" text>Update Email</v-btn>
+              <v-btn text color="success" class="mb-2" @click="updateEmailDialog = true">Update Email</v-btn>
             </template>
           </v-text-field>
         </v-col>
@@ -29,7 +29,7 @@
               :loading="updatePasswordDialog"
               readonly disabled>
             <template v-slot:append>
-              <v-btn color="success" class="mb-2" @click="updatePasswordDialog = true" text>Update Password</v-btn>
+              <v-btn text color="success" class="mb-2" @click="updatePasswordDialog = true">Update Password</v-btn>
             </template>
           </v-text-field>
         </v-col>
@@ -61,22 +61,21 @@
         @close-dialog="updatePasswordDialog = false"
     />
     <template>
-      <div class="text-center">
-        <v-dialog v-model="deleteDialog" max-width="500">
-          <v-card>
-            <v-form @submit.prevent="onDelete">
-              <v-card-title class="text-h5">Delete Account</v-card-title>
-              <v-card-text>{{ deleteText }}</v-card-text>
-              <v-text-field v-model="deleteField" class="px-5" label="Please type in delete to confirm" color="success" />
-              <v-divider></v-divider>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="success" text :disabled="deleteField !== 'delete'" type="submit">I accept</v-btn>
-              </v-card-actions>
-            </v-form>
-          </v-card>
-        </v-dialog>
-      </div>
+      <v-dialog v-model="deleteDialog" max-width="500">
+        <v-card>
+          <v-form @submit.prevent="onDelete">
+            <v-card-title class="text-h5">Delete Account</v-card-title>
+            <v-card-text>{{ deleteText }}</v-card-text>
+            <v-text-field v-model="deleteField" class="px-5" label="Please type in «delete account» to confirm the action" />
+            <v-divider></v-divider>
+            <v-card-actions>
+              <v-btn text color="success" @click="deleteDialog = false">Cancel</v-btn>
+              <v-spacer></v-spacer>
+              <v-btn text color="success" :disabled="deleteField !== 'delete account'" type="submit">I accept</v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card>
+      </v-dialog>
     </template>
   </v-card>
 </template>
@@ -85,7 +84,7 @@
 import { validationMixin } from "vuelidate";
 import UpdateEmailDialog from "@/components/dialogs/UpdateEmail";
 import UpdatePasswordDialog from "@/components/dialogs/UpdatePassword";
-import {mapActions} from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   name: "AccountSettings",
@@ -106,7 +105,7 @@ export default {
     deleteText: 'Select this option if you wish to delete your account and all of your data. Please be aware that once your account is deleted you will no longer have access to it. This action cannot be undone.',
     deleteField: null
   }),
-  mounted() {
+  created() {
     this.account = this.user
   },
   methods: {

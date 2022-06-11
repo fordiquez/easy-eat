@@ -5,7 +5,7 @@
         <v-col class="d-flex align-center justify-space-between">
           <v-card-title class="text-h5 py-0">My Profile</v-card-title>
           <v-subheader v-if="status" class="text-subtitle-1 grey--text">
-            <v-progress-circular indeterminate size="25" color="success" />
+            <v-progress-circular indeterminate size="25" />
             <label class="ml-2" v-text="status" />
           </v-subheader>
         </v-col>
@@ -17,7 +17,7 @@
                    :alt="profile.firstName + ' ' + profile.lastName"
                    :title="profile.firstName + ' ' + profile.lastName"
             />
-            <v-icon color="success" size="100" v-else>mdi-account-circle</v-icon>
+            <v-icon v-else color="success" size="100">mdi-account-circle</v-icon>
           </v-avatar>
         </v-col>
         <v-col xl="3" lg="4" md="5" sm="9">
@@ -26,49 +26,48 @@
               accept="image/png, image/jpeg, image/bmp"
               placeholder="Pick an avatar"
               label="Avatar"
-              color="success"
               prepend-icon="mdi-camera-account"
               show-size
               @change="selectImage"
               ref="avatar"
           />
-          <v-btn v-if="previewImageUrl" outlined block color="success" @click="previewImage = true">
+          <v-btn v-if="previewImageUrl" color="success" outlined block @click="previewImage = true">
             <v-icon class="mr-1">mdi-image-search</v-icon>
             <span>Preview</span>
           </v-btn>
-          <v-btn color="success" class="mt-2" block :loading="loadingUpload" :disabled="loadingUpload" @click="upload">
+          <v-btn class="mt-2" color="success" block :loading="loadingUpload" :disabled="loadingUpload" @click="upload">
             <v-icon class="mr-1">mdi-cloud-upload</v-icon>
             <span>Upload</span>
           </v-btn>
-          <div v-if="progress" class="mt-2">
-            <v-progress-linear v-model="progress" color="success" height="20" reactive>
+          <v-flex v-if="progress" class="mt-2">
+            <v-progress-linear v-model="progress" height="20" reactive>
               <strong>{{ progress }} %</strong>
             </v-progress-linear>
-          </div>
+          </v-flex>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12" sm="6" lg="5" xl="4">
-          <v-text-field v-model="profile.firstName" label="First Name" color="success" :loading="loadingFirstName" readonly>
+          <v-text-field v-model="profile.firstName" label="First Name" :loading="loadingFirstName" readonly>
             <template v-slot:append>
-              <v-btn color="success" class="mb-2" @click="onDialog('firstName')" text>
+              <v-btn class="mb-2" color="success" @click="onDialog('firstName')" text>
                 Update {{ $vuetify.breakpoint.smAndDown ? '' : 'First Name' }}
               </v-btn>
             </template>
             <template v-slot:prepend>
-              <v-icon color="success" class="mt-1">mdi-account-outline</v-icon>
+              <v-icon class="mt-1">mdi-account-outline</v-icon>
             </template>
           </v-text-field>
         </v-col>
         <v-col cols="12" sm="6" lg="5" xl="4">
-          <v-text-field v-model="profile.lastName" label="Last Name" color="success" :loading="loadingLastName" readonly>
+          <v-text-field v-model="profile.lastName" label="Last Name" :loading="loadingLastName" readonly>
             <template v-slot:append>
-              <v-btn color="success" class="mb-2" @click="onDialog('lastName')" text>
+              <v-btn class="mb-2" color="success" @click="onDialog('lastName')" text>
                 Update {{ $vuetify.breakpoint.smAndDown ? '' : 'Last Name' }}
               </v-btn>
             </template>
             <template v-slot:prepend>
-              <v-icon color="success" class="mt-1">mdi-account-outline</v-icon>
+              <v-icon class="mt-1">mdi-account-outline</v-icon>
             </template>
           </v-text-field>
         </v-col>
@@ -95,18 +94,16 @@
       </v-row>
       <v-row>
         <v-col :cols="$vuetify.breakpoint.xsOnly ? 12 : 5" md="3" lg="2">
-          <div>
-            <v-menu ref="dateMenu" v-model="dateMenu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field v-model="birthdayDate" label="Birthday date" color="success" :error-messages="birthdayDateErrors" v-bind="attrs" v-on="on" readonly>
-                  <template v-slot:prepend>
-                    <v-icon color="success">mdi-calendar</v-icon>
-                  </template>
-                </v-text-field>
-              </template>
-              <v-date-picker v-model="birthdayDate" color="success" :active-picker.sync="activePicker" :max="maxDate" scrollable @change="updateBirthdayDate" />
-            </v-menu>
-          </div>
+          <v-menu ref="dateMenu" v-model="dateMenu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field v-model="birthdayDate" label="Birthday date" :error-messages="birthdayDateErrors" v-bind="attrs" v-on="on" readonly>
+                <template v-slot:prepend>
+                  <v-icon>mdi-calendar</v-icon>
+                </template>
+              </v-text-field>
+            </template>
+            <v-date-picker v-model="birthdayDate" :active-picker.sync="activePicker" :max="maxDate" scrollable @change="updateBirthdayDate" />
+          </v-menu>
         </v-col>
       </v-row>
       <v-row>
@@ -117,7 +114,6 @@
               class="input-number"
               suffix="kg"
               type="number"
-              color="success"
               label="Current weight"
               placeholder="Enter weight"
               @blur="$v.userData.currentWeight.$touch()"
@@ -126,16 +122,15 @@
               hide-spin-buttons
           >
             <template v-slot:prepend>
-              <v-btn icon color="success"
-                     :disabled="userData.currentWeight <= 0"
+              <v-btn icon color="success" :disabled="userData.currentWeight <= 0"
                      :style="{ cursor: userData.currentWeight === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                      @click="decrement('currentWeight')">
-                <v-icon>mdi-minus</v-icon>
+                <v-icon>mdi-numeric-negative-1</v-icon>
               </v-btn>
             </template>
             <template v-slot:append-outer>
               <v-btn icon color="success" @click="increment('currentWeight')">
-                <v-icon>mdi-plus</v-icon>
+                <v-icon>mdi-numeric-positive-1</v-icon>
               </v-btn>
             </template>
           </v-text-field>
@@ -147,27 +142,25 @@
               class="input-number"
               suffix="cm"
               type="number"
-              color="success"
               label="Height"
               placeholder="Enter height"
-              append-outer-icon="mdi-plus"
+              append-outer-icon="mdi-numeric-positive-1"
               @blur="$v.userData.height.$touch()"
               @input="$v.userData.height.$touch()"
               @change="updateUserData('height')"
               hide-spin-buttons
           >
             <template v-slot:prepend>
-              <v-btn icon color="success"
-                     :disabled="userData.height <= 0"
+              <v-btn icon color="success" :disabled="userData.height <= 0"
                      :style="{ cursor: userData.height === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                      @click="decrement('height')"
               >
-                <v-icon>mdi-minus</v-icon>
+                <v-icon>mdi-numeric-negative-1</v-icon>
               </v-btn>
             </template>
             <template v-slot:append-outer>
               <v-btn icon color="success" @click="increment('height')">
-                <v-icon>mdi-plus</v-icon>
+                <v-icon>mdi-numeric-positive-1</v-icon>
               </v-btn>
             </template>
           </v-text-field>
@@ -178,8 +171,6 @@
           <v-select
               v-model="userData.activityLevel"
               :items="getActivities.labels"
-              color="success"
-              item-color="success"
               label="Activity level"
               @change="updateUserData('activityLevel')"
           />
@@ -187,8 +178,8 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-dialog v-model="dialog" max-width="600px">
-      <v-card :loading="loadingUpdate" flat>
+    <v-dialog v-model="dialog" max-width="600">
+      <v-card :loading="loadingUpdate">
         <v-card-title>
           <span class="text-h5">Update Full Name</span>
         </v-card-title>
@@ -200,7 +191,6 @@
                   <v-text-field
                       v-model="fullName.firstName"
                       :error-messages="firstNameErrors"
-                      color="success"
                       label="First Name"
                       prepend-icon="mdi-account-outline"
                       placeholder="Enter your First Name"
@@ -213,7 +203,6 @@
                   <v-text-field
                       v-model="fullName.lastName"
                       :error-messages="lastNameErrors"
-                      color="success"
                       ref="lastName"
                       label="Last Name"
                       prepend-icon="mdi-account-outline"
@@ -227,11 +216,9 @@
             </v-container>
           </v-card-text>
           <v-card-actions>
-            <v-btn color="success" @click="dialog = false" text large>Cancel</v-btn>
+            <v-btn text large @click="dialog = false" color="success">Cancel</v-btn>
             <v-spacer />
-            <v-btn color="success" type="submit" :disabled="($v.$invalid && $v.$error) || loadingUpdate" :loading="loadingUpdate" large text>
-              Save
-            </v-btn>
+            <v-btn large text type="submit" color="success" :disabled="($v.$invalid && $v.$error) || loadingUpdate" :loading="loadingUpdate">Save</v-btn>
           </v-card-actions>
         </v-form>
       </v-card>
@@ -245,7 +232,7 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="success" outlined block @click="previewImage = false">Close</v-btn>
+          <v-btn outlined block color="success" @click="previewImage = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -265,7 +252,7 @@ export default {
   mixins: [ validationMixin ],
   props: {
     user: {
-      type: [Object, Boolean],
+      type: Object,
       default: null
     }
   },
@@ -456,7 +443,6 @@ export default {
       this.updateUserData(property)
     },
     updateUserData(property) {
-      console.log(property)
       this.$v.userData[property]?.$touch()
       if (!this.status && !this.$v.userData[property]?.$invalid) {
         this.status = 'Saving...'

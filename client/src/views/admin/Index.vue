@@ -1,9 +1,9 @@
 <template>
   <v-card>
-    <v-toolbar flat color="success" dark>
+    <v-toolbar color="success">
       <v-toolbar-title>Admin Panel</v-toolbar-title>
     </v-toolbar>
-    <v-tabs color="success" grow show-arrows>
+    <v-tabs grow show-arrows>
       <v-tab :to="{ name: 'Users' }">
         <v-icon left>mdi-account-details</v-icon>
         <span>Users</span>
@@ -23,7 +23,7 @@ export default {
   }),
   created() {
     this.user = this.getUserValue
-    this.getCurrentUser()
+    // this.getCurrentUser()
   },
   computed: {
     ...mapGetters('account', ['getUser', 'getUserValue'])

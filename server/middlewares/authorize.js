@@ -24,7 +24,7 @@ function authorize(roles = []) {
         // account no longer exists or role not authorized
         return res.status(401).json({ message: 'Account no longer exists' });
       } else if (roles.length && !roles.includes(account.role)) {
-        return res.status(401).json({ message: 'Role not authorized' });
+        return res.status(401).json({ message: 'Denied access' });
       }
 
       // authentication and authorization successful

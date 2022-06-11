@@ -1,16 +1,16 @@
 <template>
-  <div>
+  <v-flex>
     <v-alert
         v-for="(alert, index) in activeAlerts"
         :key="index"
         v-model="alert.active"
         :type="alert.type"
-        :color="alert.type === 'info' ? 'primary' : alert.type"
+        :color="alert.type"
         border="left"
         colored-border dismissible prominent dense text>
       <span>{{ alert.text }}</span>
     </v-alert>
-  </div>
+  </v-flex>
 </template>
 
 <script>

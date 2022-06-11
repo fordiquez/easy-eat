@@ -8,9 +8,9 @@ const getAll = (req, res, next) => {
 }
 
 const getById = (req, res, next) => {
-  // if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
-  //   return res.status(401).json({ message: 'Unauthorized' });
-  // }
+  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
+    return res.status(401).json({ message: 'Denied access' });
+  }
   userDataService.getById(req.params.id).then(userData => userData ? res.json(userData) : res.sendStatus(404)).catch(next);
 }
 
@@ -28,6 +28,9 @@ const createSchema = (req, res, next) => {
 }
 
 const create = (req, res, next) => {
+  if (req.body.accountId !== req.user.id && req.user.role !== Role.Admin) {
+    return res.status(401).json({ message: 'Denied access' });
+  }
   userDataService.create(req.body).then(userData => res.json(userData)).catch(next);
 }
 
@@ -51,19 +54,16 @@ const updateSchema = (req, res, next) => {
 }
 
 const update = async (req, res, next) => {
-  // users can update their own account and admins can update any account
-  // if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
-  //   return res.status(401).json({ message: 'Unauthorized' });
-  // }
+  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
+    return res.status(401).json({ message: 'Denied access' });
+  }
   userDataService.update(req.params.id, req.body).then(userData => res.json(userData)).catch(next);
 }
 
 const _delete = (req, res, next) => {
-  // users can delete their own account and admins can delete any account
-  // if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
-  //   return res.status(401).json({ message: 'Unauthorized' });
-  // }
-
+  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
+    return res.status(401).json({ message: 'Denied access' });
+  }
   userDataService.delete(req.params.id).then(userData => res.json(userData)).catch(next);
 }
 

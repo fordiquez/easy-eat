@@ -2,7 +2,7 @@
   <v-card :loading="loading" rounded>
     <v-card-title>Sign Up</v-card-title>
     <v-card-subtitle class="pb-0">Please fill in all required fields to register an account</v-card-subtitle>
-    <v-form ref="form" @submit.prevent="submit">
+    <v-form @submit.prevent="submit">
       <v-container fluid>
         <v-row>
           <v-col cols="12" sm="6">
@@ -72,54 +72,49 @@
           </v-col>
           <v-col cols="12">
             <v-checkbox
-                v-model="form.acceptedTerms"
-                :error-messages="acceptedTerms"
+                v-model="acceptedTerms"
+                :error-messages="acceptedTermsErrors"
                 on-icon="mdi-marker-check"
                 off-icon="mdi-alert-circle-check-outline"
-                color="success"
-                @change="$v.form.acceptedTerms.$touch()"
+                @change="$v.acceptedTerms.$touch()"
             >
               <template v-slot:label>
-                <div @click.stop="">
+                <v-flex @click.stop>
                   <span>Agree and accept the </span>
                   <a class="custom-link" @click.prevent="terms = true">terms</a>
                   <span> & </span>
                   <a class="custom-link" @click.prevent="conditions = true">conditions</a>
-                </div>
+                </v-flex>
               </template>
             </v-checkbox>
           </v-col>
         </v-row>
       </v-container>
       <v-card-actions>
-        <v-btn :to="{ name: 'Login' }" text>Cancel</v-btn>
+        <v-btn text color="success" :to="{ name: 'Login' }">Cancel</v-btn>
         <v-spacer></v-spacer>
-        <v-btn :disabled="($v.$invalid && $v.$error) || loading" :loading="loading" color="primary" type="submit" text>
-          Sign Up
+        <v-btn type="submit" color="success" :disabled="($v.$invalid && $v.$error) || loading" :loading="loading">
+          <v-icon class="mr-1">mdi-account-plus</v-icon>
+          <span>Sign Up</span>
         </v-btn>
       </v-card-actions>
     </v-form>
-    <v-dialog v-model="terms" width="80%">
+    <v-dialog v-model="terms" :fullscreen="$vuetify.breakpoint.xsOnly">
       <v-card>
         <v-card-title class="text-h6">Terms</v-card-title>
         <v-card-text v-for="n in 5" :key="n">{{ content }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text color="success" @click="terms = false">Ok</v-btn>
+          <v-btn text block large color="success" @click="terms = false">Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="conditions" width="80%">
+    <v-dialog v-model="conditions" :fullscreen="$vuetify.breakpoint.xsOnly">
       <v-card>
-        <v-card-title class="text-h6">
-          Conditions
-        </v-card-title>
-        <v-card-text v-for="n in 5" :key="n">
-          {{ content }}
-        </v-card-text>
+        <v-card-title class="text-h6">Conditions</v-card-title>
+        <v-card-text v-for="n in 5" :key="n">{{ content }}</v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text color="success" @click="conditions = false">Ok</v-btn>
+          <v-btn text block large color="success" @click="conditions = false">Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -141,14 +136,14 @@ export default {
       lastName: '',
       email: '',
       password: '',
-      passwordConfirm: '',
-      acceptedTerms: false,
+      passwordConfirm: ''
     },
     loading: false,
     passwordVisibility: false,
     passwordConfirmVisibility: false,
     terms: false,
     conditions: false,
+    acceptedTerms: false,
     content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.',
   }),
   validations: {
@@ -178,9 +173,9 @@ export default {
         minLength: minLength(6),
         hasNumerics
       },
-      acceptedTerms: {
-        sameAs: sameAs(() => true)
-      }
+    },
+    acceptedTerms: {
+      sameAs: sameAs(() => true)
     }
   },
   computed: {
@@ -199,16 +194,13 @@ export default {
     passwordConfirmErrors() {
       return passwordConfirmErrors(this.$v.form.passwordConfirm)
     },
-    acceptedTerms() {
-      return acceptedTermsErrors(this.$v.form.acceptedTerms)
+    acceptedTermsErrors() {
+      return acceptedTermsErrors(this.$v.acceptedTerms)
     }
   },
   methods: {
-    ...mapActions({
-      register: 'account/register',
-      setAlert: 'notification/setAlert',
-      setSnackbar: 'notification/setSnackbar'
-    }),
+    ...mapActions('account', ['register']),
+    ...mapActions('notification', ['setSnackbar', 'setAlert']),
     submit() {
       this.$v.$touch()
       if (!this.$v.$invalid) {

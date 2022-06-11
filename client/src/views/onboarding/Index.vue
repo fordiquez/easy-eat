@@ -25,7 +25,6 @@
                 class="input-number"
                 suffix="kg"
                 type="number"
-                color="success"
                 label="Current weight"
                 placeholder="Enter weight"
                 @blur="$v.userData.currentWeight.$touch()"
@@ -38,12 +37,12 @@
                     :disabled="currentWeight <= 0"
                     :style="{ cursor: currentWeight === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                     @click="decrement('currentWeight')">
-                  <v-icon>mdi-minus</v-icon>
+                  <v-icon>mdi-numeric-negative-1</v-icon>
                 </v-btn>
               </template>
               <template v-slot:append-outer>
                 <v-btn icon color="success" @click="increment('currentWeight')">
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-numeric-positive-1</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -60,7 +59,6 @@
                 class="input-number"
                 suffix="kg"
                 type="number"
-                color="success"
                 label="Goal weight"
                 placeholder="Enter weight"
                 @blur="$v.userData.goalWeight.$touch()"
@@ -73,12 +71,12 @@
                        :disabled="goalWeight <= 0"
                        :style="{ cursor: goalWeight === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                        @click="decrement('goalWeight')">
-                  <v-icon>mdi-minus</v-icon>
+                  <v-icon>mdi-numeric-negative-1</v-icon>
                 </v-btn>
               </template>
               <template v-slot:append-outer>
                 <v-btn icon color="success" @click="increment('goalWeight')">
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-numeric-positive-1</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -95,7 +93,6 @@
                 class="input-number"
                 suffix="cm"
                 type="number"
-                color="success"
                 label="Height"
                 placeholder="Enter height"
                 @blur="$v.userData.height.$touch()"
@@ -108,12 +105,12 @@
                        :disabled="height <= 0"
                        :style="{ cursor: height === 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                        @click="decrement('height')">
-                  <v-icon>mdi-minus</v-icon>
+                  <v-icon>mdi-numeric-negative-1</v-icon>
                 </v-btn>
               </template>
               <template v-slot:append-outer>
                 <v-btn icon color="success" @click="increment('height')">
-                  <v-icon>mdi-plus</v-icon>
+                  <v-icon>mdi-numeric-positive-1</v-icon>
                 </v-btn>
               </template>
             </v-text-field>
@@ -144,7 +141,7 @@
             <div>
               <v-menu ref="dateMenu" v-model="dateMenu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-text-field v-model="userData.birthdayDate" label="Birthday date" color="success" :error-messages="birthdayDateErrors" v-bind="attrs" v-on="on" readonly>
+                  <v-text-field v-model="userData.birthdayDate" label="Birthday date" :error-messages="birthdayDateErrors" v-bind="attrs" v-on="on" readonly>
                     <template v-slot:prepend>
                       <v-icon color="success">mdi-calendar</v-icon>
                     </template>
@@ -173,13 +170,22 @@
       </v-window-item>
     </v-window>
 
-    <v-divider />
+    <v-divider class="mt-2" />
 
-    <v-card-actions>
-      <v-btn :disabled="step === 1" text @click="step--" width="100">Back</v-btn>
-      <v-spacer></v-spacer>
-      <v-btn color="success" width="100" @click="nextStep" v-if="step !== steps">Continue</v-btn>
-      <v-btn color="success" width="200" @click="addUserData" :loading="loading" v-else>Create meal plan</v-btn>
+    <v-card-actions :class="$vuetify.breakpoint.xsOnly ? 'flex-column' : ''">
+      <v-btn text :block="$vuetify.breakpoint.xsOnly" color="success" :class="$vuetify.breakpoint.xsOnly ? 'mb-2' : ''" :disabled="step === 1" @click="step--">
+        <v-icon class="mr-1">mdi-arrow-left</v-icon>
+        <span>Back</span>
+      </v-btn>
+      <v-spacer v-if="$vuetify.breakpoint.smAndUp" />
+      <v-btn :block="$vuetify.breakpoint.xsOnly" color="success" @click="nextStep" v-if="step !== steps">
+        <v-icon class="mr-1">mdi-arrow-right</v-icon>
+        <span>Next step</span>
+      </v-btn>
+      <v-btn :block="$vuetify.breakpoint.xsOnly" color="success" @click="addUserData" :loading="loading" v-else>
+        <v-icon class="mr-1">mdi-book-plus</v-icon>
+        <span>Create meal plan</span>
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -259,7 +265,8 @@ export default {
     this.userData.accountId = this.user.id
     this.getById(this.userData.accountId).then(() => {
       this.getUserData.subscribe(userData => this.userData = userData)
-      this.userData.birthdayDate = moment(this.userData.birthdayDate).format('YYYY-MM-DD')
+      if (this.userData.birthdayDate) this.userData.birthdayDate = moment(this.userData.birthdayDate).format('YYYY-MM-DD')
+      if (!this.userData.activityLevel) this.userData.activityLevel = 'Sedentary'
       this.userData.goalWeight = null
     }).catch(error => {
       console.log(error.response)

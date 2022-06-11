@@ -10,7 +10,7 @@ const create = async (params) => {
     servings: params.servings,
     label: params.label,
     category: params.category,
-    foodContentsLabel: params.foodContentsLabel,
+    healthLabels: params.healthLabels,
     image: params.image,
     nutrients: params.nutrients
   })
@@ -39,10 +39,16 @@ const update = async (id, params) => {
 }
 
 const _delete = async (id) => {
-  const food = await db.Food.findById(id);
-  await food.remove();
+  const food = await db.Food.findByIdAndDelete(id);
   return {
     message: `Removed ${food.label} from ${food.mealTime}`
+  }
+}
+
+const bulkDelete = async (accountId) => {
+  const foods = await db.Food.deleteMany({ accountId })
+  return {
+    message: `Foods data in the account's daily log was successfully deleted in the amount of: ${foods.deletedCount} items`
   }
 }
 
@@ -50,5 +56,6 @@ module.exports = {
   create,
   get,
   update,
-  delete: _delete
+  delete: _delete,
+  bulkDelete
 }

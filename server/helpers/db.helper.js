@@ -9,6 +9,8 @@ const assert = require("assert");
 
 mongoose.connect(process.env.MONGODB_URI).then(() => mongoose.Promise = global.Promise).catch(error => console.log(Promise.reject(error)));
 
+const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
+
 module.exports = {
   Account,
   RefreshToken,
@@ -20,18 +22,14 @@ module.exports = {
   deleteAvatar
 };
 
-function isValidId(id) {
-  return mongoose.Types.ObjectId.isValid(id);
-}
-
 async function getAvatar(filename, res) {
   mongodb.MongoClient.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   }, (error, client) => {
+    assert.ifError(error)
     const db = client.db()
     const bucket = new mongodb.GridFSBucket(db, { bucketName: 'avatars' })
-    console.log(bucket)
     const cursor = bucket.find({ filename })
     const avatar = {}
     cursor.forEach(doc => avatar.filename = doc.filename)

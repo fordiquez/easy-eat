@@ -1,9 +1,9 @@
 <template>
   <v-card>
-    <v-toolbar flat color="success" dark>
+    <v-toolbar color="success">
       <v-toolbar-title>My Settings</v-toolbar-title>
     </v-toolbar>
-    <v-tabs color="success" grow show-arrows>
+    <v-tabs grow show-arrows>
       <v-tab :to="{ name: 'Profile' }">
         <v-icon left>mdi-account-details</v-icon>
         <span>My Profile</span>

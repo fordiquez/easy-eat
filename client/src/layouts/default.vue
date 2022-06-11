@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app>
     <v-navigation-drawer v-model="application.drawer" @input="drawer" :clipped="application.clipped" :mini-variant="application.miniVariant" app fixed>
       <v-list-item class="d-flex justify-center align-center" @click="logoNav">
         <v-list-item-avatar>
@@ -14,23 +14,23 @@
       </v-list-item>
       <v-list nav dense flat>
         <v-list-item-group v-model="selectedItem" :value="selectedItem" color="success">
-          <v-list-item v-for="(route, index) in routes.drawer" :key="index" :to="{ name: route.to }" link exact>
+          <v-list-item v-for="(route, index) in drawerRoutes" :key="index" :to="{ name: route.to }" link exact>
             <v-list-item-icon>
-              <v-icon v-text="route.icon"></v-icon>
+              <v-icon v-text="route.icon" />
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title class="text-subtitle-2" v-text="route.title"></v-list-item-title>
+              <v-list-item-title class="text-subtitle-2" v-text="route.title" />
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
       </v-list>
       <template v-slot:append>
-        <div class="pa-3" v-if="user">
+        <v-flex class="pa-3" v-if="user">
           <v-btn :block="!application.miniVariant" :icon="application.miniVariant" :loading="loading" @click="onLogout">
-            <v-icon class="success--text" :large="application.miniVariant">mdi-exit-to-app</v-icon>
+            <v-icon class="success--text" :large="application.miniVariant">mdi-logout</v-icon>
             <span class="ma-2 success--text" v-if="!application.miniVariant">Logout</span>
           </v-btn>
-        </div>
+        </v-flex>
       </template>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="application.clipped" app fixed>
@@ -40,8 +40,8 @@
       </v-btn>
       <v-toolbar-title v-text="title" />
       <v-spacer />
-      <v-btn v-if="!user" :to="{ name: 'Login' }" active-class="success--text" text>Log In</v-btn>
-      <v-btn v-if="!user" :to="{ name: 'Register' }" active-class="success--text" text>Sign Up</v-btn>
+      <v-btn v-if="!user" v-show="$vuetify.breakpoint.smAndUp" :to="{ name: 'Login' }" active-class="success--text" text>Log In</v-btn>
+      <v-btn v-if="!user" v-show="$vuetify.breakpoint.smAndUp" :to="{ name: 'Register' }" active-class="success--text" text>Sign Up</v-btn>
       <v-menu v-if="user" bottom left offset-y>
         <template v-slot:activator="{ on: menu, attrs }">
           <v-tooltip bottom color="success">
@@ -81,13 +81,13 @@
       </v-container>
     </v-main>
     <v-navigation-drawer v-model="rightDrawer" right temporary hide-overlay fixed>
-      <div class="d-flex pa-3">
+      <v-flex class="d-flex pa-3">
         <h5 class="text-h6">Settings</h5>
         <v-spacer />
         <v-btn icon @click.stop="onRightDrawer">
           <v-icon>mdi-close</v-icon>
         </v-btn>
-      </div>
+      </v-flex>
       <v-divider />
       <SettingsDrawer :application="application" />
     </v-navigation-drawer>
@@ -108,17 +108,12 @@ export default {
   components: { SettingsDrawer, Snackbar, Alert },
   props: {
     user: {
-      type: [Object, Boolean],
+      type: Object,
       default: null
     }
   },
   data: () => ({
-    application: {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      miniVariant: false,
-    },
+    application: null,
     rightDrawer: false,
     loading: false,
     selectedItem: 0,
@@ -126,14 +121,14 @@ export default {
     routes: {
       drawer: [
         { icon: 'mdi-math-log', title: 'Daily Log', to: 'DailyLog' },
-        { icon: 'mdi-clipboard-text', title: 'Onboarding', to: 'Onboarding' },
-        { icon: 'mdi-file-document', title: 'Meal Plan', to: 'MealPlan' },
-        { icon: 'mdi-flower-tulip-outline', title: 'Log In', to: 'Login' },
+        { icon: 'mdi-debug-step-over', title: 'Onboarding', to: 'Onboarding' },
+        { icon: 'mdi-file-document-edit', title: 'Meal Plan', to: 'MealPlan' },
+        { icon: 'mdi-percent', title: 'Log In', to: 'Login' },
         { icon: 'mdi-movie-play-outline', title: 'Sign Up', to: 'Register' },
         { icon: 'mdi-chart-gantt', title: 'Account recovery', to: 'ForgotPassword' },
         { icon: 'mdi-account-music-outline', title: 'Reset Password', to: 'ResetPassword' },
         { icon: 'mdi-flash-auto', title: 'Email Verification', to: 'VerifyEmail' },
-        { icon: 'mdi-account-group-outline', title: 'Admin Users', to: 'Users' },
+        { icon: 'mdi-account-group-outline', title: 'Admin Users', to: 'Users', protected: true }
       ],
       account: [
         { icon: 'mdi-account-details', title: 'My Profile', to: 'Profile' },
@@ -148,17 +143,17 @@ export default {
   },
   computed: {
     ...mapState('notification', ['alerts', 'snackbars']),
-    ...mapGetters({
-      getUser: 'account/getUser',
-      getUserValue: 'account/getUserValue',
-      getApplication: 'application/getApplication'
-    }),
+    ...mapGetters('account', ['getUser', 'getUserValue']),
+    ...mapGetters('application', ['getApplication']),
     isActiveAlert() {
       return !!this.alerts.find(alert => alert.active)
     },
     isActiveSnackbar() {
       return !!this.snackbars.find(snackbar => snackbar.active && snackbar.createdAt > new Date().getTime() - 5000)
     },
+    drawerRoutes() {
+      return this.routes.drawer.filter(route => this.user?.role !== 'Admin' ? !route.protected : route)
+    }
   },
   methods: {
     ...mapActions('account', ['logout']),

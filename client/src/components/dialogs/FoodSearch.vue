@@ -9,10 +9,13 @@
             </v-btn>
           </v-col>
           <v-col cols="12" sm="6" md="4" class="ml-sm-auto">
-            <v-select v-model="mealTime" color="success" item-color="success" :items="getMealTimes.labels" :prepend-inner-icon="mealTimeIcon" rounded>
+            <v-select v-model="mealTime" :items="getMealTimes.labels" rounded>
               <template v-slot:item="{ item }">
                 <v-icon class="mr-1">{{ getMealTimes.icons[getMealTimes.labels.indexOf(item)] }}</v-icon>
                 <label>{{ item }}</label>
+              </template>
+              <template v-slot:prepend-inner>
+                <v-icon color="success" class="pb-2">{{ mealTimeIcon }}</v-icon>
               </template>
             </v-select>
           </v-col>
@@ -20,7 +23,6 @@
       </v-card-title>
       <v-toolbar>
         <v-text-field
-            color="success"
             v-model="ingr"
             label="Search foods and meals..."
             placeholder="Search foods and meals..."
@@ -58,39 +60,34 @@
                 <v-col cols="12" sm="8" md="6" class="d-sm-flex pa-0 hidden-xs-only">
                   <v-list-item-content class="d-flex flex-column align-center">
                     <v-list-item-title class="text-subtitle-1">Net Carbs</v-list-item-title>
-                    <v-list-item-subtitle class="red--text darken-3 font-weight-bold">{{ item.food.nutrients.CHOCDF | fixed }}g</v-list-item-subtitle>
+                    <v-list-item-subtitle class="red--text font-weight-bold">{{ item.food.nutrients.CHOCDF | fixed }}g</v-list-item-subtitle>
                   </v-list-item-content>
                   <v-list-item-content class="d-flex flex-column align-center">
                     <v-list-item-title class="text-subtitle-1">Protein</v-list-item-title>
-                    <v-list-item-subtitle class="blue--text darken-3 font-weight-bold">{{ item.food.nutrients.PROCNT | fixed }}g</v-list-item-subtitle>
+                    <v-list-item-subtitle class="light-blue--text font-weight-bold">{{ item.food.nutrients.PROCNT | fixed }}g</v-list-item-subtitle>
                   </v-list-item-content>
                   <v-list-item-content class="d-flex flex-column align-center">
                     <v-list-item-title class="text-subtitle-1">Fat</v-list-item-title>
-                    <v-list-item-subtitle class="orange--text darken-3 font-weight-bold">{{ item.food.nutrients.FAT | fixed }}g</v-list-item-subtitle>
+                    <v-list-item-subtitle class="orange--text font-weight-bold">{{ item.food.nutrients.FAT | fixed }}g</v-list-item-subtitle>
                   </v-list-item-content>
                   <v-list-item-content class="d-flex flex-column align-center">
                     <v-list-item-title class="text-subtitle-1">Cals</v-list-item-title>
-                    <v-list-item-subtitle class="teal--text darken-3 font-weight-bold">{{ item.food.nutrients.ENERC_KCAL | fixed }}</v-list-item-subtitle>
+                    <v-list-item-subtitle class="teal--text font-weight-bold">{{ item.food.nutrients.ENERC_KCAL | fixed }}</v-list-item-subtitle>
                   </v-list-item-content>
                 </v-col>
               </v-row>
             </v-list-item>
           </v-list-item-group>
+          <v-card v-intersect="onNextPage" />
         </v-list>
       </v-card-text>
-      <v-card-actions v-if="getCurrentPageFood.length" class="justify-space-between">
-        <span class="text-subtitle-2">Showing {{ firstFoodItem }}-{{ lastFoodItem }} of {{ getFoundFood.length }} queries</span>
-        <v-pagination v-model="currentPage" color="success" :length="getLinks.length" :total-visible="6" @input="updateCurrentPage" />
-        <v-btn text large color="success" class="ml-3" :disabled="loading" :loading="loading" @click="onNextPage">
-          <v-icon class="mr-2">mdi-magnify-plus</v-icon>
-          <span>Load more</span>
-        </v-btn>
+      <v-card-actions v-if="getCurrentPageFood.length" class="d-flex" :class="$vuetify.breakpoint.xsOnly ? 'flex-column' : 'justify-space-between'">
+        <span class="text-subtitle-2">Showing {{ firstFoodItem }}-{{ lastFoodItem }} of {{ getFoundFood.length }}</span>
+        <v-pagination v-model="currentPage" :length="getLinks.length" :total-visible="totalVisible" style="user-select: none" @input="updateCurrentPage" />
       </v-card-actions>
     </v-card>
     <v-dialog v-model="searchFiltersDialog" max-width="600">
       <v-card>
-        <div class="d-flex justify-end pr-2 pt-2">
-        </div>
         <v-card-title class="text-h5 d-flex">
           <v-spacer/>
           <span>Search filters</span>
@@ -125,7 +122,7 @@
             <v-card-text class="text-subtitle-2 white--text pt-0">Select the health labels</v-card-text>
             <v-autocomplete
                 v-model="healthLabels" :items="getHealthLabels"
-                color="success" item-color="success" label="Select options" item-text="title" item-value="value"
+                label="Select options" item-text="title" item-value="value"
                 filled chips multiple clearable hide-details single-line
             >
               <template v-slot:selection="data">
@@ -151,16 +148,15 @@
               </template>
             </v-autocomplete>
           </v-col>
-          <v-col>
+          <v-col cols="12">
             <v-card-text class="text-subtitle-2 white--text pt-0">Calories range</v-card-text>
-            <v-range-slider v-model="caloriesRange" :max="caloriesMax" :min="caloriesMin" hide-details thumb-label color="success" track-fill-color="success" class="align-center">
-              <template v-slot:prepend>
+            <v-range-slider v-model="caloriesRange" class="align-center" :class="$vuetify.breakpoint.xsOnly ? 'px-5' : ''" :max="caloriesMax" :min="caloriesMin" hide-details thumb-label>
+              <template v-if="$vuetify.breakpoint.smAndUp" v-slot:prepend>
                 <v-text-field
                     v-model.number="caloriesRange[0]"
                     class="input-number mt-0 pt-0"
                     type="number"
                     style="width: 120px"
-                    color="success"
                     label="Min value"
                     placeholder="Min value"
                     suffix="cals"
@@ -170,13 +166,12 @@
                     single-line
                 />
               </template>
-              <template v-slot:append>
+              <template v-if="$vuetify.breakpoint.smAndUp" v-slot:append>
                 <v-text-field
                     v-model.number="caloriesRange[1]"
                     class="input-number mt-0 pt-0"
                     type="number"
                     style="width: 120px"
-                    color="success"
                     label="Max value"
                     placeholder="Max value"
                     suffix="cals"
@@ -186,8 +181,37 @@
                     single-line
                 />
               </template>
-
             </v-range-slider>
+            <v-row v-if="$vuetify.breakpoint.xsOnly">
+              <v-col cols="6">
+                <v-text-field
+                    v-model.number="caloriesRange[0]"
+                    class="input-number mt-0 pt-0"
+                    type="number"
+                    label="Min value"
+                    placeholder="Min value"
+                    suffix="cals"
+                    @change="$set(caloriesRange, 0, $event)"
+                    hide-spin-buttons
+                    hide-details
+                    single-line
+                />
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                    v-model.number="caloriesRange[1]"
+                    class="input-number mt-0 pt-0"
+                    type="number"
+                    label="Max value"
+                    placeholder="Max value"
+                    suffix="cals"
+                    @change="$set(caloriesRange, 1, $event)"
+                    hide-spin-buttons
+                    hide-details
+                    single-line
+                />
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-card>
@@ -248,6 +272,9 @@ export default {
     },
     lastFoodItem() {
       return this.getFoundFood.findIndex(item => item.food.foodId === this.getCurrentPageFood[this.getCurrentPageFood.length - 1].food.foodId) + 1
+    },
+    totalVisible() {
+      return this.$vuetify.breakpoint.xsOnly ? 3 : this.$vuetify.breakpoint.mdAndUp ? 8 : 6
     }
   },
   methods: {
@@ -279,20 +306,21 @@ export default {
       this.currentPage = value
       this.setCurrentPage(value)
     },
-    onNextPage() {
-      this.loading = true
-      this.searchNextPage(this.nextPageUrl).then(() => {
-        this.updateCurrentPage(this.getLinks.length)
-      }).catch(error => {
-        console.log(error.response)
-      }).finally(() => this.loading = false)
+    onNextPage(entries, observer, isIntersecting) {
+      if (this.currentPage === this.getLinks.length && isIntersecting) {
+        this.loading = true
+        this.searchNextPage(this.nextPageUrl).then(() => {
+          this.updateCurrentPage(this.getLinks.length)
+        }).catch(error => {
+          console.log(error.response)
+        }).finally(() => this.loading = false)
+      }
     },
     remove(item) {
       const index = this.healthLabels.indexOf(item.value)
       if (index >= 0) this.healthLabels.splice(index, 1)
     },
     increment() {
-      console.log(this.caloriesRange[0])
       this.caloriesRange[0] += 1
     },
     decrement() {
