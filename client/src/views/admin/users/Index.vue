@@ -6,13 +6,15 @@
         :items="getUsers"
         :items-per-page="10"
         :search="search"
-        :loading="!getUsers.length"
-        loading-text="Users is loading... Please wait"
+        :loading="loading"
     >
+      <template v-slot:loading>
+        <v-progress-circular indeterminate color="success" class="my-5" />
+      </template>
       <template v-slot:top>
         <v-toolbar>
-          <v-toolbar-title>Users</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical />
+          <v-toolbar-title v-show="$vuetify.breakpoint.smAndUp">Users</v-toolbar-title>
+          <v-divider v-show="$vuetify.breakpoint.smAndUp" class="mx-4" inset vertical />
           <v-text-field
               v-model="search"
               append-icon="mdi-magnify"
@@ -28,80 +30,6 @@
             <span>Add user</span>
           </v-btn>
         </v-toolbar>
-        <create-user v-if="isCreating" :is-creating="isCreating" @close-dialog="onClose" />
-        <v-dialog v-model="isEditing" max-width="700">
-          <v-card :loading="loading">
-            <v-card-title>
-              <span class="text-h5">{{ editingTitle }}</span>
-            </v-card-title>
-            <v-form @submit.prevent="onSubmit">
-              <v-card-text>
-                <v-container fluid>
-                  <v-row>
-                    <v-col cols="12" sm="6">
-                      <v-text-field
-                          v-model="editedUser.firstName"
-                          :error-messages="firstNameErrors"
-                          label="First name"
-                          prepend-icon="mdi-account-outline"
-                          placeholder="Enter your first name"
-                          ref="firstName"
-                          @blur="$v.editedUser.firstName.$touch()"
-                          @input="$v.editedUser.firstName.$touch()"
-                      />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-text-field
-                          v-model="editedUser.lastName"
-                          :error-messages="lastNameErrors"
-                          label="Last Name"
-                          prepend-icon="mdi-account-outline"
-                          placeholder="Enter your last name"
-                          @blur="$v.editedUser.lastName.$touch()"
-                          @input="$v.editedUser.lastName.$touch()"
-                      />
-                    </v-col>
-                    <v-col cols="12">
-                      <v-text-field
-                          v-model="editedUser.email"
-                          :error-messages="emailErrors"
-                          label="Email address"
-                          prepend-icon="mdi-email-outline"
-                          placeholder="Enter your email address"
-                          @blur="$v.editedUser.email.$touch()"
-                          @input="$v.editedUser.email.$touch()"
-                      />
-                    </v-col>
-                    <v-col cols="12">
-                      <v-radio-group v-model="editedUser.role" :error-messages="roleErrors" prepend-icon="mdi-account-multiple" dense row>
-                        <span class="mr-2">User role</span>
-                        <v-radio label="User" value="User" @change="$v.editedUser.role.$touch()"></v-radio>
-                        <v-radio label="Admin" value="Admin" @change="$v.editedUser.role.$touch()"></v-radio>
-                      </v-radio-group>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-btn text color="success" @click="onClose">Cancel</v-btn>
-                <v-spacer />
-                <v-btn color="success" type="submit" :disabled="($v.$invalid && $v.$error) || loading" :loading="loading">Save</v-btn>
-              </v-card-actions>
-            </v-form>
-          </v-card>
-        </v-dialog>
-        <v-dialog v-model="isDeleting" max-width="700">
-          <v-card>
-            <v-card-title class="text-h5">{{ deletingTitle }}</v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn text color="success" @click="onCloseDelete">Cancel</v-btn>
-              <v-btn text color="red" @click="onDeleteUserConfirm">Confirm</v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </template>
       <template v-slot:item.actions="{ item }">
         <v-tooltip bottom color="success">
@@ -126,9 +54,93 @@
         </v-tooltip>
       </template>
       <template v-slot:no-data>
-        <v-btn color="success" @click="getAll">Reset</v-btn>
+        <v-card-title class="justify-center text-subtitle-1">Users not found</v-card-title>
       </template>
     </v-data-table>
+    <create-user v-if="isCreating" :is-creating="isCreating" @close-dialog="onClose" />
+    <v-dialog v-model="isEditing" max-width="700" :fullscreen="$vuetify.breakpoint.xsOnly" @input="onClose">
+      <v-card :loading="loading">
+        <v-toolbar color="success" dense>
+          <v-toolbar-title>{{ editingTitle }}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon class="ml-5" @click="onClose">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-form @submit.prevent="onSubmit">
+          <v-card-text>
+            <v-container fluid>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                      v-model="editedUser.firstName"
+                      :error-messages="firstNameErrors"
+                      label="First name"
+                      prepend-icon="mdi-account-outline"
+                      placeholder="Enter your first name"
+                      ref="firstName"
+                      @blur="$v.editedUser.firstName.$touch()"
+                      @input="$v.editedUser.firstName.$touch()"
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                      v-model="editedUser.lastName"
+                      :error-messages="lastNameErrors"
+                      label="Last Name"
+                      prepend-icon="mdi-account-outline"
+                      placeholder="Enter your last name"
+                      @blur="$v.editedUser.lastName.$touch()"
+                      @input="$v.editedUser.lastName.$touch()"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field
+                      v-model="editedUser.email"
+                      :error-messages="emailErrors"
+                      label="Email address"
+                      prepend-icon="mdi-email-outline"
+                      placeholder="Enter your email address"
+                      @blur="$v.editedUser.email.$touch()"
+                      @input="$v.editedUser.email.$touch()"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <v-radio-group v-model="editedUser.role" :error-messages="roleErrors" prepend-icon="mdi-account-multiple" dense row>
+                    <span class="mr-2">User role</span>
+                    <v-radio label="User" value="User" @change="$v.editedUser.role.$touch()"></v-radio>
+                    <v-radio label="Admin" value="Admin" @change="$v.editedUser.role.$touch()"></v-radio>
+                  </v-radio-group>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-btn text color="success" @click="onClose">Cancel</v-btn>
+            <v-spacer />
+            <v-btn color="success" type="submit" :disabled="($v.$invalid && $v.$error) || loading" :loading="loading">
+              <v-icon class="mr-1">mdi-account-edit</v-icon>
+              <span>Update</span>
+            </v-btn>
+          </v-card-actions>
+        </v-form>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="isDeleting" max-width="700" @input="onClose">
+      <v-card>
+        <v-card-title class="text-h5">{{ deletingTitle }}</v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text color="success" @click="onClose">Cancel</v-btn>
+          <v-btn text color="red" @click="onDeleteUserConfirm">
+            <v-icon class="mr-1">mdi-account-remove</v-icon>
+            <span>Confirm</span>
+          </v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -176,10 +188,11 @@ export default {
     },
   }),
   created() {
+    this.loading = true
     this.getAll().catch(error => {
       console.log(error.response)
       this.setSnackbar({ color: 'error', text: error.response.data.message })
-    })
+    }).finally(() => this.loading = false)
   },
   validations: {
     editedUser: {
@@ -203,9 +216,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('account', ['getUsers']),
+    ...mapGetters('account', ['getUsers', 'getUserValue']),
     editingTitle() {
-      return 'Editing user account of ' + this.editedUser.firstName + ' ' + this.editedUser.lastName
+      const fullName = this.editedIndex !== -1 ? this.getUsers[this.editedIndex]?.firstName + ' ' + this.getUsers[this.editedIndex]?.lastName : null
+      return this.editedIndex !== -1 ? 'Editing user account of ' + fullName : undefined
     },
     deletingTitle() {
       return 'Delete user account ' + this.editedUser.email + '?'
@@ -238,26 +252,23 @@ export default {
       this.isDeleting = true
     },
     onDeleteUserConfirm() {
-      this.delete(this.editedUser.id).then(async response => {
+      this.loading = true
+      this.delete(this.editedUser.id).then(response => {
         console.log(response)
-        this.onCloseDelete()
-        !this.user ? await this.$router.push({ name: 'Login' }) : null
-        await this.setSnackbar({ color: 'success', text: response.data.message })
+        this.onClose()
+        if (!this.getUserValue) {
+          this.$router.push({ name: 'Login' }).then(() => {
+            this.setSnackbar({ color: 'success', text: response.data.message })
+          })
+        }
       }).catch(error => {
         console.log(error.response)
         this.setSnackbar({ color: 'error', text: error.response.data.message })
-      })
+      }).finally(() => this.loading = false)
     },
     onClose() {
-      this.isCreating = this.isEditing = false
+      this.isCreating = this.isEditing = this.isDeleting = false
       this.$v.$reset()
-      this.$nextTick(() => {
-        this.editedUser = Object.assign({})
-        this.editedIndex = -1
-      })
-    },
-    onCloseDelete() {
-      this.isDeleting = false
       this.$nextTick(() => {
         this.editedUser = Object.assign({})
         this.editedIndex = -1

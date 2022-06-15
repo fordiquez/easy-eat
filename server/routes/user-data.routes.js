@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const userDataController = require("controllers/user-data.controller");
+const Role = require("utils/role");
 const authorize = require("middlewares/authorize");
-const Role = require("helpers/role.helper");
 
 router.get('/', authorize(Role.Admin), userDataController.getAll);
 router.post('/', authorize(), userDataController.createSchema, userDataController.create);

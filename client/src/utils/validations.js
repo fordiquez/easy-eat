@@ -126,6 +126,24 @@ export const foodNumerics = (numeric, displayedTitle, minValue) => {
   return errors
 }
 
+export const validationRules = (property, displayedTitle) => {
+  const errors = []
+  if (property.$dirty) {
+    if (property.$params?.required) !property.required && errors.push(`${displayedTitle} field is required`)
+    if (property.$params?.numeric) !property.numeric && errors.push(`${displayedTitle} must be a numeric`)
+  }
+  return errors
+}
+
+export const proportions = ({ CARBS, PROTEIN, FAT }) => {
+  const errors = []
+  if (typeof CARBS === 'number' && typeof PROTEIN === 'number' && typeof FAT === 'number') {
+    const total = CARBS + PROTEIN + FAT
+    if (total < 99 || total > 100) errors.push('macronutrient proportions total must equal 99 or 100')
+  }
+  return errors
+}
+
 export const hasUppercase = val => /[A-Z]/.test(val)
 export const hasLowercase = val => /[a-z]/.test(val)
 export const hasSpecialChars = val => /[!@#$%^&*()\\/<>|"№;:?+-=']/.test(val)

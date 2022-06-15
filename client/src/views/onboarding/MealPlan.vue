@@ -78,17 +78,20 @@
                   color="success"
                   class="input-number pt-0 mt-0"
                   suffix="g"
-                  append-outer-icon="mdi-numeric-positive-1"
-                  @click:append-outer="increment('CARBS')"
                   :disabled="!isCustomPlan"
                   hide-spin-buttons
               >
-                <template v-slot:prepend>
+                <template v-slot:prepend v-if="isCustomPlan">
                   <v-btn icon
                          :disabled="!isCustomPlan || userData.macros.CARBS <= 0"
                          :style="{ cursor: userData.macros.CARBS <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                          @click="decrement('CARBS')">
                     <v-icon>mdi-numeric-negative-1</v-icon>
+                  </v-btn>
+                </template>
+                <template v-slot:append-outer v-if="isCustomPlan">
+                  <v-btn icon :disabled="!isCustomPlan" @click="increment('CARBS')">
+                    <v-icon>mdi-numeric-positive-1</v-icon>
                   </v-btn>
                 </template>
               </v-text-field>
@@ -116,17 +119,20 @@
                   color="success"
                   class="input-number pt-0 mt-0"
                   suffix="g"
-                  append-outer-icon="mdi-numeric-positive-1"
-                  @click:append-outer="increment('PROTEIN')"
                   :disabled="!isCustomPlan"
                   hide-spin-buttons
               >
-                <template v-slot:prepend>
+                <template v-slot:prepend v-if="isCustomPlan">
                   <v-btn icon
                          :disabled="!isCustomPlan || userData.macros.PROTEIN <= 0"
                          :style="{ cursor: userData.macros.PROTEIN <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                          @click="decrement('PROTEIN')">
                     <v-icon>mdi-numeric-negative-1</v-icon>
+                  </v-btn>
+                </template>
+                <template v-slot:append-outer v-if="isCustomPlan">
+                  <v-btn icon :disabled="!isCustomPlan" @click="increment('PROTEIN')">
+                    <v-icon>mdi-numeric-positive-1</v-icon>
                   </v-btn>
                 </template>
               </v-text-field>
@@ -154,17 +160,20 @@
                   color="success"
                   class="input-number pt-0 mt-0"
                   suffix="g"
-                  append-outer-icon="mdi-numeric-positive-1"
-                  @click:append-outer="increment('FAT')"
                   :disabled="!isCustomPlan"
                   hide-spin-buttons
               >
-                <template v-slot:prepend>
+                <template v-slot:prepend v-if="isCustomPlan">
                   <v-btn icon
                          :disabled="!isCustomPlan || userData.macros.FAT <= 0"
                          :style="{ cursor: userData.macros.FAT <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                          @click="decrement('FAT')">
                     <v-icon>mdi-numeric-negative-1</v-icon>
+                  </v-btn>
+                </template>
+                <template v-slot:append-outer v-if="isCustomPlan">
+                  <v-btn icon :disabled="!isCustomPlan" @click="increment('FAT')">
+                    <v-icon>mdi-numeric-positive-1</v-icon>
                   </v-btn>
                 </template>
               </v-text-field>
@@ -249,7 +258,19 @@ export default {
     caloriesMismatch: false,
   }),
   created() {
-    this.getAll().then(() => this.getData()).catch(error => this.setSnackbar({ color: 'error', text: error.response.data.message }))
+    this.getAll().then(() => {
+      if (this.getPlans.length) {
+        this.getData()
+      } else if (this.user.role === 'Admin') {
+        this.$router.push({ name: 'MealPlans' }).then(() => {
+          this.setSnackbar({ color: 'error', text: 'Please create at least 1 meal plan' })
+        })
+      } else {
+        this.$router.push({ name: 'Login' }).then(() => {
+          this.setSnackbar({ color: 'error', text: 'There are no meal plans in the database at the moment, please try again later' })
+        })
+      }
+    }).catch(error => this.setSnackbar({ color: 'error', text: error.response.data.message } ))
   },
   computed: {
     ...mapGetters('userData', ['getUserData']),
@@ -362,7 +383,7 @@ export default {
           mealGoal.range[0] = this.fixedNumber(this.fixedTDEE + this.fixedTDEE * mealGoal.range[0] / 100)
           mealGoal.range[1] = this.fixedNumber(this.fixedTDEE + this.fixedTDEE * mealGoal.range[1] / 100)
         })
-        if (!this.userData.selectedPlan) this.userData.selectedPlan = this.getPlans[1]
+        if (!this.userData.selectedPlan) this.userData.selectedPlan = this.getPlans[0]
         !this.userData?.caloriesGoal ? this.caloriesGoal = this.weightGoal : this.caloriesGoal = this.mealGoals.findIndex(mealGoal => mealGoal.title === this.userData.caloriesGoal)
         Object.assign(this.range, this.mealGoals[this.caloriesGoal])
         if (!this.userData.macros) {

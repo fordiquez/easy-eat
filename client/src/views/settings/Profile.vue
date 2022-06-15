@@ -5,7 +5,7 @@
         <v-col class="d-flex align-center justify-space-between">
           <v-card-title class="text-h5 py-0">My Profile</v-card-title>
           <v-subheader v-if="status" class="text-subtitle-1 grey--text">
-            <v-progress-circular indeterminate size="25" />
+            <v-progress-circular indeterminate size="25" color="success" />
             <label class="ml-2" v-text="status" />
           </v-subheader>
         </v-col>

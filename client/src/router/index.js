@@ -8,13 +8,15 @@ import Register from "@/views/auth/Register"
 import ForgotPassword from "@/views/auth/ForgotPassword"
 import VerifyEmail from "@/views/auth/VerifyEmail"
 import ResetPassword from "@/views/auth/ResetPassword"
-import UserView from "@/views/admin/users/Show"
 import Settings from "@/views/settings/Index"
 import Profile from "@/views/settings/Profile"
 import Account from "@/views/settings/Account"
 import App from "@/views/settings/App"
 import Admin from "@/views/admin/Index"
 import Users from "@/views/admin/users/Index"
+import UserView from "@/views/admin/users/View"
+import MealPlans from "@/views/admin/meal-plans/Index"
+import MealPlanView from "@/views/admin/meal-plans/View"
 import DailyLog from "@/views/daily-log/Index"
 import Onboarding from "@/views/onboarding/Index"
 import MealPlan from "@/views/onboarding/MealPlan"
@@ -104,6 +106,18 @@ const routes = [
         path: 'users/view/:id',
         name: 'UserView',
         component: UserView,
+        meta: { authorized: [Role.Admin] }
+      },
+      {
+        path: 'meal-plans',
+        name: 'MealPlans',
+        component: MealPlans,
+        meta: { authorized: [Role.Admin] }
+      },
+      {
+        path: 'meal-plans/view/:id',
+        name: 'MealPlanView',
+        component: MealPlanView,
         meta: { authorized: [Role.Admin] }
       }
     ]

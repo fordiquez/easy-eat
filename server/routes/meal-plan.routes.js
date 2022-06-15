@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const mealPlanController = require("controllers/meal-plan.controller");
+const Role = require("utils/role");
 const authorize = require("middlewares/authorize");
-const Role = require("helpers/role.helper");
 
 router.get('/', mealPlanController.getAll);
 router.post('/', authorize(Role.Admin), mealPlanController.createSchema, mealPlanController.create);

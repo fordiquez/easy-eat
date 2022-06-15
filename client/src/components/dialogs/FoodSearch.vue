@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" @input="onClose" scrollable max-width="800">
+  <v-dialog scrollable v-model="dialog" max-width="800" :fullscreen="$vuetify.breakpoint.xsOnly" @input="onClose">
     <v-card>
       <v-card-title>
         <v-row class="d-flex flex-sm-row-reverse align-center">

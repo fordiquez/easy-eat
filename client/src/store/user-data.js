@@ -53,9 +53,7 @@ const actions = {
 };
 
 const mutations = {
-  SET_USER_DATA: (state, userData) => {
-    state.userData.next(excludedFilter(userData, ['message']))
-  },
+  SET_USER_DATA: (state, userData) => state.userData.next(excludedFilter(userData, ['message'])),
   CLEAR_USER_DATA: state => state.userData.next(null)
 };
 

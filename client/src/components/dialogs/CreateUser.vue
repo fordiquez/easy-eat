@@ -1,9 +1,13 @@
 <template>
   <v-dialog v-model="dialog" max-width="700" :fullscreen="$vuetify.breakpoint.xsOnly" @input="onCloseDialog">
     <v-card :loading="loading">
-      <v-card-title>
-        <span class="text-h5">Creating a new user account</span>
-      </v-card-title>
+      <v-toolbar color="success" dense>
+        <v-toolbar-title>Creating new user account</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon class="ml-5" @click="onCloseDialog">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-toolbar>
       <v-form @submit.prevent="onSubmit">
         <v-card-text>
           <v-container fluid>

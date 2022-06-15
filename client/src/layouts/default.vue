@@ -14,7 +14,7 @@
       </v-list-item>
       <v-list nav dense flat>
         <v-list-item-group v-model="selectedItem" :value="selectedItem" color="success">
-          <v-list-item v-for="(route, index) in drawerRoutes" :key="index" :to="{ name: route.to }" link exact>
+          <v-list-item v-for="(route, index) in routes.drawer" :key="index" :to="{ name: route.to }" link exact>
             <v-list-item-icon>
               <v-icon v-text="route.icon" />
             </v-list-item-icon>
@@ -23,6 +23,19 @@
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
+        <v-list-group v-if="isAdminRole" prepend-icon="mdi-account-cowboy-hat" :value="isActiveAdminRoute">
+          <template v-slot:activator>
+            <v-list-item-content>
+              <v-list-item-title class="text-subtitle-2">Admin Panel</v-list-item-title>
+            </v-list-item-content>
+          </template>
+            <v-list-item v-for="(route, index) in routes.admins" :key="index" :to="{ name: route.to }" link exact class="ml-14">
+              <v-list-item-title v-text="route.title" />
+              <v-list-item-icon>
+                <v-icon v-text="route.icon" />
+              </v-list-item-icon>
+            </v-list-item>
+          </v-list-group>
       </v-list>
       <template v-slot:append>
         <v-flex class="pa-3" v-if="user">
@@ -127,15 +140,18 @@ export default {
         { icon: 'mdi-movie-play-outline', title: 'Sign Up', to: 'Register' },
         { icon: 'mdi-chart-gantt', title: 'Account recovery', to: 'ForgotPassword' },
         { icon: 'mdi-account-music-outline', title: 'Reset Password', to: 'ResetPassword' },
-        { icon: 'mdi-flash-auto', title: 'Email Verification', to: 'VerifyEmail' },
-        { icon: 'mdi-account-group-outline', title: 'Admin Users', to: 'Users', protected: true }
+        { icon: 'mdi-flash-auto', title: 'Email Verification', to: 'VerifyEmail' }
+      ],
+      admins: [
+        { icon: 'mdi-account-group-outline', title: 'Users', to: 'Users' },
+        { icon: 'mdi-file-document-multiple', title: 'Meal Plans', to: 'MealPlans' }
       ],
       account: [
         { icon: 'mdi-account-details', title: 'My Profile', to: 'Profile' },
         { icon: 'mdi-account-lock-open', title: 'Account Settings', to: 'Account' },
         { icon: 'mdi-application-cog', title: 'App Settings', to: 'App' },
       ]
-    }
+    },
   }),
   created() {
     this.init()
@@ -151,8 +167,11 @@ export default {
     isActiveSnackbar() {
       return !!this.snackbars.find(snackbar => snackbar.active && snackbar.createdAt > new Date().getTime() - 5000)
     },
-    drawerRoutes() {
-      return this.routes.drawer.filter(route => this.user?.role !== 'Admin' ? !route.protected : route)
+    isAdminRole() {
+      return this.user?.role === 'Admin'
+    },
+    isActiveAdminRoute() {
+      return this.$route.meta.authorized?.includes('Admin')
     }
   },
   methods: {

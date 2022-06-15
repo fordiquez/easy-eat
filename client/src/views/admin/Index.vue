@@ -5,8 +5,12 @@
     </v-toolbar>
     <v-tabs grow show-arrows>
       <v-tab :to="{ name: 'Users' }">
-        <v-icon left>mdi-account-details</v-icon>
+        <v-icon left>mdi-account-group-outline</v-icon>
         <span>Users</span>
+      </v-tab>
+      <v-tab :to="{ name: 'MealPlans' }">
+        <v-icon left>mdi-file-document-multiple</v-icon>
+        <span>Meal Plans</span>
       </v-tab>
     </v-tabs>
     <router-view :user="user" />

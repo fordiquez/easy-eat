@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" @input="onClose" scrollable max-width="600">
+  <v-dialog v-model="dialog" max-width="600" :fullscreen="$vuetify.breakpoint.xsOnly" @input="onClose" scrollable>
     <v-card class="mx-auto" rounded>
       <v-toolbar color="success" dense>
         <v-toolbar-title>Create Food</v-toolbar-title>
@@ -8,7 +8,7 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-card-text class="px-3" style="max-height: 600px">
+      <v-card-text class="px-3" :style="$vuetify.breakpoint.smAndUp ? { maxHeight: '600px' } : null">
         <v-card-title class="white--text pb-1">Food Details</v-card-title>
         <v-card-text class="pb-0">Create your own custom food. Add food details, including servings, nutritional information and meal time.</v-card-text>
         <v-row class="mx-auto">

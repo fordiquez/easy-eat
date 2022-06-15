@@ -23,21 +23,13 @@ const actions = {
     snackbar.position = snackbar.position || 'bottom'
     commit('SET_SNACKBAR', snackbar)
   },
-  clearAlerts: ({ commit }) => {
-    commit('CLEAR_ALERTS')
-  }
+  clearAlerts: ({ commit }) => commit('CLEAR_ALERTS')
 };
 
 const mutations = {
-  SET_ALERT: (state, alert) => {
-    state.alerts = state.alerts.concat(alert)
-  },
-  SET_SNACKBAR: (state, snackbar) => {
-    state.snackbars = state.snackbars.concat(snackbar)
-  },
-  CLEAR_ALERTS: (state) => {
-    state.alerts = []
-  }
+  SET_ALERT: (state, alert) => state.alerts = state.alerts.concat(alert),
+  SET_SNACKBAR: (state, snackbar) => state.snackbars = state.snackbars.concat(snackbar),
+  CLEAR_ALERTS: state => state.alerts = []
 };
 
 export const notification = {

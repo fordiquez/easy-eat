@@ -43,9 +43,7 @@ const actions = {
     }
     state.loading = false
   },
-  update: ({ commit }, application) => {
-    commit('SET_STORAGE_FIELDS', application)
-  }
+  update: ({ commit }, application) => commit('SET_STORAGE_FIELDS', application)
 };
 
 const mutations = {

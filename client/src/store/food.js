@@ -263,27 +263,13 @@ const actions = {
       return response
     })
   },
-  setCurrentPage({ commit }, pageNumber) {
-    commit('SET_CURRENT_PAGE', pageNumber)
-  },
-  selectedMealTime({ commit }, mealTime) {
-    commit('SET_MEAL_TIME', mealTime)
-  },
-  selectedDate({ commit }, date) {
-    commit('SET_DATE', date)
-  },
-  setSelectedNutrients({ commit }, nutrients) {
-    commit('SET_SELECTED_NUTRIENTS', nutrients)
-  },
-  setDailyMacros({ commit }, userFood) {
-    commit('SET_DAILY_MACROS', userFood)
-  },
-  updateDailyMacros({ commit }, foodItem) {
-    commit('UPDATE_DAILY_MACROS', foodItem)
-  },
-  clearDailyMacros({ commit }) {
-    commit('CLEAR_DAILY_MACROS')
-  },
+  setCurrentPage: ({ commit }, pageNumber) => commit('SET_CURRENT_PAGE', pageNumber),
+  selectedMealTime: ({ commit }, mealTime) => commit('SET_MEAL_TIME', mealTime),
+  selectedDate: ({ commit }, date) => commit('SET_DATE', date),
+  setSelectedNutrients: ({ commit }, nutrients) => commit('SET_SELECTED_NUTRIENTS', nutrients),
+  setDailyMacros: ({ commit }, userFood) => commit('SET_DAILY_MACROS', userFood),
+  updateDailyMacros: ({ commit }, foodItem) => commit('UPDATE_DAILY_MACROS', foodItem),
+  clearDailyMacros: ({ commit }) => commit('CLEAR_DAILY_MACROS'),
   clearFoundFood: ({ commit }) => commit('CLEAR_FOUND_FOOD'),
   clearUserFood: ({ commit }) => commit('CLEAR_USER_FOOD'),
   clearLinks: ({ commit }) => commit('CLEAR_LINKS')
@@ -294,14 +280,10 @@ const mutations = {
     const uniqueHints = hints.filter((value, index, self) => self.findIndex((item) => item.food.foodId === value.food.foodId) === index)
     uniqueHints.forEach(hint => state.foundFood.push(hint))
   },
-  SET_LINKS: (state, { _links }) => {
-    state.links.push(_links.next.href)
-  },
+  SET_LINKS: (state, { _links }) => state.links.push(_links.next.href),
   CLEAR_FOUND_FOOD: state => state.foundFood = [],
   CLEAR_LINKS: state => state.links = [],
-  SET_CURRENT_PAGE: (state, number) => {
-    state.currentPage = number
-  },
+  SET_CURRENT_PAGE: (state, number) => state.currentPage = number,
   SET_USER_FOOD: (state, userFood) => {
     if (Array.isArray(userFood)) {
       state.userFood = []
@@ -313,12 +295,8 @@ const mutations = {
     state.userFood.splice(foodIndex, 1)
   },
   CLEAR_USER_FOOD: state => state.userFood = [],
-  SET_MEAL_TIME: (state, mealTime) => {
-    state.mealTime = mealTime
-  },
-  SET_DATE: (state, date) => {
-    state.selectedDate = date
-  },
+  SET_MEAL_TIME: (state, mealTime) => state.mealTime = mealTime,
+  SET_DATE: (state, date) => state.selectedDate = date,
   SET_SELECTED_NUTRIENTS: (state, nutrients) => {
     state.selectedNutrients = Object.assign({}, nutrients)
   },
@@ -355,9 +333,7 @@ const mutations = {
     state.dailyMacros.FAT += diffFAT
     state.dailyMacros.CALS += diffCALS
   },
-  CLEAR_DAILY_MACROS: (state) => {
-    state.dailyMacros.CARBS = state.dailyMacros.PROTEIN = state.dailyMacros.FAT = state.dailyMacros.CALS = 0
-  }
+  CLEAR_DAILY_MACROS: state => state.dailyMacros.CARBS = state.dailyMacros.PROTEIN = state.dailyMacros.FAT = state.dailyMacros.CALS = 0
 };
 
 export const food = {

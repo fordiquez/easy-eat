@@ -6,10 +6,14 @@ const UserData = require('models/user-data.model')
 const MealPlan = require('models/meal-plan.model')
 const mongodb = require("mongodb");
 const assert = require("assert");
+const logger = require('utils/logger')
 
-mongoose.connect(process.env.MONGODB_URI).then(() => mongoose.Promise = global.Promise).catch(error => console.log(Promise.reject(error)));
+mongoose.connect(process.env.MONGODB_URI).then(() => {
+  mongoose.Promise = global.Promise
+  logger.info('Connected to MongoDB successfully')
+}).catch(error => logger.error(Promise.reject(error)));
 
-const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
+const isValidId = id => mongoose.Types.ObjectId.isValid(id)
 
 module.exports = {
   Account,
@@ -22,7 +26,7 @@ module.exports = {
   deleteAvatar
 };
 
-async function getAvatar(filename, res) {
+function getAvatar(filename, res) {
   mongodb.MongoClient.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -33,7 +37,7 @@ async function getAvatar(filename, res) {
     const cursor = bucket.find({ filename })
     const avatar = {}
     cursor.forEach(doc => avatar.filename = doc.filename)
-      .then(() => avatar.filename === filename ? bucket.openDownloadStreamByName(filename).pipe(res) : res.json({message: 'Avatar not found'}))
+      .then(() => avatar.filename === filename ? bucket.openDownloadStreamByName(filename).pipe(res) : res.json({ message: 'Avatar not found' }))
       .catch(error => res.json(error))
   })
 }

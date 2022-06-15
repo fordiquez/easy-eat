@@ -1,4 +1,4 @@
-const db = require("helpers/db.helper");
+const db = require("utils/db");
 
 const getAll = async () => await db.UserData.find()
 

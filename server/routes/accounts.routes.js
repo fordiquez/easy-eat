@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const accountController = require("controllers/accounts.controller");
+const Role = require("utils/role");
+const uploadAvatar = require('utils/avatars-storage');
 const authorize = require("middlewares/authorize");
-const Role = require("helpers/role.helper");
-const uploadAvatar = require('middlewares/avatars-storage');
 
 router.post('/authenticate', accountController.authenticateSchema, accountController.authenticate);
 router.post('/refresh-token', accountController.refreshToken);

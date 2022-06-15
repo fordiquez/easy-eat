@@ -123,7 +123,7 @@ export default {
     accountService.getById(this.$route.params.id).then(response => {
       console.log(response)
       this.user = response.data
-      if (this.user.avatar) {
+      if (this.user.avatar?.filename && this.user.avatar?.id) {
         this.avatarPath = `${process.env.VUE_APP_BASE_API_URL}${process.env.VUE_APP_ACCOUNT_AVATAR_PATH}/${this.user.id}`
       }
     }).catch(error => {

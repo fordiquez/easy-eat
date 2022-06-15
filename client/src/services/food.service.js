@@ -3,26 +3,26 @@ import qs from "qs";
 
 const baseURL = '/foods'
 
-const searchParser = async (params) => {
+const searchParser = async params => {
   return await FoodDatabaseAPI.get('/api/food-database/v2/parser', {
     params,
     paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
   })
 }
 
-const searchNextPage = async (nextUrl) => {
+const searchNextPage = async nextUrl => {
   return await FoodDatabaseAPI.get(nextUrl)
 }
 
-const add = async (payload) => {
+const add = async payload => {
   return await DefaultAPI.post(`${baseURL}/`, payload)
 }
 
-const get = async (params) => {
+const get = async params => {
   return await DefaultAPI.get(`${baseURL}/`, { params })
 }
 
-const update = async (payload) => {
+const update = async payload => {
   return await DefaultAPI.put(`${baseURL}/${payload.id}`, payload)
 }
 
@@ -30,7 +30,7 @@ const _delete = async (id, params) => {
   return await DefaultAPI.delete(`${baseURL}/${id}`, { params })
 }
 
-const bulkDelete = async (params) => {
+const bulkDelete = async params => {
   return await DefaultAPI.delete(`${baseURL}/`, { params })
 }
 

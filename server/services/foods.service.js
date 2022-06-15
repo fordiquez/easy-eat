@@ -1,4 +1,4 @@
-const db = require('helpers/db.helper')
+const db = require('utils/db')
 
 const create = async (params) => {
   const { id } = await db.Account.findById(params.accountId);

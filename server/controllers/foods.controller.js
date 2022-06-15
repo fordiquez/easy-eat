@@ -3,7 +3,7 @@ const foodsService = require('services/foods.service');
 const validateRequest = require('middlewares/validate-request');
 
 const get = (req, res, next) => {
-  if (req.query.accountId !== req.user.id) {
+  if (req.query.accountId !== req.auth.id) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   foodsService.get(req.query).then(food => res.json(food)).catch(next);
@@ -26,7 +26,7 @@ const createSchema = (req, res, next) => {
 }
 
 const create = (req, res, next) => {
-  if (req.body.accountId !== req.user.id) {
+  if (req.body.accountId !== req.auth.id) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   foodsService.create(req.body).then(food => res.json(food)).catch(next);
@@ -50,21 +50,21 @@ const updateSchema = (req, res, next) => {
 }
 
 const update = (req, res, next) => {
-  if (req.body.accountId !== req.user.id) {
+  if (req.body.accountId !== req.auth.id) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   foodsService.update(req.params.id, req.body).then(food => res.json(food)).catch(next);
 }
 
 const _delete = (req, res, next) => {
-  if (req.query.accountId !== req.user.id) {
+  if (req.query.accountId !== req.auth.id) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   foodsService.delete(req.params.id).then(food => res.json(food)).catch(next);
 }
 
 const bulkDelete = (req, res, next) => {
-  if (req.query.accountId !== req.user.id) {
+  if (req.query.accountId !== req.auth.id) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   foodsService.bulkDelete(req.query.accountId).then(food => res.json(food)).catch(next);

@@ -30,19 +30,19 @@ const refreshToken = () => {
   })
 }
 
-const register = (user) => {
+const register = user => {
   return DefaultAPI.post(`${baseURL}/register`, user)
 }
 
-const verifyEmail = (token) => {
+const verifyEmail = token => {
   return DefaultAPI.post(`${baseURL}/verify-email`, { token })
 }
 
-const forgotPassword = (email) => {
+const forgotPassword = email => {
   return DefaultAPI.post(`${baseURL}/forgot-password`, { email })
 }
 
-const validateResetToken = (token) => {
+const validateResetToken = token => {
   return DefaultAPI.post(`${baseURL}/validate-reset-token`, { token })
 }
 
@@ -54,11 +54,11 @@ const getAll = () => {
   return DefaultAPI.get(`${baseURL}/`)
 }
 
-const create = (user) => {
+const create = user => {
   return DefaultAPI.post(`${baseURL}/`, user)
 }
 
-const getById = (id) => {
+const getById = id => {
   return DefaultAPI.get(`${baseURL}/${id}`)
 }
 
@@ -66,7 +66,7 @@ const update = (id, payload) => {
   return DefaultAPI.put(`${baseURL}/${id}`, payload)
 }
 
-const _delete = (id) => {
+const _delete = id => {
   return DefaultAPI.delete(`${baseURL}/${id}`)
 }
 

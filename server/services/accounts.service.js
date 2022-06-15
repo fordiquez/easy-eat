@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const crypto = require("crypto");
-const sendEmail = require('helpers/email.helper');
-const db = require('helpers/db.helper');
-const Role = require('helpers/role.helper');
+const bcrypt = require('bcryptjs');
+const db = require('utils/db');
+const logger = require("utils/logger");
+const Role = require('utils/role');
+const { sendAlreadyRegisteredEmail, sendVerificationEmail, sendPasswordResetEmail } = require('utils/email');
 
 const register = async (params, origin) => {
   if (await db.Account.findOne({ email: params.email })) {
@@ -211,38 +212,37 @@ const _delete = async (id) => {
   await db.RefreshToken.deleteMany({ account: id })
   await db.UserData.findOneAndDelete({ accountId: id })
   await account.remove()
+  const message = 'Account deleted successfully'
+  logger.info(message)
 
-  return {
-    message: 'The user account has been successfully deleted'
-  }
+  return { message }
 }
 
-const uploadAvatar = async (req) => {
-  const account = await getAccount(req.params.id)
+const uploadAvatar = async (id, file) => {
+  const account = await getAccount(id)
   if (account.avatar.id && account.avatar.filename) await db.deleteAvatar(account.avatar.id)
   account.avatar = {
-    id: req.file.id,
-    filename: req.file.filename
+    id: file.id,
+    filename: file.filename
   }
   await account.save()
   return {
-    avatar: req.file,
+    avatar: file,
     message: 'Avatar has been downloaded successfully'
   }
 }
 
-const getAvatar = async (req, res) => {
-  const { avatar } = await getAccount(req.params.id)
+const getAvatar = async (id, res) => {
+  const { avatar } = await getAccount(id)
   return avatar.id && avatar.filename ? db.getAvatar(avatar.filename, res) : res.json({ message: 'Avatar not found' })
 }
 
-const updatedAvatar = async (req, res) => {
-  const filename = req.params.filename
+const updatedAvatar = async (filename, res) => {
   return filename ? db.getAvatar(filename, res) : res.json({ message: 'Avatar not found' })
 }
 
-const deleteAvatar = async (req) => {
-  const account = await getAccount(req.params.id)
+const deleteAvatar = async (id) => {
+  const account = await getAccount(id)
   if (!account.avatar.id || !account.avatar.filename) {
     return {
       message: 'Avatar not found'
@@ -258,13 +258,9 @@ const deleteAvatar = async (req) => {
 
 // helper functions
 
-const randomTokenString = () => {
-  return crypto.randomBytes(40).toString('hex')
-}
+const randomTokenString = () => crypto.randomBytes(40).toString('hex')
 
-const hash = (password) => {
-  return bcrypt.hashSync(password, 10);
-}
+const hash = password => bcrypt.hashSync(password, 10)
 
 const getAccount = async (id) => {
   if (!db.isValidId(id)) throw 'Account not found';
@@ -297,64 +293,6 @@ const generateRefreshToken = (account, ipAddress) => {
 const basicDetails = (account) => {
   const { id, email, firstName, lastName, role, verified, created, updated, avatar } = account;
   return { id, email, firstName, lastName, role, verified, created, updated, avatar };
-}
-
-// email functions
-
-const sendVerificationEmail = async (account, origin) => {
-  let message;
-  if (origin) {
-    const verifyUrl = `${origin}/auth/verify-email?token=${account.verificationToken}`;
-    message = `<p>Please click the below link to verify your email address:</p>
-                   <p><a href="${verifyUrl}" target="_blank">${verifyUrl}</a></p>`;
-  } else {
-    message = `<p>Please use the below token to verify your email address with the <code>/accounts/verify-email</code> api route:</p>
-                   <p><code>${account.verificationToken}</code></p>`;
-  }
-
-  await sendEmail({
-    to: account.email,
-    subject: 'EasyEat — Verify Email',
-    html: `<h4>Verify Email</h4>
-               <p>Thanks for registering!</p>
-               ${message}`
-  });
-}
-
-const sendAlreadyRegisteredEmail = async (email, origin) => {
-  let message;
-  if (origin) {
-    message = `<p>If you don't know your password please visit the <a href="${origin}/auth/forgot-password">forgot password</a> page.</p>`;
-  } else {
-    message = `<p>If you don't know your password you can reset it via the <code>/accounts/forgot-password</code> api route.</p>`;
-  }
-
-  await sendEmail({
-    to: email,
-    subject: 'EasyEat — Email Already Registered',
-    html: `<h4>Email Already Registered</h4>
-               <p>Your email <strong>${email}</strong> is already registered.</p>
-               ${message}`
-  });
-}
-
-const sendPasswordResetEmail = async (account, origin) => {
-  let message;
-  if (origin) {
-    const resetUrl = `${origin}/auth/reset-password?token=${account.resetToken.token}`;
-    message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
-                   <p><a href="${resetUrl}" target="_blank">${resetUrl}</a></p>`;
-  } else {
-    message = `<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
-                   <p><code>${account.resetToken.token}</code></p>`;
-  }
-
-  await sendEmail({
-    to: account.email,
-    subject: 'EasyEat — Reset Password',
-    html: `<h4>Reset Password Email</h4>
-               ${message}`
-  });
 }
 
 module.exports = {

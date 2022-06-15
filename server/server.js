@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const errorHandler = require('middlewares/error-handler');
+const logger = require('utils/logger');
+const swagger = require('utils/swagger');
 const accountsRoutes = require('routes/accounts.routes');
 const userDataRoutes = require('routes/user-data.routes');
 const mealPlanRoutes = require('routes/meal-plan.routes');
@@ -32,8 +34,8 @@ app.use('/user-data', userDataRoutes);
 app.use('/meal-plan', mealPlanRoutes);
 app.use('/foods', foodsRoutes);
 
-// swagger docs route
-app.use('/api-docs', require('helpers/swagger.helper'));
+// swagger docs routes
+app.use('/api-docs', swagger);
 
 // global error handler
 app.use(errorHandler);
@@ -42,5 +44,5 @@ app.use(errorHandler);
 const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
 app.listen(port, () => {
   const date = new Date().toLocaleTimeString()
-  console.log('[' + date + ']' + ' Server listening on port ' + port);
+  logger.info('[' + date + ']' + ' Express running, listening on port ' + port);
 });

@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const validateRequest = require('middlewares/validate-request');
-const Role = require('helpers/role.helper');
+const Role = require('utils/role');
 const accountService = require('services/accounts.service');
 
 const registerSchema = (req, res, next) => {
@@ -97,7 +97,7 @@ const revokeToken = (req, res, next) => {
   const token = req.cookies.refreshToken
   if (!token) return res.status(400).json({ message: 'Token is required' });
 
-  if (!req.user.ownsToken(token) && req.user.role !== Role.Admin) {
+  if (!req.auth.ownsToken(token) && req.auth.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   accountService.revokeToken(token).then(response => res.json(response)).catch(next);
@@ -108,7 +108,7 @@ const getAll = (req, res, next) => {
 }
 
 const getById = (req, res, next) => {
-  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   accountService.getById(req.params.id).then(account => account ? res.json(account) : res.sendStatus(404)).catch(next);
@@ -140,7 +140,7 @@ const updateSchema = (req, res, next) => {
     updatedPasswordConfirm: Joi.string().valid(Joi.ref('updatedPassword')).empty('')
   };
 
-  if (req.user.role === Role.Admin) {
+  if (req.auth.role === Role.Admin) {
     schemaRules.role = Joi.string().valid(Role.Admin, Role.User).empty('');
   }
 
@@ -148,34 +148,40 @@ const updateSchema = (req, res, next) => {
   validateRequest(req, next, schema);
 }
 
-const update = async (req, res, next) => {
-  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
+const update = (req, res, next) => {
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   accountService.update(req.params.id, req.body).then(account => res.json(account)).catch(next);
 }
 
 const _delete = (req, res, next) => {
-  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   accountService.delete(req.params.id).then(account => res.json(account)).catch(next);
 }
 
 const uploadAvatar = async (req, res, next) => {
-  await accountService.uploadAvatar(req, res).then(avatar => res.json(avatar)).catch(next)
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  await accountService.uploadAvatar(req.params.id, req.file).then(avatar => res.json(avatar)).catch(next)
 }
 
 const getAvatar = async (req, res, next) => {
-  await accountService.getAvatar(req, res).then(avatar => avatar).catch(next)
+  await accountService.getAvatar(req.params.id, res).then(avatar => avatar).catch(next)
 }
 
 const updatedAvatar = async (req, res, next) => {
-  await accountService.updatedAvatar(req, res).then(avatar => avatar).catch(next)
+  await accountService.updatedAvatar(req.params.filename, res).then(avatar => avatar).catch(next)
 }
 
 const deleteAvatar = async (req, res, next) => {
-  await accountService.deleteAvatar(req, res).then(avatar => res.json(avatar)).catch(next)
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  await accountService.deleteAvatar(req.params.id).then(avatar => res.json(avatar)).catch(next)
 }
 
 // helper functions

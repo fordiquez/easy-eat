@@ -30,7 +30,7 @@ const updateSchema = (req, res, next) => {
   validateRequest(req, next, schema);
 }
 
-const update = async (req, res, next) => {
+const update = (req, res, next) => {
   mealPlanService.update(req.params.id, req.body).then(mealPlan => res.json(mealPlan)).catch(next);
 }
 

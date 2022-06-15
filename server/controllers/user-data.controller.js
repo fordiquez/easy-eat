@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const Role = require("helpers/role.helper");
+const Role = require("utils/role");
 const userDataService = require("services/user-data.service");
 const validateRequest = require("middlewares/validate-request");
 
@@ -8,7 +8,7 @@ const getAll = (req, res, next) => {
 }
 
 const getById = (req, res, next) => {
-  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
     return res.status(401).json({ message: 'Denied access' });
   }
   userDataService.getById(req.params.id).then(userData => userData ? res.json(userData) : res.sendStatus(404)).catch(next);
@@ -28,7 +28,7 @@ const createSchema = (req, res, next) => {
 }
 
 const create = (req, res, next) => {
-  if (req.body.accountId !== req.user.id && req.user.role !== Role.Admin) {
+  if (req.body.accountId !== req.auth.id && req.auth.role !== Role.Admin) {
     return res.status(401).json({ message: 'Denied access' });
   }
   userDataService.create(req.body).then(userData => res.json(userData)).catch(next);
@@ -53,15 +53,15 @@ const updateSchema = (req, res, next) => {
   validateRequest(req, next, schema);
 }
 
-const update = async (req, res, next) => {
-  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
+const update = (req, res, next) => {
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
     return res.status(401).json({ message: 'Denied access' });
   }
   userDataService.update(req.params.id, req.body).then(userData => res.json(userData)).catch(next);
 }
 
 const _delete = (req, res, next) => {
-  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
     return res.status(401).json({ message: 'Denied access' });
   }
   userDataService.delete(req.params.id).then(userData => res.json(userData)).catch(next);

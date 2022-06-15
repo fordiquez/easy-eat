@@ -114,9 +114,7 @@ const mutations = {
     state.token.next(null)
     state.users = []
   },
-  SET_USERS: (state, users) => {
-    state.users = users
-  },
+  SET_USERS: (state, users) => state.users = users,
   SET_CREATED_USER: (state, response) => {
     const user = excludedFilter(response, ['message'])
     state.users.push(user)
