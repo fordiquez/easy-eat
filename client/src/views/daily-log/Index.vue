@@ -318,10 +318,10 @@ export default {
       this.foodItemDialog = true
       this.selectedFood = foodItem.food
       const nutrients = {
-        CALS: foodItem.food.nutrients.ENERC_KCAL || null,
-        CARBS: foodItem.food.nutrients.CHOCDF || null,
-        PROTEIN: foodItem.food.nutrients.PROCNT || null,
-        FAT: foodItem.food.nutrients.FAT || null
+        CALS: foodItem.food.nutrients.ENERC_KCAL || 0,
+        CARBS: foodItem.food.nutrients.CHOCDF || 0,
+        PROTEIN: foodItem.food.nutrients.PROCNT || 0,
+        FAT: foodItem.food.nutrients.FAT || 0
       }
       this.selectedNutrients = Object.assign({}, nutrients)
     },

@@ -13,7 +13,11 @@ const getById = (req, res, next) => {
 const createSchema = (req, res, next) => {
   const schema = Joi.object({
     title: Joi.string().required(),
-    proportions: Joi.object().required()
+    proportions: Joi.object({
+      CARBS: Joi.number().required(),
+      PROTEIN: Joi.number().required(),
+      FAT: Joi.number().required()
+    }),
   });
   validateRequest(req, next, schema);
 }
@@ -25,7 +29,11 @@ const create = (req, res, next) => {
 const updateSchema = (req, res, next) => {
   const schema = Joi.object({
     title: Joi.string().required(),
-    proportions: Joi.object().required()
+    proportions: Joi.object({
+      CARBS: Joi.number().required(),
+      PROTEIN: Joi.number().required(),
+      FAT: Joi.number().required()
+    }),
   });
   validateRequest(req, next, schema);
 }

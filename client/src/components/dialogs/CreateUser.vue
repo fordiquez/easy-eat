@@ -79,11 +79,20 @@
                 />
               </v-col>
               <v-col cols="12">
-                <v-radio-group v-model="user.role" :error-messages="roleErrors" prepend-icon="mdi-account-multiple" dense row>
-                  <span class="mr-2">User role</span>
-                  <v-radio label="User" value="User" @change="$v.user.role.$touch()"></v-radio>
-                  <v-radio label="Admin" value="Admin" @change="$v.user.role.$touch()"></v-radio>
-                </v-radio-group>
+                <v-icon class="mr-3">mdi-account-multiple</v-icon>
+                <label class="text-subtitle-1" :class="$vuetify.breakpoint.smAndUp ? 'mr-3' : ''">Role</label>
+                <v-btn-toggle v-model="user.role" :class="$vuetify.breakpoint.xsOnly ? 'd-flex justify-center' : ''" mandatory shaped>
+                  <v-btn value="User" text :style="$vuetify.breakpoint.xsOnly ? { width: '50%' } : ''" :color="user.role === 'User' ? 'success' : ''"
+                  >
+                    <v-icon :color="user.role === 'User' ? 'success' : ''">mdi-account</v-icon>
+                    <v-card-text class="text-subtitle-1 text-capitalize">User</v-card-text>
+                  </v-btn>
+                  <v-btn value="Admin" text :style="$vuetify.breakpoint.xsOnly ? { width: '50%' } : ''" :color="user.role === 'Admin' ? 'success' : ''"
+                  >
+                    <v-icon :color="user.role === 'Admin' ? 'success' : ''">mdi-account-lock</v-icon>
+                    <v-card-text class="text-subtitle-1 text-capitalize">Admin</v-card-text>
+                  </v-btn>
+                </v-btn-toggle>
               </v-col>
             </v-row>
           </v-container>
@@ -104,14 +113,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import {
-  emailErrors,
-  firstNameErrors, hasNumerics,
-  lastNameErrors,
-  passwordConfirmErrors,
-  passwordErrors,
-  roleErrors
-} from "@/utils/validations";
+import { hasNumerics, validationRules } from "@/utils/validations";
 import { alpha, email, minLength, required, sameAs } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
 
@@ -177,23 +179,20 @@ export default {
   computed: {
     ...mapGetters('account', ['getUsers']),
     firstNameErrors() {
-      return firstNameErrors(this.$v.user.firstName)
+      return validationRules(this.$v.user.firstName, 'First Name', {})
     },
     lastNameErrors() {
-      return lastNameErrors(this.$v.user.lastName)
+      return validationRules(this.$v.user.lastName, 'Last Name', {})
     },
     emailErrors() {
-      return emailErrors(this.$v.user.email)
+      return validationRules(this.$v.user.email, 'Email', {})
     },
     passwordErrors() {
-      return passwordErrors(this.$v.user.password)
+      return validationRules(this.$v.user.password, 'Password', { minLength: 6, sameAs: 'Passwords must be identical' })
     },
     passwordConfirmErrors() {
-      return passwordConfirmErrors(this.$v.user.passwordConfirm)
+      return validationRules(this.$v.user.passwordConfirm, 'Confirmation password', { minLength: 6, sameAs: 'Passwords must be identical' })
     },
-    roleErrors() {
-      return roleErrors(this.$v.user.role)
-    }
   },
   methods: {
     ...mapActions('account', ['getAll', 'create']),

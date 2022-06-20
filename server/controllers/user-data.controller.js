@@ -46,9 +46,17 @@ const updateSchema = (req, res, next) => {
     caloriesGoal: Joi.string(),
     BMR: Joi.number(),
     TDEE: Joi.number(),
-    macros: Joi.object(),
+    macros: Joi.object({
+      CARBS: Joi.number().required(),
+      PROTEIN: Joi.number().required(),
+      FAT: Joi.number().required()
+    }),
     selectedPlan: Joi.string(),
-    customProportions: Joi.object()
+    customProportions: Joi.object({
+      CARBS: Joi.number().required(),
+      PROTEIN: Joi.number().required(),
+      FAT: Joi.number().required()
+    }),
   });
   validateRequest(req, next, schema);
 }

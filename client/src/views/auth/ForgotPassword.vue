@@ -33,7 +33,7 @@
 import { mapActions } from "vuex";
 import { required, email } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
-import { emailErrors } from "@/utils/validations";
+import { validationRules } from "@/utils/validations";
 
 export default {
   name: "ForgotPassword",
@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     emailErrors() {
-      return emailErrors(this.$v.email)
+      return validationRules(this.$v.email, 'Email', {})
     },
   },
   methods: {

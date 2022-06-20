@@ -37,7 +37,14 @@ function getAvatar(filename, res) {
     const cursor = bucket.find({ filename })
     const avatar = {}
     cursor.forEach(doc => avatar.filename = doc.filename)
-      .then(() => avatar.filename === filename ? bucket.openDownloadStreamByName(filename).pipe(res) : res.json({ message: 'Avatar not found' }))
+      .then(() => {
+        if (avatar.filename === filename) {
+          bucket.openDownloadStreamByName(filename).pipe(res)
+        } else {
+          res.json({ message: 'Avatar not found' })
+          logger.error(`Avatar ${filename} not found`)
+        }
+      })
       .catch(error => res.json(error))
   })
 }

@@ -156,14 +156,14 @@ router.beforeEach((to, from, next) => {
   const { authorized } = to.meta
   const user = getUser()
   const token = getToken()
-  if (authorized) {
-    if (!isAuthorized()) {
-      user || token ? store.commit('account/LOGOUT_USER') : null
-      return next({ name: 'Login', query: { returnUrl: to.path } })
-    }
-    if (authorized.length && !authorized.includes(user.role)) return next({ name: 'DailyLog' })
+  if (authorized && !isAuthorized()) {
+    if (user || token) store.commit('account/LOGOUT_USER')
+    return next({ name: 'Login', query: { returnUrl: to.path } })
+  } else if (authorized?.length && !authorized.includes(user.role)) {
+    return next({ name: 'DailyLog' })
+  } else {
+    return next()
   }
-  return next()
 })
 
 export default router

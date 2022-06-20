@@ -70,8 +70,8 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { minLength, required, sameAs } from "vuelidate/lib/validators";
-import { hasNumerics, passwordConfirmErrors, passwordErrors } from "@/utils/validations";
 import { mapActions } from "vuex";
+import { hasNumerics, validationRules } from "@/utils/validations";
 
 export default {
   name: "UpdatePasswordDialog",
@@ -124,13 +124,13 @@ export default {
   },
   computed: {
     passwordErrors() {
-      return passwordErrors(this.$v.updatedAccount.password)
+      return validationRules(this.$v.updatedAccount.password, 'Password', {})
     },
     updatedPasswordErrors() {
-      return passwordErrors(this.$v.updatedAccount.updatedPassword)
+      return validationRules(this.$v.updatedAccount.updatedPassword, 'Updated password', { minLength: 6, sameAs: 'Passwords must be identical' })
     },
     updatedPasswordConfirmErrors() {
-      return passwordConfirmErrors(this.$v.updatedAccount.updatedPasswordConfirm)
+      return validationRules(this.$v.updatedAccount.updatedPasswordConfirm, 'Confirmation updated password', { minLength: 6, sameAs: 'Passwords must be identical' })
     }
   },
   methods: {

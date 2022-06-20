@@ -13,7 +13,6 @@ export default {
     user: null
   }),
   created() {
-    // console.log(window.matchMedia("(prefers-color-scheme: light)").matches)
     this.getUser.subscribe(user => this.user = user)
   },
   computed: {
@@ -21,9 +20,10 @@ export default {
       return this.$route.meta.layout || 'DefaultLayout'
     },
     ...mapState('notification', ['alerts']),
-    ...mapGetters('account', ['getUser']),
+    ...mapGetters('account', ['getUser', 'getUserValue']),
   },
   methods: {
+    ...mapActions('account', ['getById']),
     ...mapActions('notification', ['clearAlerts'])
   },
   watch: {

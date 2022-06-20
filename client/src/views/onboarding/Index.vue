@@ -192,8 +192,11 @@
 
 <script>
 import { validationMixin } from "vuelidate";
-import { required, minValue, maxValue } from "vuelidate/lib/validators";
-import { birthdayDateErrors, hasNumerics, numericErrors, sexErrors, rangeDate } from "@/utils/validations";
+import { required, minValue, maxValue, numeric } from "vuelidate/lib/validators";
+import {
+  rangeDate,
+  validationRules
+} from "@/utils/validations";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
 
@@ -276,19 +279,19 @@ export default {
     userData: {
       currentWeight: {
         required,
-        hasNumerics,
+        numeric,
         minValue: minValue(25),
         maxValue: maxValue(300)
       },
       goalWeight: {
         required,
-        hasNumerics,
+        numeric,
         minValue: minValue(25),
         maxValue: maxValue(300)
       },
       height: {
         required,
-        hasNumerics,
+        numeric,
         minValue: minValue(90),
         maxValue: maxValue(250)
       },
@@ -311,6 +314,9 @@ export default {
     },
     currentSubtitle() {
       return this.content[this.step - 1].subtitle
+    },
+    currentStep() {
+      return this.content[this.step - 1].step
     },
     currentWeight() {
       return this.userData.currentWeight
@@ -340,19 +346,20 @@ export default {
       return this.getActivities.descriptions[this.activityIndex]
     },
     currentWeightErrors() {
-      return numericErrors(this.$v.userData.currentWeight, this.content[this.step - 1].step, [25, 300])
+      return validationRules(this.$v.userData.currentWeight, this.currentStep, { minValue: 25, maxValue: 300 })
     },
     goalWeightErrors() {
-      return numericErrors(this.$v.userData.goalWeight, this.content[this.step - 1].step, [25, 300])
+      return validationRules(this.$v.userData.goalWeight, this.currentStep, {  minValue: 25, maxValue: 300 })
     },
     heightErrors() {
-      return numericErrors(this.$v.userData.height, this.content[this.step - 1].step, [90, 240])
+      return validationRules(this.$v.userData.height, this.currentStep, {  minValue: 90, maxValue: 240 })
     },
     birthdayDateErrors() {
-      return birthdayDateErrors(this.$v.userData.birthdayDate, [new Date('1922-02-22').toISOString().slice(0, 10), this.maxDate])
+      const range = [new Date('1922-02-22').toISOString().slice(0, 10), this.maxDate]
+      return validationRules(this.$v.userData.birthdayDate, 'Birthday date', { range })
     },
     sexErrors() {
-      return sexErrors(this.$v.userData.sex)
+      return validationRules(this.$v.userData.sex, 'Sex', {})
     },
   },
   methods: {

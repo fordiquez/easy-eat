@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "FoodItemDialog",
@@ -346,6 +346,7 @@ export default {
     },
     setNutrients(measure) {
       const oneUnits = this.oneUnits()
+      console.log(oneUnits)
       if (measure === 'gram' || measure === 'milliliter') {
         this.selectedNutrients.CALS = oneUnits.CALS * this.servings
         this.selectedNutrients.CARBS = oneUnits.CARBS * this.servings

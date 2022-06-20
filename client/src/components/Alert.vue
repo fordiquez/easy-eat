@@ -1,8 +1,8 @@
 <template>
   <v-flex>
     <v-alert
-        v-for="(alert, index) in activeAlerts"
-        :key="index"
+        v-for="alert in activeAlerts"
+        :key="alert.id"
         v-model="alert.active"
         :type="alert.type"
         :color="alert.type"
@@ -14,15 +14,12 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
   name: "Alert",
   computed: {
-    ...mapState('notification', ['alerts']),
-    activeAlerts() {
-      return this.alerts.filter(alert => alert.active)
-    }
+    ...mapGetters('notification', ['activeAlerts']),
   }
 }
 </script>

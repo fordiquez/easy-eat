@@ -68,7 +68,7 @@
 import { mapActions } from "vuex";
 import { validationMixin } from "vuelidate";
 import { minLength, required, sameAs } from "vuelidate/lib/validators";
-import { passwordConfirmErrors, passwordErrors, hasNumerics } from "@/utils/validations";
+import { hasNumerics, validationRules } from "@/utils/validations";
 
 export default {
   name: "ResetPassword",
@@ -105,10 +105,10 @@ export default {
   },
   computed: {
     passwordErrors() {
-      return passwordErrors(this.$v.form.password)
+      return validationRules(this.$v.form.password, 'Password', { minLength: 6, sameAs: 'Passwords must be identical' })
     },
     passwordConfirmErrors() {
-      return passwordConfirmErrors(this.$v.form.passwordConfirm)
+      return validationRules(this.$v.form.passwordConfirm, 'Confirmation password', { minLength: 6, sameAs: 'Passwords must be identical' })
     }
   },
   methods: {

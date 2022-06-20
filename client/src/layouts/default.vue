@@ -38,6 +38,16 @@
           </v-list-group>
       </v-list>
       <template v-slot:append>
+        <v-flex v-if="user" class="d-flex flex-column align-center justify-center">
+          <v-avatar size="150">
+            <v-img v-if="avatarPath" :src="avatarPath" :lazy-src="avatarPath"
+                   :alt="user.firstName + ' ' + user.lastName"
+                   :title="user.firstName + ' ' + user.lastName"
+            />
+            <v-icon v-else color="success" size="100">mdi-account-circle</v-icon>
+          </v-avatar>
+          <v-card-title class="text-button py-2">{{ user.firstName }} {{ user.lastName }}</v-card-title>
+        </v-flex>
         <v-flex class="pa-3" v-if="user">
           <v-btn :block="!application.miniVariant" :icon="application.miniVariant" :loading="loading" @click="onLogout">
             <v-icon class="success--text" :large="application.miniVariant">mdi-logout</v-icon>
@@ -135,12 +145,7 @@ export default {
       drawer: [
         { icon: 'mdi-math-log', title: 'Daily Log', to: 'DailyLog' },
         { icon: 'mdi-debug-step-over', title: 'Onboarding', to: 'Onboarding' },
-        { icon: 'mdi-file-document-edit', title: 'Meal Plan', to: 'MealPlan' },
-        { icon: 'mdi-percent', title: 'Log In', to: 'Login' },
-        { icon: 'mdi-movie-play-outline', title: 'Sign Up', to: 'Register' },
-        { icon: 'mdi-chart-gantt', title: 'Account recovery', to: 'ForgotPassword' },
-        { icon: 'mdi-account-music-outline', title: 'Reset Password', to: 'ResetPassword' },
-        { icon: 'mdi-flash-auto', title: 'Email Verification', to: 'VerifyEmail' }
+        { icon: 'mdi-file-document-edit', title: 'Meal Plan', to: 'MealPlan' }
       ],
       admins: [
         { icon: 'mdi-account-group-outline', title: 'Users', to: 'Users' },
@@ -156,6 +161,7 @@ export default {
   created() {
     this.init()
     this.application = this.getApplication
+    if (this.user?.id) this.getById(this.user.id)
   },
   computed: {
     ...mapState('notification', ['alerts', 'snackbars']),
@@ -172,10 +178,13 @@ export default {
     },
     isActiveAdminRoute() {
       return this.$route.meta.authorized?.includes('Admin')
+    },
+    avatarPath() {
+      return this.user?.avatar?.filename ? `${process.env.VUE_APP_BASE_API_URL}${process.env.VUE_APP_ACCOUNT_AVATAR_PATH}/${this.user.id}` : null
     }
   },
   methods: {
-    ...mapActions('account', ['logout']),
+    ...mapActions('account', ['getById', 'logout']),
     ...mapActions('food', ['clearUserFood']),
     ...mapActions('userData', ['clearUserData']),
     ...mapActions('mealPlan', ['clearSelectedPlan']),

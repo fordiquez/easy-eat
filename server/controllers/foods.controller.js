@@ -15,12 +15,17 @@ const createSchema = (req, res, next) => {
     date: Joi.date().required(),
     mealTime: Joi.string().required(),
     measure: Joi.string().required(),
-    servings: Joi.number().required(),
+    servings: Joi.number().required().min(1),
     label: Joi.string().required(),
     category: Joi.string().required(),
     healthLabels: Joi.array().items(Joi.string()),
     image: Joi.string(),
-    nutrients: Joi.object().required(),
+    nutrients: Joi.object({
+      CALS: Joi.number().required(),
+      CARBS: Joi.number().required(),
+      PROTEIN: Joi.number().required(),
+      FAT: Joi.number().required()
+    }),
   });
   validateRequest(req, next, schema);
 }
@@ -44,7 +49,12 @@ const updateSchema = (req, res, next) => {
     category: Joi.string().required(),
     healthLabels: Joi.array().items(Joi.string()),
     image: Joi.string(),
-    nutrients: Joi.object().required()
+    nutrients: Joi.object({
+      CALS: Joi.number().required(),
+      CARBS: Joi.number().required(),
+      PROTEIN: Joi.number().required(),
+      FAT: Joi.number().required()
+    }),
   });
   validateRequest(req, next, schema);
 }

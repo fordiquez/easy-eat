@@ -82,7 +82,7 @@
                   hide-spin-buttons
               >
                 <template v-slot:prepend v-if="isCustomPlan">
-                  <v-btn icon
+                  <v-btn icon color="success"
                          :disabled="!isCustomPlan || userData.macros.CARBS <= 0"
                          :style="{ cursor: userData.macros.CARBS <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                          @click="decrement('CARBS')">
@@ -90,7 +90,7 @@
                   </v-btn>
                 </template>
                 <template v-slot:append-outer v-if="isCustomPlan">
-                  <v-btn icon :disabled="!isCustomPlan" @click="increment('CARBS')">
+                  <v-btn icon color="success" :disabled="!isCustomPlan" @click="increment('CARBS')">
                     <v-icon>mdi-numeric-positive-1</v-icon>
                   </v-btn>
                 </template>
@@ -123,7 +123,7 @@
                   hide-spin-buttons
               >
                 <template v-slot:prepend v-if="isCustomPlan">
-                  <v-btn icon
+                  <v-btn icon color="success"
                          :disabled="!isCustomPlan || userData.macros.PROTEIN <= 0"
                          :style="{ cursor: userData.macros.PROTEIN <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                          @click="decrement('PROTEIN')">
@@ -131,7 +131,7 @@
                   </v-btn>
                 </template>
                 <template v-slot:append-outer v-if="isCustomPlan">
-                  <v-btn icon :disabled="!isCustomPlan" @click="increment('PROTEIN')">
+                  <v-btn icon color="success" :disabled="!isCustomPlan" @click="increment('PROTEIN')">
                     <v-icon>mdi-numeric-positive-1</v-icon>
                   </v-btn>
                 </template>
@@ -164,7 +164,7 @@
                   hide-spin-buttons
               >
                 <template v-slot:prepend v-if="isCustomPlan">
-                  <v-btn icon
+                  <v-btn icon color="success"
                          :disabled="!isCustomPlan || userData.macros.FAT <= 0"
                          :style="{ cursor: userData.macros.FAT <= 0 ? 'not-allowed' : 'pointer', pointerEvents: 'auto' }"
                          @click="decrement('FAT')">
@@ -172,7 +172,7 @@
                   </v-btn>
                 </template>
                 <template v-slot:append-outer v-if="isCustomPlan">
-                  <v-btn icon :disabled="!isCustomPlan" @click="increment('FAT')">
+                  <v-btn icon color="success" :disabled="!isCustomPlan" @click="increment('FAT')">
                     <v-icon>mdi-numeric-positive-1</v-icon>
                   </v-btn>
                 </template>
@@ -211,7 +211,7 @@
 
 <script>
 import RoundSlider from 'vue-round-slider'
-import {mapActions, mapGetters} from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
 import DoughnutChart from "@/components/charts/mealPlanDoughnut";
 

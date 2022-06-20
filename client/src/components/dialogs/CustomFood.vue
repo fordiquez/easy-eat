@@ -129,7 +129,7 @@
           <v-col cols="11" class="pl-0">
             <v-text-field
                 v-model.number="foodItem.nutrients.CALS"
-                :error-messages="foodNutrientsCALSErrors"
+                :error-messages="foodNutrientsCalsErrors"
                 class="input-number"
                 type="number"
                 label="Calories"
@@ -159,7 +159,7 @@
           <v-col cols="11" class="pl-0">
             <v-text-field
                 v-model.number="foodItem.nutrients.CARBS"
-                :error-messages="foodNutrientsCARBSErrors"
+                :error-messages="foodNutrientsCarbsErrors"
                 class="input-number"
                 type="number"
                 label="Net Carbs"
@@ -189,7 +189,7 @@
           <v-col cols="11" class="pl-0">
             <v-text-field
                 v-model.number="foodItem.nutrients.PROTEIN"
-                :error-messages="foodNutrientsPROTEINErrors"
+                :error-messages="foodNutrientsProteinErrors"
                 class="input-number"
                 type="number"
                 label="Protein"
@@ -219,7 +219,7 @@
           <v-col cols="11" class="pl-0">
             <v-text-field
                 v-model.number="foodItem.nutrients.FAT"
-                :error-messages="foodNutrientsFATErrors"
+                :error-messages="foodNutrientsFatErrors"
                 class="input-number"
                 type="number"
                 label="Fat"
@@ -268,7 +268,7 @@
       <v-card>
         <v-card-title class="text-h5">Preview Image</v-card-title>
         <v-card-text>
-          <v-img :src="foodItem.image" :lazy-src="foodItem.image" alt="Preview image" title="Preview image" />
+          <v-img v-if="previewImage" :src="foodItem.image" :lazy-src="foodItem.image" alt="Preview image" title="Preview image" />
         </v-card-text>
         <v-divider />
         <v-card-actions>
@@ -283,7 +283,7 @@
 import { mapActions, mapGetters } from "vuex";
 import { required, url, numeric, minValue } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
-import { foodImage, foodNumerics, foodString, hasNotNumerics, hasNotSpecialChars } from "@/utils/validations";
+import { validationRules } from "@/utils/validations";
 
 export default {
   name: "CustomFoodDialog",
@@ -322,9 +322,7 @@ export default {
   validations: {
     foodItem: {
       label: {
-        required,
-        hasNotSpecialChars,
-        hasNotNumerics
+        required
       },
       image: {
         required,
@@ -383,25 +381,25 @@ export default {
       return this.getMealTimes.labels[this.foodItem.mealTime]
     },
     foodLabelErrors() {
-      return foodString(this.$v.foodItem.label, 'Food label')
+      return validationRules(this.$v.foodItem.label, 'Food label', {})
     },
     foodImageErrors() {
-      return foodImage(this.$v.foodItem.image)
+      return validationRules(this.$v.foodItem.image, 'Food image', {})
     },
     foodServingsErrors() {
-      return foodNumerics(this.$v.foodItem.servings, 'Servings', 1)
+      return validationRules(this.$v.foodItem.servings, 'Servings', { minValue: 1 })
     },
-    foodNutrientsCALSErrors() {
-      return foodNumerics(this.$v.foodItem.nutrients.CALS, 'Calories')
+    foodNutrientsCalsErrors() {
+      return validationRules(this.$v.foodItem.nutrients.CALS, 'Calories', {})
     },
-    foodNutrientsCARBSErrors() {
-      return foodNumerics(this.$v.foodItem.nutrients.CARBS, 'Net Carbs')
+    foodNutrientsCarbsErrors() {
+      return validationRules(this.$v.foodItem.nutrients.CARBS, 'Carbs', {})
     },
-    foodNutrientsPROTEINErrors() {
-      return foodNumerics(this.$v.foodItem.nutrients.PROTEIN, 'Protein')
+    foodNutrientsProteinErrors() {
+      return validationRules(this.$v.foodItem.nutrients.PROTEIN, 'Protein', {})
     },
-    foodNutrientsFATErrors() {
-      return foodNumerics(this.$v.foodItem.nutrients.FAT, 'Fat')
+    foodNutrientsFatErrors() {
+      return validationRules(this.$v.foodItem.nutrients.FAT, 'Fat', {})
     }
   },
   methods: {

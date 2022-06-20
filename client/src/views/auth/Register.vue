@@ -70,7 +70,7 @@
                 @input="$v.form.passwordConfirm.$touch()"
             />
           </v-col>
-          <v-col cols="12">
+          <v-col cols="12" md="6" lg="5" xl="3">
             <v-checkbox
                 v-model="acceptedTerms"
                 :error-messages="acceptedTermsErrors"
@@ -125,7 +125,7 @@
 import { required, alpha, minLength, email, sameAs } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
 import { mapActions } from "vuex";
-import { acceptedTermsErrors, emailErrors, firstNameErrors, lastNameErrors, passwordConfirmErrors, passwordErrors, hasNumerics } from "@/utils/validations";
+import { hasNumerics, validationRules } from "@/utils/validations";
 
 export default {
   name: 'Register',
@@ -180,22 +180,22 @@ export default {
   },
   computed: {
     firstNameErrors() {
-      return firstNameErrors(this.$v.form.firstName)
+      return validationRules(this.$v.form.firstName, 'First Name', {})
     },
     lastNameErrors() {
-      return lastNameErrors(this.$v.form.lastName)
+      return validationRules(this.$v.form.lastName, 'Last Name', {})
     },
     emailErrors() {
-      return emailErrors(this.$v.form.email)
+      return validationRules(this.$v.form.email, 'Email', {})
     },
     passwordErrors() {
-      return passwordErrors(this.$v.form.password)
+      return validationRules(this.$v.form.password, 'Password', { minLength: 6, sameAs: 'Passwords must be identical' })
     },
     passwordConfirmErrors() {
-      return passwordConfirmErrors(this.$v.form.passwordConfirm)
+      return validationRules(this.$v.form.passwordConfirm, 'Confirmation password', { minLength: 6, sameAs: 'Passwords must be identical' })
     },
     acceptedTermsErrors() {
-      return acceptedTermsErrors(this.$v.acceptedTerms)
+      return validationRules(this.$v.acceptedTerms, null, { sameAs: 'You don\'t have a choice, you eat it' })
     }
   },
   methods: {

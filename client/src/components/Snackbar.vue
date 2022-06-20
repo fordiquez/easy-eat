@@ -19,15 +19,12 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "Snackbar",
   computed: {
-    ...mapState('notification', ['snackbars']),
-    activeSnackbars() {
-      return this.snackbars.filter(s => s.active && s.createdAt > new Date().getTime() - 5000)
-    }
+    ...mapGetters('notification', ['activeSnackbars']),
   },
 }
 </script>

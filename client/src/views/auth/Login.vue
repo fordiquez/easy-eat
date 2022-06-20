@@ -5,7 +5,7 @@
     <v-form @submit.prevent="submit">
       <v-container fluid>
         <v-row>
-          <v-col cols="12">
+          <v-col :cols="$vuetify.breakpoint.lgAndUp ? 6 : 12">
             <v-text-field
                 v-model="form.email"
                 :error-messages="emailErrors"
@@ -15,7 +15,9 @@
                 @blur="$v.form.email.$touch()"
                 @input="$v.form.email.$touch()" />
           </v-col>
-          <v-col cols="12">
+        </v-row>
+        <v-row>
+          <v-col :cols="$vuetify.breakpoint.lgAndUp ? 6 : 12">
             <v-text-field
                 v-model="form.password"
                 :error-messages="passwordErrors"
@@ -30,17 +32,19 @@
                 @input="$v.form.password.$touch()" />
           </v-col>
         </v-row>
-        <v-card-actions>
-          <v-btn color="success" class="mr-4" :loading="loading" :disabled="loading || $v.form.$anyError" type="submit">
-            <v-icon class="mr-1">mdi-login</v-icon>
-            <span>Log In</span>
-          </v-btn>
-          <v-btn text color="success" :to="{ name: 'Register' }">
-            <v-icon class="mr-1">mdi-account-plus</v-icon>
-            <span>Sign Up</span>
-          </v-btn>
-          <v-spacer />
-          <v-btn text color="red" :to="{ name: 'ForgotPassword' }">
+        <v-card-actions class="d-flex" :class="$vuetify.breakpoint.xsOnly ? 'flex-column' : ''">
+          <div :class="$vuetify.breakpoint.lgAndUp ? 'mr-10' : ''">
+            <v-btn color="success" class="mr-4" :loading="loading" :disabled="loading || $v.form.$anyError" type="submit">
+              <v-icon class="mr-1">mdi-login</v-icon>
+              <span>Log In</span>
+            </v-btn>
+            <v-btn text color="success" :to="{ name: 'Register' }">
+              <v-icon class="mr-1">mdi-account-plus</v-icon>
+              <span>Sign Up</span>
+            </v-btn>
+          </div>
+          <v-spacer v-if="$vuetify.breakpoint.smOnly || $vuetify.breakpoint.mdOnly" />
+          <v-btn text color="red" :to="{ name: 'ForgotPassword' }" :class="$vuetify.breakpoint.xsOnly ? 'mt-5' : ''">
             <v-icon class="mr-1">mdi-lock-reset</v-icon>
             <span>Forgot Password</span>
           </v-btn>
@@ -54,7 +58,7 @@
 import { mapActions } from 'vuex'
 import { validationMixin } from 'vuelidate'
 import { email, required } from 'vuelidate/lib/validators'
-import { emailErrors, passwordErrors } from "@/utils/validations";
+import { validationRules } from "@/utils/validations";
 
 export default {
   name: 'Login',
@@ -81,10 +85,10 @@ export default {
   },
   computed: {
     emailErrors() {
-      return emailErrors(this.$v.form.email)
+      return validationRules(this.$v.form.email, 'Email', {})
     },
     passwordErrors() {
-      return passwordErrors(this.$v.form.password)
+      return validationRules(this.$v.form.password, 'Password', {})
     },
 
   },

@@ -106,11 +106,20 @@
                   />
                 </v-col>
                 <v-col cols="12">
-                  <v-radio-group v-model="editedUser.role" :error-messages="roleErrors" prepend-icon="mdi-account-multiple" dense row>
-                    <span class="mr-2">User role</span>
-                    <v-radio label="User" value="User" @change="$v.editedUser.role.$touch()"></v-radio>
-                    <v-radio label="Admin" value="Admin" @change="$v.editedUser.role.$touch()"></v-radio>
-                  </v-radio-group>
+                  <v-icon class="mr-3">mdi-account-multiple</v-icon>
+                  <label class="text-subtitle-1" :class="$vuetify.breakpoint.smAndUp ? 'mr-3' : ''">Role</label>
+                  <v-btn-toggle v-model="editedUser.role" :class="$vuetify.breakpoint.xsOnly ? 'd-flex justify-center' : ''" mandatory shaped>
+                    <v-btn value="User" text :style="$vuetify.breakpoint.xsOnly ? { width: '50%' } : ''" :color="editedUser.role === 'User' ? 'success' : ''"
+                    >
+                      <v-icon :color="editedUser.role === 'User' ? 'success' : ''">mdi-account</v-icon>
+                      <v-card-text class="text-subtitle-1 text-capitalize">User</v-card-text>
+                    </v-btn>
+                    <v-btn value="Admin" text :style="$vuetify.breakpoint.xsOnly ? { width: '50%' } : ''" :color="editedUser.role === 'Admin' ? 'success' : ''"
+                    >
+                      <v-icon :color="editedUser.role === 'Admin' ? 'success' : ''">mdi-account-lock</v-icon>
+                      <v-card-text class="text-subtitle-1 text-capitalize">Admin</v-card-text>
+                    </v-btn>
+                  </v-btn-toggle>
                 </v-col>
               </v-row>
             </v-container>
@@ -129,15 +138,14 @@
     </v-dialog>
     <v-dialog v-model="isDeleting" max-width="700" @input="onClose">
       <v-card>
-        <v-card-title class="text-h5">{{ deletingTitle }}</v-card-title>
+        <v-card-title class="text-h5 d-flex justify-center">{{ deletingTitle }}</v-card-title>
         <v-card-actions>
-          <v-spacer></v-spacer>
           <v-btn text color="success" @click="onClose">Cancel</v-btn>
+          <v-spacer />
           <v-btn text color="red" @click="onDeleteUserConfirm">
             <v-icon class="mr-1">mdi-account-remove</v-icon>
             <span>Confirm</span>
           </v-btn>
-          <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -148,7 +156,7 @@
 import { mapActions, mapGetters } from "vuex";
 import { alpha, email, minLength, required } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
-import { emailErrors, firstNameErrors, lastNameErrors, roleErrors } from "@/utils/validations";
+import { validationRules } from "@/utils/validations";
 import CreateUser from "@/components/dialogs/CreateUser";
 
 export default {
@@ -225,16 +233,13 @@ export default {
       return 'Delete user account ' + this.editedUser.email + '?'
     },
     firstNameErrors() {
-      return firstNameErrors(this.$v.editedUser.firstName)
+      return validationRules(this.$v.editedUser.firstName, 'First Name', {})
     },
     lastNameErrors() {
-      return lastNameErrors(this.$v.editedUser.lastName)
+      return validationRules(this.$v.editedUser.lastName, 'Last Name', {})
     },
     emailErrors() {
-      return emailErrors(this.$v.editedUser.email)
-    },
-    roleErrors() {
-      return roleErrors(this.$v.editedUser.role)
+      return validationRules(this.$v.editedUser.email, 'Email', {})
     }
   },
   methods: {

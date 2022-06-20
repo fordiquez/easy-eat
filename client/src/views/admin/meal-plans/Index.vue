@@ -25,7 +25,7 @@
               @click="onSearch"
               hide-details
           />
-          <v-btn class="ml-3" color="success" @click="isCreating = dialog = true">
+          <v-btn class="ml-3" color="success" @click="onCreateDialog">
             <v-icon class="mr-1">mdi-file-plus</v-icon>
             <span>Add meal plan</span>
           </v-btn>
@@ -101,7 +101,7 @@
               <v-col :cols="$vuetify.breakpoint.xsOnly ? 10 : 11" class="px-0">
                 <v-text-field
                     v-model.number="editedPlan.proportions.CARBS"
-                    :error-messages="CarbsErrors && proportionsErrors"
+                    :error-messages="carbsErrors"
                     class="input-number"
                     suffix="g"
                     type="number"
@@ -131,7 +131,7 @@
               <v-col :cols="$vuetify.breakpoint.xsOnly ? 10 : 11" class="px-0">
                 <v-text-field
                     v-model.number="editedPlan.proportions.PROTEIN"
-                    :error-messages="ProteinErrors && proportionsErrors"
+                    :error-messages="proteinErrors"
                     class="input-number"
                     suffix="g"
                     type="number"
@@ -161,7 +161,7 @@
               <v-col :cols="$vuetify.breakpoint.xsOnly ? 10 : 11" class="px-0">
                 <v-text-field
                     v-model.number="editedPlan.proportions.FAT"
-                    :error-messages="FatErrors && proportionsErrors"
+                    :error-messages="fatErrors"
                     class="input-number"
                     suffix="g"
                     type="number"
@@ -185,6 +185,11 @@
                   </template>
                 </v-text-field>
               </v-col>
+              <v-col class="d-flex justify-center">
+                <v-chip :color="proportionsTotal === 99 || proportionsTotal === 100 ? 'success' : 'red'">
+                  The total proportions of macronutrients: {{ proportionsTotal }} %
+                </v-chip>
+              </v-col>
             </v-row>
           </v-container>
         </v-card-text>
@@ -192,11 +197,11 @@
         <v-card-actions>
           <v-btn text color="success" @click="onClose">Cancel</v-btn>
           <v-spacer />
-          <v-btn v-if="isCreating" color="success" :disabled="$v.$anyError || loading" :loading="loading" @click="onCreate">
+          <v-btn v-if="isCreating" color="success" :disabled="$v.$anyError || loading || proportionsErrors !== false" :loading="loading" @click="onCreate">
             <v-icon class="mr-1" small>mdi-file-document-edit</v-icon>
             <span>Create</span>
           </v-btn>
-          <v-btn v-else color="success" :disabled="$v.$anyError || loading" :loading="loading" @click="onUpdate">
+          <v-btn v-else color="success" :disabled="$v.$anyError || loading || proportionsErrors !== false" :loading="loading" @click="onUpdate">
             <v-icon class="mr-1" small>mdi-file-remove</v-icon>
             <span>Update</span>
           </v-btn>
@@ -205,15 +210,14 @@
     </v-dialog>
     <v-dialog v-model="isDeleting" max-width="500" @input="onClose">
       <v-card>
-        <v-card-title class="text-h5">{{ dialogTitle }}</v-card-title>
+        <v-card-title class="text-h5 d-flex justify-center">{{ dialogTitle }}</v-card-title>
         <v-card-actions>
-          <v-spacer></v-spacer>
           <v-btn text color="success" @click="onClose">Cancel</v-btn>
+          <v-spacer />
           <v-btn text color="red" :disabled="loading" :loading="loading" @click="onDeleteConfirm">
             <v-icon class="mr-1" small>mdi-file-remove</v-icon>
             <span>Confirm</span>
           </v-btn>
-          <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -222,9 +226,9 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import { required, numeric } from "vuelidate/lib/validators";
+import { required, numeric, maxValue } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
-import {proportions, validationRules} from "@/utils/validations";
+import { validationRules } from "@/utils/validations";
 
 export default {
   name: 'MealPlans',
@@ -251,15 +255,17 @@ export default {
       { text: 'Actions', value: 'actions', sortable: false }
     ],
     editedIndex: -1,
-    editedPlan: null
+    editedPlan: {}
   }),
   created() {
     this.loading = true
     this.editedPlan = Object.assign({}, this.defaultPlan)
-    this.getAll().catch(error => {
-      console.log(error.response)
-      this.setSnackbar({ color: 'error', text: error.response.data.message })
-    }).finally(() => this.loading = false)
+    this.getById(this.user.id).then(() => {
+      this.getAll().catch(error => {
+        console.log(error.response)
+        this.setSnackbar({ color: 'error', text: error.response.data.message })
+      }).finally(() => this.loading = false)
+    })
   },
   validations: {
     editedPlan: {
@@ -267,18 +273,20 @@ export default {
         required
       },
       proportions: {
-        proportions,
         CARBS: {
           required,
-          numeric
+          numeric,
+          maxValue: maxValue(100)
         },
         PROTEIN: {
           required,
-          numeric
+          numeric,
+          maxValue: maxValue(100)
         },
         FAT: {
           required,
-          numeric
+          numeric,
+          maxValue: maxValue(100)
         }
       }
     }
@@ -286,46 +294,53 @@ export default {
   computed: {
     ...mapGetters('mealPlan', ['getPlans']),
     dialogTitle() {
-      return this.isCreating ? 'Creating new Meal Plan' : this.isEditing ? 'Editing meal plan: ' + this.getPlans[this.editedIndex].title : this.isDeleting ? 'Delete meal plan: ' + this.editedPlan.title + '?' : null
+      return this.isCreating ? 'Creating new Meal Plan' : this.isEditing ? `Editing ${this.getPlans[this.editedIndex].title} meal plan` : this.isDeleting ? `Delete ${this.editedPlan.title} meal plan?` : null
     },
-    defaultPlan() {
-      return {
-        title: '',
-        proportions: {
-          CARBS: null,
-          PROTEIN: null,
-          FAT: null
-        }
+    defaultPlan: () => ({
+      title: '',
+      proportions: {
+        CARBS: null,
+        PROTEIN: null,
+        FAT: null
       }
-    },
+    }),
     titleErrors() {
-      return validationRules(this.$v.editedPlan.title, 'Title')
+      return validationRules(this.$v.editedPlan.title, 'Title', {})
     },
-    CarbsErrors() {
-      return validationRules(this.$v.editedPlan.proportions.CARBS, 'CARBS')
+    carbsErrors() {
+      return validationRules(this.$v.editedPlan.proportions.CARBS, 'Net Carbs', { maxValue: 100 })
     },
-    ProteinErrors() {
-      return validationRules(this.$v.editedPlan.proportions.PROTEIN, 'PROTEIN')
+    proteinErrors() {
+      return validationRules(this.$v.editedPlan.proportions.PROTEIN, 'Protein', { maxValue: 100 })
     },
-    FatErrors() {
-      return validationRules(this.$v.editedPlan.proportions.FAT, 'FAT')
+    fatErrors() {
+      return validationRules(this.$v.editedPlan.proportions.FAT, 'Fat', { maxValue: 100 })
+    },
+    proportionsTotal() {
+      return parseInt(this.editedPlan.proportions.CARBS + this.editedPlan.proportions.PROTEIN + this.editedPlan.proportions.FAT)
     },
     proportionsErrors() {
-      return proportions(this.editedPlan.proportions)
+      return this.proportionsTotal === 100 || this.proportionsTotal === 99 ? false : 'Macronutrient proportions total must equal 99 or 100'
     }
   },
   methods: {
     ...mapActions('notification', ['setSnackbar']),
+    ...mapActions('account', ['getById']),
     ...mapActions('mealPlan', ['getAll', 'create', 'update', 'delete']),
     onEditDialog(item) {
       this.editedIndex = this.getPlans.indexOf(item)
       this.editedPlan = Object.assign({}, item)
+      this.editedPlan.proportions = Object.assign({}, item.proportions)
       this.dialog = this.isEditing = true
     },
     onDeleteDialog(item) {
       this.editedIndex = this.getPlans.indexOf(item)
       this.editedPlan = Object.assign({}, item)
       this.isDeleting = true
+    },
+    onCreateDialog() {
+      this.editedPlan.proportions = Object.assign({}, this.defaultPlan.proportions)
+      this.isCreating = this.dialog = true
     },
     onClose() {
       this.dialog = this.isCreating = this.isEditing = this.isDeleting = false
@@ -337,7 +352,8 @@ export default {
     },
     onCreate() {
       this.$v.$touch()
-      if (!this.$v.$invalid) {
+      if (this.proportionsErrors) this.setSnackbar({ color: 'error', text: this.proportionsErrors })
+      if (!this.$v.$invalid && !this.proportionsErrors) {
         this.loading = true
         this.create(this.editedPlan).then(response => {
           console.log(response)
@@ -351,7 +367,8 @@ export default {
     },
     onUpdate() {
       this.$v.$touch()
-      if (!this.$v.$invalid) {
+      if (this.proportionsErrors) this.setSnackbar({ color: 'error', text: this.proportionsErrors })
+      if (!this.$v.$invalid && !this.proportionsErrors) {
         this.loading = true
         this.update(this.editedPlan).then(response => {
           console.log(response)
@@ -388,9 +405,7 @@ export default {
     },
   },
   watch: {
-    dialog(value) {
-      if (!value) this.editedPlan.title = this.editedPlan.proportions.CARBS = this.editedPlan.proportions.PROTEIN = this.editedPlan.proportions.FAT = null
-    }
+
   }
 }
 </script>

@@ -50,9 +50,9 @@
 
 <script>
 import { email, required } from "vuelidate/lib/validators";
-import { emailErrors, passwordErrors } from "@/utils/validations";
 import { validationMixin } from "vuelidate";
 import { mapActions } from "vuex";
+import { validationRules } from "@/utils/validations";
 
 export default {
   name: "UpdateEmailDialog",
@@ -95,10 +95,10 @@ export default {
   },
   computed: {
     emailErrors() {
-      return emailErrors(this.$v.updatedAccount.email)
+      return validationRules(this.$v.updatedAccount.email, 'Email', {})
     },
     passwordErrors() {
-      return passwordErrors(this.$v.updatedAccount.password)
+      return validationRules(this.$v.updatedAccount.password, 'Password', {})
     },
   },
   methods: {

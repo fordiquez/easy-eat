@@ -15,7 +15,7 @@
 
         <v-list-item-content class="py-0">
           <v-list-item-title :style="style">{{ mealPlan.proportions.CARBS }} %</v-list-item-title>
-          <v-list-item-subtitle>Carbs</v-list-item-subtitle>
+          <v-list-item-subtitle>Net Carbs</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
 

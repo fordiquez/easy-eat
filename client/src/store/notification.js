@@ -6,12 +6,16 @@ const state = () => ({
 });
 
 const getters = {
-  activeSnackbars: state => state.snackbars
+  activeAlerts: state => state.alerts.filter(alert => alert.active && alert.createdAt > new Date().getTime() - alert.timeout),
+  activeSnackbars: state => state.snackbars.filter(snackbar => snackbar.active && snackbar.createdAt > new Date().getTime() - snackbar.timeout)
 }
 
 const actions = {
   setAlert: ({ commit }, alert) => {
+    alert.id = uuidv4()
     alert.active = true
+    alert.timeout = alert.timeout || 10000
+    alert.createdAt = new Date().getTime()
     commit('SET_ALERT', alert)
   },
   setSnackbar: ({ commit }, snackbar) => {

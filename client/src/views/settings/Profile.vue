@@ -98,11 +98,11 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field v-model="birthdayDate" label="Birthday date" :error-messages="birthdayDateErrors" v-bind="attrs" v-on="on" readonly>
                 <template v-slot:prepend>
-                  <v-icon>mdi-calendar</v-icon>
+                  <v-icon color="success">mdi-calendar</v-icon>
                 </template>
               </v-text-field>
             </template>
-            <v-date-picker v-model="birthdayDate" :active-picker.sync="activePicker" :max="maxDate" scrollable @change="updateBirthdayDate" />
+            <v-date-picker v-model="birthdayDate" color="success" :active-picker.sync="activePicker" :max="maxDate" scrollable @change="updateBirthdayDate" />
           </v-menu>
         </v-col>
       </v-row>
@@ -241,9 +241,9 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import { alpha, minLength, required, minValue, maxValue } from "vuelidate/lib/validators";
+import { alpha, minLength, required, numeric, minValue, maxValue } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
-import { birthdayDateErrors, firstNameErrors, hasNumerics, lastNameErrors, numericErrors, rangeDate } from "@/utils/validations";
+import { rangeDate, validationRules } from "@/utils/validations";
 import { accountService } from "@/services";
 import moment from "moment";
 
@@ -293,6 +293,7 @@ export default {
     this.status = 'Loading...'
     this.profile = this.user
     if (this.profile.avatar?.id && this.profile.avatar?.filename) this.avatar = true
+    this.avatarPath += `/${this.profile.id}`
     this.getUserDataById(this.profile.id).then(() => {
       this.getUserData.subscribe(userData => this.userData = userData)
       if (this.userData?.birthdayDate) this.birthdayDate = moment(this.userData.birthdayDate).format('YYYY-MM-DD')
@@ -310,7 +311,6 @@ export default {
         this.setSnackbar({ color: 'error', text: error.response.data.message })
       }
     }).finally(() => this.status = null)
-    this.avatarPath += `/${this.profile.id}`
   },
   validations: {
     fullName: {
@@ -330,12 +330,12 @@ export default {
         rangeDate
       },
       currentWeight: {
-        hasNumerics,
+        numeric,
         minValue: minValue(25),
         maxValue: maxValue(300)
       },
       height: {
-        hasNumerics,
+        numeric,
         minValue: minValue(90),
         maxValue: maxValue(250)
       },
@@ -344,22 +344,23 @@ export default {
   computed: {
     ...mapGetters('userData', ['getUserData', 'getActivities']),
     firstNameErrors() {
-      return firstNameErrors(this.$v.fullName.firstName)
+      return validationRules(this.$v.fullName.firstName, 'First Name', {})
     },
     lastNameErrors() {
-      return lastNameErrors(this.$v.fullName.lastName)
+      return validationRules(this.$v.fullName.lastName, 'Last Name', {})
     },
     maxDate() {
       return (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().slice(0, 10)
     },
     birthdayDateErrors() {
-      return birthdayDateErrors(this.$v.userData.birthdayDate, [new Date('1922-02-22').toISOString().slice(0, 10), this.maxDate])
+      const range = [new Date('1922-02-22').toISOString().slice(0, 10), this.maxDate]
+      return validationRules(this.$v.userData.birthdayDate, 'Birthday date', { range })
     },
     weightErrors() {
-      return numericErrors(this.$v.userData.currentWeight, 'currentWeight', [25, 300])
+      return validationRules(this.$v.userData.currentWeight, 'Current weight', { minValue: 25, maxValue: 300 })
     },
     heightErrors() {
-      return numericErrors(this.$v.userData.height, 'height', [90, 250])
+      return validationRules(this.$v.userData.height, 'Height', {  minValue: 90, maxValue: 240 })
     },
     activityIndex() {
       return this.getActivities.labels.findIndex(activity => activity === this.userData.activityLevel)
