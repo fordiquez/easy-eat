@@ -185,6 +185,9 @@ export default {
       default: null
     }
   },
+  metaInfo: {
+    title: 'Daily Log'
+  },
   data: () => ({
     fab: false,
     date: null,

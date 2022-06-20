@@ -32,23 +32,27 @@
                 @input="$v.form.password.$touch()" />
           </v-col>
         </v-row>
-        <v-card-actions class="d-flex" :class="$vuetify.breakpoint.xsOnly ? 'flex-column' : ''">
-          <div :class="$vuetify.breakpoint.lgAndUp ? 'mr-10' : ''">
-            <v-btn color="success" class="mr-4" :loading="loading" :disabled="loading || $v.form.$anyError" type="submit">
-              <v-icon class="mr-1">mdi-login</v-icon>
-              <span>Log In</span>
-            </v-btn>
-            <v-btn text color="success" :to="{ name: 'Register' }">
-              <v-icon class="mr-1">mdi-account-plus</v-icon>
-              <span>Sign Up</span>
-            </v-btn>
-          </div>
-          <v-spacer v-if="$vuetify.breakpoint.smOnly || $vuetify.breakpoint.mdOnly" />
-          <v-btn text color="red" :to="{ name: 'ForgotPassword' }" :class="$vuetify.breakpoint.xsOnly ? 'mt-5' : ''">
-            <v-icon class="mr-1">mdi-lock-reset</v-icon>
-            <span>Forgot Password</span>
-          </v-btn>
-        </v-card-actions>
+        <v-row>
+          <v-col :cols="$vuetify.breakpoint.lgAndUp ? 6 : 12">
+            <v-card-actions class="d-flex" :class="$vuetify.breakpoint.xsOnly ? 'flex-column' : ''">
+              <div>
+                <v-btn color="success" :class="$vuetify.breakpoint.xsOnly ? '' : 'mr-5'" :loading="loading" :disabled="loading || $v.form.$anyError" type="submit">
+                  <v-icon class="mr-1">mdi-login</v-icon>
+                  <span>Log In</span>
+                </v-btn>
+                <v-btn text color="success" :to="{ name: 'Register' }">
+                  <v-icon class="mr-1">mdi-account-plus</v-icon>
+                  <span>Sign Up</span>
+                </v-btn>
+              </div>
+              <v-spacer />
+              <v-btn text color="red" :to="{ name: 'ForgotPassword' }" :class="$vuetify.breakpoint.xsOnly ? 'mt-5' : ''">
+                <v-icon class="mr-1">mdi-lock-reset</v-icon>
+                <span>Forgot Password</span>
+              </v-btn>
+            </v-card-actions>
+          </v-col>
+        </v-row>
       </v-container>
     </v-form>
   </v-card>
@@ -63,6 +67,9 @@ import { validationRules } from "@/utils/validations";
 export default {
   name: 'Login',
   mixins: [ validationMixin ],
+  metaInfo: {
+    title: 'Log In'
+  },
   data: () => ({
     form: {
       email: '',

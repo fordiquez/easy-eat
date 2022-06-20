@@ -209,6 +209,9 @@ export default {
       default: null
     }
   },
+  metaInfo: {
+    title: 'Onboarding'
+  },
   data: () => ({
     step: 1,
     steps: 6,

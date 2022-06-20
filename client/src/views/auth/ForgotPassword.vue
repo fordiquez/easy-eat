@@ -5,7 +5,7 @@
     <v-form ref="form" @submit.prevent="submit">
       <v-container fluid>
         <v-row>
-          <v-col cols="12">
+          <v-col :cols="$vuetify.breakpoint.lgAndUp ? 6 : 12">
             <v-text-field
                 v-model="email"
                 :error-messages="emailErrors"
@@ -16,14 +16,18 @@
                 @input="$v.email.$touch()" />
           </v-col>
         </v-row>
-        <v-card-actions>
-          <v-btn color="success" :loading="loading" :disabled="loading || $v.email.$anyError" type="submit">
-            <v-icon class="mr-1">mdi-lock-reset</v-icon>
-            <span>Reset Password</span>
-          </v-btn>
-          <v-spacer />
-          <v-btn text color="success" :to="{ name: 'Login' }">Cancel</v-btn>
-        </v-card-actions>
+        <v-row>
+          <v-col :cols="$vuetify.breakpoint.lgAndUp ? 6 : 12">
+            <v-card-actions>
+              <v-btn color="success" :loading="loading" :disabled="loading || $v.email.$anyError" type="submit">
+                <v-icon class="mr-1">mdi-lock-reset</v-icon>
+                <span>Reset Password</span>
+              </v-btn>
+              <v-spacer />
+              <v-btn text color="success" :to="{ name: 'Login' }">Cancel</v-btn>
+            </v-card-actions>
+          </v-col>
+        </v-row>
       </v-container>
     </v-form>
   </v-card>
@@ -38,6 +42,9 @@ import { validationRules } from "@/utils/validations";
 export default {
   name: "ForgotPassword",
   mixins: [ validationMixin ],
+  metaInfo: {
+    title: 'Account recovery'
+  },
   data: () => ({
     email: '',
     loading: false

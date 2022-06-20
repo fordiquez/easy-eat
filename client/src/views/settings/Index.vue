@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-toolbar color="success">
-      <v-toolbar-title>My Settings</v-toolbar-title>
+      <v-toolbar-title>Account</v-toolbar-title>
     </v-toolbar>
     <v-tabs grow show-arrows>
       <v-tab :to="{ name: 'Profile' }">

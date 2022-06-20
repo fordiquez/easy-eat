@@ -224,6 +224,9 @@ export default {
       default: null
     },
   },
+  metaInfo: {
+    title: 'Meal Plan'
+  },
   data: () => ({
     mealGoals: [
       {

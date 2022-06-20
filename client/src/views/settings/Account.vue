@@ -96,6 +96,9 @@ export default {
       default: null
     }
   },
+  metaInfo: {
+    title: 'App Settings'
+  },
   data: () => ({
     account: null,
     deleteDialog: false,

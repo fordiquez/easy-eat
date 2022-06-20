@@ -21,6 +21,9 @@ import { mapActions } from "vuex";
 
 export default {
   name: "VerifyEmail",
+  metaInfo: {
+    title: 'Verify Email'
+  },
   data: () => ({
     loading: false,
     error: false
@@ -30,11 +33,8 @@ export default {
     this.verify(token)
   },
   methods: {
-    ...mapActions({
-      verifyEmail: 'account/verifyEmail',
-      setAlert: 'notification/setAlert',
-      setSnackbar: 'notification/setSnackbar'
-    }),
+    ...mapActions('account', ['verifyEmail']),
+    ...mapActions('notification', ['setAlert', 'setSnackbar']),
     verify(token) {
       if (token) {
         this.$router.replace(location.pathname).then(() => {

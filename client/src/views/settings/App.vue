@@ -74,6 +74,9 @@ export default {
       default: null
     }
   },
+  metaInfo: {
+    title: 'App Settings'
+  },
   data: () => ({
     app: null,
     application: null,

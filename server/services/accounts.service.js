@@ -4,13 +4,10 @@ const bcrypt = require('bcryptjs');
 const db = require('utils/db');
 const logger = require("utils/logger");
 const Role = require('utils/role');
-const { sendAlreadyRegisteredEmail, sendVerificationEmail, sendPasswordResetEmail } = require('utils/email');
+const { sendVerificationEmail, sendPasswordResetEmail } = require('utils/email');
 
 const register = async (params, origin) => {
-  if (await db.Account.findOne({ email: params.email })) {
-    await sendAlreadyRegisteredEmail(params.email, origin);
-    throw 'Account with such email has already been registered'
-  }
+  if (await db.Account.findOne({ email: params.email })) throw 'Account with such email has already been registered'
   const account = new db.Account(params);
 
   const isFirstAccount = (await db.Account.countDocuments({})) === 0;
@@ -20,8 +17,18 @@ const register = async (params, origin) => {
   account.passwordHash = hash(params.password);
 
   await account.save();
+  console.log(origin)
 
-  await sendVerificationEmail(account, origin);
+  const emailOptions = {
+    email: params.email,
+    origin,
+    subject: 'EasyEat — Email Verification',
+    title: 'Account has been successfully registered',
+    linkText: 'Click to verify email',
+    verificationToken: account.verificationToken
+  }
+
+  await sendVerificationEmail(emailOptions);
   const messages = {
     success: `Congratulations, ${params.firstName}! Your account has been successfully registered`,
     info: `Please check your email ${params.email} to verify the account`
@@ -62,7 +69,15 @@ const forgotPassword = async ({ email }, origin) => {
   await account.save();
 
   // send email
-  await sendPasswordResetEmail(account, origin);
+  const emailOptions = {
+    email,
+    origin,
+    subject: 'EasyEat — Reset Password',
+    title: 'Reset account password',
+    linkText: 'Click to reset password',
+    resetToken: account.resetToken.token
+  }
+  await sendPasswordResetEmail(emailOptions);
 
   return {
     message: 'Please check your email for password reset instructions'

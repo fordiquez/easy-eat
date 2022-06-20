@@ -13,10 +13,7 @@
       <v-row class="d-flex justify-start align-center flex-column flex-sm-row">
         <v-col cols="12" sm="3" lg="2" class="d-flex justify-center">
           <v-avatar size="150">
-            <v-img v-if="avatar" :src="avatarPath" :lazy-src="avatarPath"
-                   :alt="profile.firstName + ' ' + profile.lastName"
-                   :title="profile.firstName + ' ' + profile.lastName"
-            />
+            <v-img v-if="avatar" :src="avatarPath" :lazy-src="avatarPath" :alt="imgFullName" :title="imgFullName" />
             <v-icon v-else color="success" size="100">mdi-account-circle</v-icon>
           </v-avatar>
         </v-col>
@@ -240,7 +237,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import { alpha, minLength, required, numeric, minValue, maxValue } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
 import { rangeDate, validationRules } from "@/utils/validations";
@@ -255,6 +252,9 @@ export default {
       type: Object,
       default: null
     }
+  },
+  metaInfo: {
+    title: 'Profile Settings'
   },
   data: () => ({
     fullName: {
@@ -365,6 +365,9 @@ export default {
     activityIndex() {
       return this.getActivities.labels.findIndex(activity => activity === this.userData.activityLevel)
     },
+    imgFullName() {
+      return this.profile.firstName + ' ' + this.profile.lastName
+    }
   },
   methods: {
     ...mapActions({
@@ -374,6 +377,7 @@ export default {
       accountUpdate: 'account/update',
       setSnackbar: 'notification/setSnackbar'
     }),
+    ...mapMutations('account', ['SET_USER']),
     selectImage(image) {
       this.currentImage = image
       image ? this.previewImageUrl = URL.createObjectURL(this.currentImage) : this.previewImageUrl = null
@@ -387,8 +391,10 @@ export default {
         this.progress = Math.round((100 * event.loaded) / event.total)
       }).then(response => {
         console.log(response)
+        this.profile.avatar.filename = response.data.avatar.filename
+        this.SET_USER(this.profile)
         this.avatar = true
-        this.avatarPath = `${process.env.VUE_APP_BASE_API_URL}${process.env.VUE_APP_ACCOUNT_AVATAR_PATH}/${this.profile.id}/${response.data.avatar.filename}`
+        this.avatarPath = `${process.env.VUE_APP_BASE_API_URL}${process.env.VUE_APP_ACCOUNT_AVATAR_PATH}/${this.profile.id}/${this.profile.avatar.filename}`
         this.setSnackbar({ color: 'success', text: response.data.message })
         this.previewImageUrl = null
         this.$refs.avatar.reset()

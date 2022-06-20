@@ -1,6 +1,7 @@
 <template>
   <v-card :loading="loading" rounded>
     <v-card-title>Reset password</v-card-title>
+    <v-card-subtitle class="pb-0">Please create a new password for your account</v-card-subtitle>
     <v-form v-if="tokenStatus" ref="form" @submit.prevent="submit">
       <v-container fluid>
         <v-row>
@@ -20,6 +21,8 @@
                 @input="$v.form.password.$touch()"
             />
           </v-col>
+        </v-row>
+        <v-row>
           <v-col cols="12" sm="6">
             <v-text-field
                 v-model="form.passwordConfirm"
@@ -37,14 +40,18 @@
             />
           </v-col>
         </v-row>
-        <v-card-actions>
-          <v-btn color="success" type="submit" :loading="loading" :disabled="loading">
-            <v-icon class="mr-1">mdi-lock-reset</v-icon>
-            <span>Reset Password</span>
-          </v-btn>
-          <v-spacer />
-          <v-btn text color="success" :to="{ name: 'Login' }">Cancel</v-btn>
-        </v-card-actions>
+        <v-row>
+          <v-col cols="12" sm="6">
+            <v-card-actions>
+              <v-btn color="success" type="submit" :loading="loading" :disabled="loading">
+                <v-icon class="mr-1">mdi-lock-reset</v-icon>
+                <span>Reset Password</span>
+              </v-btn>
+              <v-spacer />
+              <v-btn text color="success" :to="{ name: 'Login' }">Cancel</v-btn>
+            </v-card-actions>
+          </v-col>
+        </v-row>
       </v-container>
     </v-form>
     <template v-else>
@@ -73,6 +80,9 @@ import { hasNumerics, validationRules } from "@/utils/validations";
 export default {
   name: "ResetPassword",
   mixins: [ validationMixin ],
+  metaInfo: {
+    title: 'Reset Password'
+  },
   data: () => ({
     tokenStatus: false,
     visibility: false,

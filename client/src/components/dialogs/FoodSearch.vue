@@ -83,6 +83,7 @@
       </v-card-text>
       <v-card-actions v-if="getCurrentPageFood.length" class="d-flex" :class="$vuetify.breakpoint.xsOnly ? 'flex-column' : 'justify-space-between'">
         <span class="text-subtitle-2">Showing {{ firstFoodItem }}-{{ lastFoodItem }} of {{ getFoundFood.length }}</span>
+        <v-img v-if="$vuetify.breakpoint.mdAndUp" :src="require('@/assets/Edamam_Badge.svg')" :lazy-src="require('@/assets/Edamam_Badge.svg')" max-width="220" />
         <v-pagination v-model="currentPage" :length="getLinks.length" :total-visible="totalVisible" style="user-select: none" @input="updateCurrentPage" />
       </v-card-actions>
     </v-card>
@@ -274,11 +275,12 @@ export default {
       return this.getFoundFood.findIndex(item => item.food.foodId === this.getCurrentPageFood[this.getCurrentPageFood.length - 1].food.foodId) + 1
     },
     totalVisible() {
-      return this.$vuetify.breakpoint.xsOnly ? 3 : this.$vuetify.breakpoint.mdAndUp ? 8 : 6
+      return this.$vuetify.breakpoint.xsOnly ? 3 : this.$vuetify.breakpoint.mdAndUp ? 6 : 5
     }
   },
   methods: {
     ...mapActions('food', ['searchParser', 'searchNextPage', 'selectedMealTime', 'setCurrentPage']),
+    ...mapActions('notification', ['setSnackbar']),
     onFoodSearch() {
       if (this.ingr.length >= 3) {
         const params = {}
@@ -287,10 +289,12 @@ export default {
         if (this.categories.length) params.category = this.categories.map(index => this.getCategories[index].value)
         if (this.healthLabels.length) params.healthLabels = this.healthLabels
         if (this.caloriesRange[0] !== 0 || this.caloriesRange[1] !== 1000) params.calories = `${this.caloriesRange[0]}-${this.caloriesRange[1]}`
+        this.updateCurrentPage(1)
         this.loading = true
         console.log(params)
         this.searchParser(params).catch(error => {
           console.log(error.response)
+          this.setSnackbar({ color: 'error', text: error.response.data.message })
         }).finally(() => this.loading = false)
       }
     },

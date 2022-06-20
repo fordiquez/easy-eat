@@ -171,6 +171,9 @@ export default {
       default: null
     }
   },
+  metaInfo: {
+    title: 'Users | Admin Panel'
+  },
   data: () => ({
     search: '',
     loading: false,

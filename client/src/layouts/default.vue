@@ -23,6 +23,7 @@
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
+        <v-divider v-if="isAdminRole" />
         <v-list-group v-if="isAdminRole" prepend-icon="mdi-account-cowboy-hat" :value="isActiveAdminRoute">
           <template v-slot:activator>
             <v-list-item-content>
@@ -38,12 +39,9 @@
           </v-list-group>
       </v-list>
       <template v-slot:append>
-        <v-flex v-if="user" class="d-flex flex-column align-center justify-center">
+        <v-flex v-if="user && !application.miniVariant" class="d-flex flex-column align-center justify-center">
           <v-avatar size="150">
-            <v-img v-if="avatarPath" :src="avatarPath" :lazy-src="avatarPath"
-                   :alt="user.firstName + ' ' + user.lastName"
-                   :title="user.firstName + ' ' + user.lastName"
-            />
+            <v-img v-if="avatarPath" :src="avatarPath" :lazy-src="avatarPath" :alt="fullName" :title="fullName" />
             <v-icon v-else color="success" size="100">mdi-account-circle</v-icon>
           </v-avatar>
           <v-card-title class="text-button py-2">{{ user.firstName }} {{ user.lastName }}</v-card-title>
@@ -179,8 +177,14 @@ export default {
     isActiveAdminRoute() {
       return this.$route.meta.authorized?.includes('Admin')
     },
+    avatar() {
+      return this.user?.avatar?.filename
+    },
     avatarPath() {
-      return this.user?.avatar?.filename ? `${process.env.VUE_APP_BASE_API_URL}${process.env.VUE_APP_ACCOUNT_AVATAR_PATH}/${this.user.id}` : null
+      return this.user?.avatar?.filename ? `${process.env.VUE_APP_BASE_API_URL}${process.env.VUE_APP_ACCOUNT_AVATAR_PATH}/${this.user.id}/${this.user.avatar.filename}` : null
+    },
+    fullName() {
+      return this.user?.firstName + ' ' + this.user?.lastName
     }
   },
   methods: {

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Meta from 'vue-meta'
 import { getToken, getUser, isAuthorized } from "@/utils/storage"
 import { Role } from "@/utils/role"
 import Auth from "@/views/auth/Index"
@@ -23,6 +24,9 @@ import MealPlan from "@/views/onboarding/MealPlan"
 import store from '@/store/index'
 
 Vue.use(VueRouter)
+Vue.use(Meta, {
+  refreshOnceOnNavigation: true
+})
 
 const routes = [
   {

@@ -130,6 +130,9 @@ import { hasNumerics, validationRules } from "@/utils/validations";
 export default {
   name: 'Register',
   mixins: [ validationMixin ],
+  metaInfo: {
+    title: 'Sign Up'
+  },
   data: () => ({
     form: {
       firstName: '',

@@ -232,6 +232,9 @@ import { validationRules } from "@/utils/validations";
 
 export default {
   name: 'MealPlans',
+  metaInfo: {
+    title: 'Meal Plans | Admin Panel'
+  },
   mixins: [ validationMixin ],
   props: {
     user: {

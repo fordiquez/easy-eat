@@ -72,7 +72,10 @@ import { mapActions } from "vuex";
 import { mealPlanService } from "@/services";
 
 export default {
-  name: "MealPlanShow",
+  name: "MealPlanView",
+  metaInfo: {
+    title: 'Meal Plan View | Admin Panel'
+  },
   data: () => ({
     mealPlan: null,
     loading: false,

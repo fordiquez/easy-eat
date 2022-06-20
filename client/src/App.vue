@@ -9,6 +9,9 @@ import DefaultLayout from "@/layouts/default"
 export default {
   name: 'app',
   components: { DefaultLayout },
+  metaInfo: {
+    titleTemplate: '%s – EasyEat'
+  },
   data: () => ({
     user: null
   }),
